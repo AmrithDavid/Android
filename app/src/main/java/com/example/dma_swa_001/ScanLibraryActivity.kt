@@ -33,17 +33,25 @@ import com.example.dma_swa_001.ui.theme.Dmaswa001Theme
 
 // MainActivity class - entry point of the app
 class MainActivity : ComponentActivity() {
+    // This declaration and call of onCreate followed by this call works together by first overriding to allow customisation and pass activity's previous state if any as a parameter
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Calling the default super class implementation of onCreate provides the necessary setup
         super.onCreate(savedInstanceState)
+
+        // Enable edge-to-edge display
         enableEdgeToEdge()
-        setContent {
-            Dmaswa001Theme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = { TopNavigationBar() },
-                    containerColor = Color(0xFFFFFFFF)
-                ) { innerPadding ->
-                    CardList(modifier = Modifier.padding(innerPadding))
+
+        // Set the content using Jetpack Compose. Main layout consists of Scaffold with a topnavbar + cardlist
+        setContent { // Function to define UI
+            Dmaswa001Theme { // Theme
+                Scaffold( // Composable that implements the layout structure
+                    modifier = Modifier.fillMaxSize(), // Scaffold fills screen
+                    topBar = { TopNavigationBar() }, // top app bar set as definition in TopNavigationBar
+                    containerColor = Color(0xFFFFFFFF) // Background colour is white
+                    // innerPadding and CardList are still parameters even though they are not in parameter list - trailing lambda syntax (function like structure)
+                ) { innerPadding -> // contains amount of space taken up by system UI (status bar). not defined explicity scaffold knows already.
+                    // Display a list of cards with padding
+                    CardList(modifier = Modifier.padding(innerPadding)) //  applying the padding to cardlist so that it doesnt overlap with other elements in the scaffold (topnavbar)
                 }
             }
         }
@@ -174,15 +182,16 @@ fun TopNavigationBar() {
     }
 }
 
+// Custom Composable to create a list of empty cards
 @Composable
-fun CardList(modifier: Modifier = Modifier) {
+fun CardList(modifier: Modifier = Modifier) { //standard way of defining custom composables.func accepts parameter modifier of type Modifier and if no argument provided when calling func default to empty Modifier object
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier, // passes modifier from cardlist to lazycolumn
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(4) {
-            EmptyCard(patientName = "Sam Kellahan") // Example patient name
+            EmptyCard(patientName = "John Doe") // Example patient name
         }
     }
 }
@@ -201,7 +210,8 @@ fun EmptyCard(patientName: String = "Patient Name") {
     )
     val buttonColor = Color(0xFF2E3176)
     val titleColor = Color(0xFF1D1D1F)
-    val subheadingColor = Color(0xFF606066)  // New color for patient name
+    val subheadingColor = Color(0xFF606066)  // Color for patient name
+    val dividerColor = Color(0xFFD1D1DB)  // Color for the divider line
 
     Card(
         modifier = Modifier
@@ -220,47 +230,69 @@ fun EmptyCard(patientName: String = "Patient Name") {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(top = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 2.dp)
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.width(100.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.width(84.dp))
+                        Text(
+                            text = "Study Description",
+                            style = TextStyle(
+                                fontFamily = plusJakartaSans,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 18.sp,
+                                lineHeight = 26.sp,
+                                letterSpacing = 0.sp,
+                                color = titleColor
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Study Description",
+                        text = patientName,
                         style = TextStyle(
                             fontFamily = plusJakartaSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 18.sp,
-                            lineHeight = 26.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
                             letterSpacing = 0.sp,
-                            color = titleColor
-                        )
+                            color = subheadingColor
+                        ),
+                        modifier = Modifier.padding(start = 84.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = patientName,
-                    style = TextStyle(
-                        fontFamily = plusJakartaSans,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        letterSpacing = 0.sp,
-                        color = subheadingColor
-                    ),
-                    modifier = Modifier.padding(start = 100.dp)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_more),
+                    contentDescription = "More options",
+                    tint = buttonColor,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
+            // Adjusted: Divider line extending to the edges, 10dp below patient name
+            Spacer(modifier = Modifier.height(10.dp))
+            Divider(
+                color = dividerColor,
+                thickness = 1.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 100.dp, end = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.weight(1f)) // Push buttons to the bottom
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp), // Added horizontal padding here
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 val buttonData = listOf(
@@ -314,6 +346,7 @@ fun EmptyCard(patientName: String = "Patient Name") {
     }
 }
 
+// Preview function to visualise the CardList
 @Preview(showBackground = true)
 @Composable
 fun CardListPreview() {
