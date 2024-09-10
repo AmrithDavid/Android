@@ -8,6 +8,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,27 +33,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
 import com.example.dma_swa_001.ui.theme.Dmaswa001Theme
 
-// MainActivity class - entry point of the app
 class MainActivity : ComponentActivity() {
-    // This declaration and call of onCreate followed by this call works together by first overriding to allow customisation and pass activity's previous state if any as a parameter
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Calling the default super class implementation of onCreate provides the necessary setup
         super.onCreate(savedInstanceState)
-
-        // Enable edge-to-edge display
         enableEdgeToEdge()
-
-        // Set the content using Jetpack Compose. Main layout consists of Scaffold with a topnavbar + cardlist
-        setContent { // Function to define UI
-            Dmaswa001Theme { // Theme
-                Scaffold( // Composable that implements the layout structure
-                    modifier = Modifier.fillMaxSize(), // Scaffold fills screen
-                    topBar = { TopNavigationBar() }, // top app bar set as definition in TopNavigationBar
-                    containerColor = Color(0xFFFFFFFF) // Background colour is white
-                    // innerPadding and CardList are still parameters even though they are not in parameter list - trailing lambda syntax (function like structure)
-                ) { innerPadding -> // contains amount of space taken up by system UI (status bar). not defined explicity scaffold knows already.
-                    // Display a list of cards with padding
-                    CardList(modifier = Modifier.padding(innerPadding)) //  applying the padding to cardlist so that it doesnt overlap with other elements in the scaffold (topnavbar)
+        setContent {
+            Dmaswa001Theme {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = { TopNavigationBar() },
+                    containerColor = Color(0xFFFFFFFF)
+                ) { innerPadding ->
+                    CardList(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -60,6 +53,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TopNavigationBar() {
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     val provider = GoogleFont.Provider(
         providerAuthority = "com.google.android.gms.fonts",
         providerPackage = "com.google.android.gms",
@@ -74,9 +69,8 @@ fun TopNavigationBar() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 128.dp)
-            .statusBarsPadding()
             .background(Color(0xFF2E3176))
+            .padding(top = statusBarHeight)
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         Row(
@@ -182,41 +176,65 @@ fun TopNavigationBar() {
     }
 }
 
-// Custom Composable to create a list of empty cards
 @Composable
-fun CardList(modifier: Modifier = Modifier) { //standard way of defining custom composables.func accepts parameter modifier of type Modifier and if no argument provided when calling func default to empty Modifier object
+fun CardList(modifier: Modifier = Modifier) {
     LazyColumn(
-        modifier = modifier, // passes modifier from cardlist to lazycolumn
+        modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(4) {
-            EmptyCard(patientName = "John Doe") // Example patient name
+            EmptyCard(patientName = "Sam Kellahan")
         }
     }
 }
 
 @Composable
-fun EmptyCard(patientName: String = "Patient Name") {
-    val plusJakartaSans = FontFamily(
-        Font(
-            googleFont = GoogleFont("Plus Jakarta Sans"),
-            fontProvider = GoogleFont.Provider(
-                providerAuthority = "com.google.android.gms.fonts",
-                providerPackage = "com.google.android.gms",
-                certificates = emptyList()
-            )
-        )
+fun EmptyCard(
+    patientName: String = "John Doe",
+    date: String = "2024-09-10",
+    patientId: String = "123456789",
+    modality: String = "CT",
+    expiresIn: String = "7 days",
+    imageRes: Int = R.drawable.patient_image
+) {
+    val provider = GoogleFont.Provider(
+        providerAuthority = "com.google.android.gms.fonts",
+        providerPackage = "com.google.android.gms",
+        certificates = emptyList()
     )
+
+    val plusJakartaSans = GoogleFont("Plus Jakarta Sans")
+    val plusJakartaSansFamily = FontFamily(
+        Font(googleFont = plusJakartaSans, fontProvider = provider)
+    )
+
     val buttonColor = Color(0xFF2E3176)
     val titleColor = Color(0xFF1D1D1F)
-    val subheadingColor = Color(0xFF606066)  // Color for patient name
-    val dividerColor = Color(0xFFD1D1DB)  // Color for the divider line
+    val subheadingColor = Color(0xFF606066)
+    val dividerColor = Color(0xFFD1D1DB)
+
+    val labelStyle = TextStyle(
+        fontFamily = plusJakartaSansFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp,
+        color = subheadingColor
+    )
+
+    val contentStyle = TextStyle(
+        fontFamily = plusJakartaSansFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp,
+        color = subheadingColor
+    )
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(227.dp)
             .shadow(
                 elevation = 3.dp,
                 shape = RoundedCornerShape(8.dp),
@@ -229,46 +247,78 @@ fun EmptyCard(patientName: String = "Patient Name") {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 16.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.Top
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.width(84.dp))
-                        Text(
-                            text = "Study Description",
-                            style = TextStyle(
-                                fontFamily = plusJakartaSans,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 18.sp,
-                                lineHeight = 26.sp,
-                                letterSpacing = 0.sp,
-                                color = titleColor
-                            )
+                // Image
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = "Patient Image",
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(125.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    contentScale = ContentScale.Fit
+                )
+
+                // Content
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)) {
+                    Text(
+                        text = "Study Description",
+                        style = TextStyle(
+                            fontFamily = plusJakartaSansFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            lineHeight = 26.sp,
+                            letterSpacing = 0.sp,
+                            color = titleColor
                         )
-                    }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = patientName,
                         style = TextStyle(
-                            fontFamily = plusJakartaSans,
+                            fontFamily = plusJakartaSansFamily,
                             fontWeight = FontWeight.Normal,
                             fontSize = 14.sp,
                             lineHeight = 20.sp,
                             letterSpacing = 0.sp,
                             color = subheadingColor
-                        ),
-                        modifier = Modifier.padding(start = 84.dp)
+                        )
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Divider(
+                        color = dividerColor,
+                        thickness = 1.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        Text("Date: ", style = labelStyle)
+                        Text(date, style = contentStyle)
+                    }
+                    Row {
+                        Text("Patient ID: ", style = labelStyle)
+                        Text(patientId, style = contentStyle)
+                    }
+                    Row {
+                        Text("Modality: ", style = labelStyle)
+                        Text(modality, style = contentStyle)
+                    }
+                    Row {
+                        Text("Expires in: ", style = labelStyle)
+                        Text(expiresIn, style = contentStyle)
+                    }
                 }
+
                 Icon(
                     painter = painterResource(id = R.drawable.ic_more),
                     contentDescription = "More options",
@@ -277,22 +327,11 @@ fun EmptyCard(patientName: String = "Patient Name") {
                 )
             }
 
-            // Adjusted: Divider line extending to the edges, 10dp below patient name
-            Spacer(modifier = Modifier.height(10.dp))
-            Divider(
-                color = dividerColor,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 100.dp, end = 8.dp)
-            )
+            Spacer(modifier = Modifier.height(2.dp))
 
-            Spacer(modifier = Modifier.weight(1f)) // Push buttons to the bottom
-
+            // Buttons
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp), // Added horizontal padding here
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 val buttonData = listOf(
@@ -328,7 +367,7 @@ fun EmptyCard(patientName: String = "Patient Name") {
                             Text(
                                 text = text,
                                 style = TextStyle(
-                                    fontFamily = plusJakartaSans,
+                                    fontFamily = plusJakartaSansFamily,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 14.sp,
                                     lineHeight = 14.sp,
@@ -345,6 +384,7 @@ fun EmptyCard(patientName: String = "Patient Name") {
         }
     }
 }
+
 
 // Preview function to visualise the CardList
 @Preview(showBackground = true)
