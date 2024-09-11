@@ -1,34 +1,75 @@
+// Type.kt
 package com.example.dma_swa_001.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.googlefonts.Font
 
-// Set of Material typography styles to start with
+val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = emptyList()
+)
+
+val plusJakartaSans = GoogleFont("Plus Jakarta Sans")
+val PlusJakartaSansFamily = FontFamily(
+    Font(googleFont = plusJakartaSans, fontProvider = provider)
+)
+
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlusJakartaSansFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
+    ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontFamily = PlusJakartaSansFamily,
+        fontWeight = FontWeight.Normal, // changed from medium to normal despite wireframe info as it looks more similiar
+        fontSize = 20.sp,
+        lineHeight = 26.sp,
+        letterSpacing = 0.5.sp,
     ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlusJakartaSansFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp,
+    ),
+    // Add more text styles as needed for your app
+    titleMedium = TextStyle(
+        fontFamily = PlusJakartaSansFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp,
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = PlusJakartaSansFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp,
+    ),
+    labelMedium = TextStyle(
+        fontFamily = PlusJakartaSansFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.5.sp,
+    ),
+    // Add labelLarge style
+    labelLarge = TextStyle(
+        fontFamily = PlusJakartaSansFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp,
     )
-    */
 )
