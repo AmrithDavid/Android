@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+
 }
 
 android {
@@ -70,11 +69,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
-// Allow references to generated code
-    kapt {
-        correctErrorTypes = true
+
 
 }

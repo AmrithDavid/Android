@@ -15,6 +15,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,12 +25,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dma_swa_001.ui.theme.DividerColor
 import com.example.dma_swa_001.ui.theme.SubheadingColor
 import com.example.dma_swa_001.ui.theme.Dmaswa001Theme
+import com.example.dma_swa_001.viewmodel.ScanViewModel
+import com.example.dma_swa_001.viewmodel.PatientCard
+import androidx.compose.ui.platform.LocalContext
 
-// MainActivity is the entry point of the app
-class MainActivity : ComponentActivity() {
+
+
+// ScanLibraryActivity is the main entry point of the app
+class ScanLibraryActivity : ComponentActivity() {
     // onCreate is called when the activity is first created
     override fun onCreate(savedInstanceState: Bundle?) {
         // Override onCreate to set up the activity's user interface and initial state
@@ -44,31 +52,37 @@ class MainActivity : ComponentActivity() {
             // Composable to apply the custom theme to the entire app
             Dmaswa001Theme {
                 // Scaffold composable provides a basic material design layout structure
-                // Takes several parameters wih a last being a lambda function so it can be define outside of parameter list (trailing lambda syntax)
+                // Takes several parameters with a last being a lambda function so it can be defined outside of parameter list (trailing lambda syntax)
                 // In Kotlin, when a function's last parameter is a lambda it can be placed
                 // All Scaffolds require a content lambda to define the content of the main area of the screen (between the top and possible bottom bar)
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(), // modifier is a parameter of most composables including Scaffold
-                    // Modifier is a class in Compose and .fillMaxSize is a method that is applied to the modifier parameter of Scaffold
-                    // Generally Modifier methods are applied to the modifier parameters of composables but not always so thats why modifier = Modifier is important to identify the parameter
-                    topBar = { TopNavigationBar() }, // Lambda that returns a composable that sets the custom top bar
-                    containerColor = MaterialTheme.colorScheme.background // Use the background color from MaterialTheme
-                    // This content lambda defines the main content area
-                    // innerPadding is not a parameter of Scaffold but a parameter provided by Scaffold to its content lambda
-                    // Scaffold provides this lambda with a PaddingValues object (named innerPadding here)
-                    // This innerPadding contains the padding values needed to avoid overlapping with Scaffold elements like top bar
-                ) { innerPadding ->
-                    // here the innerPadding is applied to the CardList via its modifier (main area content)
-                    CardList(modifier = Modifier.padding(innerPadding))
-                }
+                ScanScreen()
             }
         }
     }
 }
 
+@Composable
+fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
+    val greeting by viewModel.greeting.collectAsState()
+    val patientCards by viewModel.patientCards.collectAsState()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { TopNavigationBar(greeting = greeting) },
+        containerColor = MaterialTheme.colorScheme.background
+        // This content lambda defines the main content area
+        // innerPadding is not a parameter of Scaffold but a parameter provided by Scaffold to its content lambda
+        // Scaffold provides this lambda with a PaddingValues object (named innerPadding here)
+        // This innerPadding contains the padding values needed to avoid overlapping with Scaffold elements like top bar
+    ) { innerPadding ->
+        // here the innerPadding is applied to the CardList via its modifier (main area content)
+        CardList(modifier = Modifier.padding(innerPadding), patientCards = patientCards)
+    }
+}
+
 // TopNavigationBar is a custom composable function for the app's top bar
 @Composable
-fun TopNavigationBar() {
+fun TopNavigationBar(greeting: String) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
@@ -98,7 +112,7 @@ fun TopNavigationBar() {
                 Spacer(modifier = Modifier.width(27.dp))
 
                 Text(
-                    text = "Hello Sam",
+                    text = greeting,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -182,30 +196,25 @@ fun TopNavigationBar() {
 
 // CardList is a composable function that displays a list of EmptyCard items
 @Composable
-fun CardList(modifier: Modifier = Modifier) {
+fun CardList(modifier: Modifier = Modifier, patientCards: List<PatientCard>) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Create 4 EmptyCard items
-        items(4) {
-            EmptyCard(patientName = "Sam Kellahan")
+        // Create EmptyCard items for each patient card
+        items(patientCards.size) { index ->
+            EmptyCard(patientCard = patientCards[index])
         }
     }
 }
 
 // EmptyCard is a composable function that represents a single card in the list
 @Composable
-fun EmptyCard(
-    // Parameters with default values
-    patientName: String = "John Doe",
-    date: String = "2024-09-10",
-    patientId: String = "123456789",
-    modality: String = "CT",
-    expiresIn: String = "7 days",
-    imageRes: Int = R.drawable.patient_image
-) {
+fun EmptyCard(patientCard: PatientCard) {
+    val context = LocalContext.current
+    val imageResId = context.resources.getIdentifier(patientCard.imageName, "drawable", context.packageName)
+
     // Card composable for the main container
     Card(
         modifier = Modifier
@@ -235,7 +244,7 @@ fun EmptyCard(
             ) {
                 // Patient image
                 Image(
-                    painter = painterResource(id = imageRes),
+                    painter = painterResource(id = imageResId),
                     contentDescription = "Patient Image",
                     modifier = Modifier
                         .width(80.dp)
@@ -254,7 +263,7 @@ fun EmptyCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = patientName,
+                        text = patientCard.patientName,
                         style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -267,19 +276,19 @@ fun EmptyCard(
                     // Patient details (Date, ID, Modality, Expiration)
                     Row {
                         Text("Date: ", style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor))
-                        Text(date, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
+                        Text(patientCard.date, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
                     }
                     Row {
                         Text("Patient ID: ", style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor))
-                        Text(patientId, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
+                        Text(patientCard.patientId, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
                     }
                     Row {
                         Text("Modality: ", style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor))
-                        Text(modality, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
+                        Text(patientCard.modality, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
                     }
                     Row {
                         Text("Expires in: ", style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor))
-                        Text(expiresIn, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
+                        Text(patientCard.expiresIn, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
                     }
                 }
 
@@ -342,17 +351,13 @@ fun EmptyCard(
         }
     }
 }
-// Preview function to visualise the CardList
+
+// Preview function to visualise the ScanScreen
 @Preview(showBackground = true)
 @Composable
-fun CardListPreview() {
+fun ScanScreenPreview() {
     Dmaswa001Theme {
-        Scaffold(
-            topBar = { TopNavigationBar() },
-            containerColor = MaterialTheme.colorScheme.background
-        ) { innerPadding ->
-            CardList(modifier = Modifier.padding(innerPadding))
-        }
+        ScanScreen()
     }
 }
 
