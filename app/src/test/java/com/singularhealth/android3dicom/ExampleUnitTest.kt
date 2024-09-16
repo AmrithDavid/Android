@@ -1,8 +1,7 @@
-package com.example.dma_swa_001
-
-import org.junit.Test
+package com.singularhealth.android3dicom
 
 import org.junit.Assert.*
+import org.junit.Test
 
 /**
  * Example local unit test, which will execute on the development machine (host).

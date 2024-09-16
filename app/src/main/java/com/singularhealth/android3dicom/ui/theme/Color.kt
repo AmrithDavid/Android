@@ -1,4 +1,4 @@
-package com.example.dma_swa_001.ui.theme
+package com.singularhealth.android3dicom.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "dma-swa-001"
+rootProject.name = "android3DicomViewer"
 include(":app")
- 

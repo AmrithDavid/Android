@@ -1,5 +1,5 @@
 // Theme.kt
-package com.example.dma_swa_001.ui.theme
+package com.singularhealth.android3dicom.ui.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
@@ -10,23 +10,23 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColorScheme = lightColorScheme(
-    primary = DarkBlue,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = White,
-    surface = White,
-    onPrimary = White,
-    onSecondary = White,
-    onTertiary = White,
-    onBackground = TitleColor,
-    onSurface = TitleColor,
-)
+private val LightColorScheme =
+    lightColorScheme(
+        primary = DarkBlue,
+        secondary = PurpleGrey40,
+        tertiary = Pink40,
+        background = White,
+        surface = White,
+        onPrimary = White,
+        onSecondary = White,
+        onTertiary = White,
+        onBackground = TitleColor,
+        onSurface = TitleColor,
+    )
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
-fun Dmaswa001Theme(
-    content: @Composable () -> Unit
-) {
+fun Android3DicomTheme(content: @Composable () -> Unit) {
     val colorScheme = LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -40,6 +40,6 @@ fun Dmaswa001Theme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

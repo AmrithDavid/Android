@@ -1,15 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-
 }
 
 android {
-    namespace = "com.example.dma_swa_001"
+    namespace = "com.singularhealth.android3dicom"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.dma_swa_001"
+        applicationId = "com.singularhealth.android3dicom"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -26,7 +25,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -51,7 +50,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -71,7 +69,4 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-
-
-
 }
