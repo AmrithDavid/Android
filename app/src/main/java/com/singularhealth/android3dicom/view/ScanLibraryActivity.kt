@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -45,14 +44,11 @@ import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
 class ScanLibraryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        val viewModel: ScanViewModel = viewModel()
-        splashScreen.setKeepOnScreenCondition { !viewModel.isDataLoaded() }
 
         setContent {
             Android3DicomTheme {
