@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.android3dicom" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Existing theme attributes -->
 
-    <style name="Theme.android3dicom" parent="android:Theme.Material.Light.NoActionBar" />
+        <!-- Splash screen theme -->
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/splash_icon_background</item>
+        <item name="android:windowSplashScreenBehavior">icon_preferred</item>
+    </style>
 </resources>

@@ -12,13 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.android3dicom"
         tools:targetApi="31">
+
         <activity
             android:name=".view.MyNewActivityWithThe3crViewer"
             android:exported="true" />
         <activity
             android:name=".view.ScanLibraryActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.android3dicom">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
