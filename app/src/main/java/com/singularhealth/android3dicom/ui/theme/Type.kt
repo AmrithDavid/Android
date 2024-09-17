@@ -43,7 +43,7 @@ val Typography =
         labelSmall =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
                 lineHeight = 18.sp,
                 letterSpacing = 0.sp,
