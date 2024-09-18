@@ -1,5 +1,7 @@
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
+package com.singularhealth.android3dicom.view
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -95,7 +97,6 @@ fun MainImageMenuTopBar() {
                 modifier = Modifier.size(24.dp),
             )
         }
-
 
         Row(
             modifier =

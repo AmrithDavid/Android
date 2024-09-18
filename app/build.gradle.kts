@@ -58,6 +58,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,5 +72,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation("androidx.compose.material:material-icons-extended:1.7.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("com.github.singularhealth:3cr-sdk-android:1.2.9")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
 }

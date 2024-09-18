@@ -13,13 +13,15 @@
         android:theme="@style/Theme.android3dicom"
         tools:targetApi="31">
         <activity
-            android:name=".view.ScanLibraryActivity"
+            android:name=".view.MyNewActivityWithThe3crViewer"
+            android:exported="true" />
+        <activity
+            android:name=".view.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.android3dicom">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
