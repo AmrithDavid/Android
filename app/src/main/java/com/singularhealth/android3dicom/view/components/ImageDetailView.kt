@@ -96,7 +96,7 @@ fun MainImageMenuTopBar() {
             )
         }
 
-        // New row for the buttons
+
         Row(
             modifier =
                 Modifier
