@@ -35,9 +35,10 @@ val Typography =
         titleLarge =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
-                fontWeight = FontWeight.Normal, // changed from medium to normal despite wireframe info as it looks more similiar
+                fontWeight = FontWeight.Medium, // changed from medium to normal despite wireframe info as it looks more similiar
                 fontSize = 18.sp,
                 lineHeight = 26.sp,
+                letterSpacing = 0.sp,
             ),
         labelSmall =
             TextStyle(
@@ -51,7 +52,7 @@ val Typography =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 18.sp,
+                fontSize = 14.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.15.sp,
             ),
