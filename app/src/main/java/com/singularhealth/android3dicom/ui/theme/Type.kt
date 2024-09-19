@@ -70,7 +70,6 @@ val Typography =
                 lineHeight = 16.sp,
                 letterSpacing = 0.5.sp,
             ),
-        // Add labelLarge style
         labelLarge =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
@@ -78,6 +77,12 @@ val Typography =
                 fontSize = 14.sp,
                 lineHeight = 16.sp,
                 letterSpacing = 0.1.sp,
+            ),
+        headlineMedium =
+            TextStyle(
+                fontFamily = PlusJakartaSansFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp,
             ),
         displayLarge =
             TextStyle(
