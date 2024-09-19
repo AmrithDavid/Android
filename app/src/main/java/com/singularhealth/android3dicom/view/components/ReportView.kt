@@ -2,23 +2,24 @@
 
 package com.singularhealth.android3dicom.view.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
@@ -27,217 +28,188 @@ import com.singularhealth.android3dicom.ui.theme.TitleColor
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun ReportScreen() {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
     ) {
         ReportTopBar()
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(screenHeight * 0.02f)) // 2% of screen height
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = MaterialTheme.shapes.medium,
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White,
-                ),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Row {
-                        Text(
-                            "Study Description: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "CT Scan",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                    Row {
-                        Text(
-                            "Patient name: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "Sam Kellahan :(",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                    Row {
-                        Text(
-                            "Patient ID: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "12345",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                    Row {
-                        Text(
-                            "Date of Birth: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "01/01/1980",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                    Row {
-                        Text(
-                            "Study Date: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "06/15/2023",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                    Row {
-                        Text(
-                            "Physician's name: ",
-                            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
-                        )
-                        Text(
-                            "David,Amrith",
-                            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
-                        )
-                    }
-                }
-            }
+            PatientInfoCard()
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(screenHeight * 0.02f))
 
-            Text(
-                text = "Indications",
-                style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
-            )
-            Text(
-                text = "Lorem ipsum dolor sit amet.",
-                style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Procedure",
-                style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
-            )
-
-            Text(
-                text = @Suppress("ktlint:standard:max-line-length")
+            ReportSection("Indications", "Lorem ipsum dolor sit amet.")
+            ReportSection(
+                "Procedure",
                 "Lorem ipsum dolor sit amet, bifehf34fb34uibf43fyhuuibf3ubfy3fb3fyu3bfy34ubf34yfub34yfub34yfb34fuyb34fyubfyu34frg3grgr3gr3gwgwrgrewgr3gr3g2r3g.",
-                style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Findings",
-                style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
-            )
-
-            Text(
-                text = @Suppress("ktlint:standard:max-line-length")
+            ReportSection(
+                "Findings",
                 "Lorem ipsum dolor sit amet, uhuiwhdquwdhquiwdquiwdhquiwdhquiwhduwdhqwuidhqwidhqwidhqwwidhqwdhuqwhduiqwdhiquwdhquiwhdqiwuhdquiwdhquiwdquiwdhquiwdhqwhuiqwdhquiwd.",
-                style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
             )
+            ReportSection("Impressions", "Lorem ipsum dolor sit amet.")
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(screenHeight * 0.04f)) // 4% of screen height
 
-            Text(
-                text = "Impressions",
-                style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
-            )
-            Text(
-                text = @Suppress("ktlint:standard:max-line-length")
-                "Lorem ipsum dolor sit amet.",
-                style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
-            )
+            ActionButtons()
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(screenHeight * 0.02f))
+        }
+    }
+}
 
+@Composable
+fun PatientInfoCard() {
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(125.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = MaterialTheme.shapes.medium,
+                ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Color.White,
+            ),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            PatientInfoRow("Study Description:", "CT Scan")
+            PatientInfoRow("Patient name:", "Sam Kellahan :(")
+            PatientInfoRow("Patient ID:", "12345")
+            PatientInfoRow("Date of Birth:", "01/01/1980")
+            PatientInfoRow("Study Date:", "06/15/2023")
+            PatientInfoRow("Physician's name:", "David,Amrith")
+        }
+    }
+}
+
+@Composable
+fun PatientInfoRow(
+    label: String,
+    value: String,
+) {
+    Row {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor),
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor),
+        )
+    }
+}
+
+@Composable
+fun ReportSection(
+    title: String,
+    content: String,
+) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
+    )
+    Text(
+        text = content,
+        style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
+    )
+    Spacer(modifier = Modifier.height(screenHeight * 0.02f)) // 2% of screen height
+}
+
+@Composable
+fun ActionButtons() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        Button(
+            onClick = { /* TODO: Handle view images click */ },
+            modifier =
+                Modifier
+                    .width(147.dp)
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+            border = BorderStroke(2.dp, DarkBlue),
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(start = 8.dp, end = 16.dp),
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
             ) {
-                Button(
-                    onClick = { /* TODO: Handle view images click */ },
-                    modifier = Modifier
-                        .width(147.dp)
-                        .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    border = BorderStroke(2.dp, DarkBlue),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(start = 8.dp, end = 16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_radiology),
-                            contentDescription = "Radiology Icon",
-                            tint = DarkBlue,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "View Images",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = DarkBlue
-                        )
-                    }
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_radiology),
+                    contentDescription = "Radiology Icon",
+                    tint = DarkBlue,
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "View Images",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = DarkBlue,
+                )
+            }
+        }
 
-                Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(20.dp))
 
-                Button(
-                    onClick = { /* TODO: Handle download PDF click */ },
-                    modifier = Modifier
-                        .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = DarkBlue
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_download),
-                            contentDescription = "Download Icon",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            "Download PDF",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White
-                        )
-                    }
-                }
+        Button(
+            onClick = { /* TODO: Handle download PDF click */ },
+            modifier =
+                Modifier
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = DarkBlue,
+                ),
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_download),
+                    contentDescription = "Download Icon",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp),
+                )
+                Text(
+                    "Download PDF",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color.White,
+                )
             }
         }
     }
@@ -247,16 +219,18 @@ fun ReportScreen() {
 @Composable
 fun ReportTopBar() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(DarkBlue),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(DarkBlue),
     ) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
