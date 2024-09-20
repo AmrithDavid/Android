@@ -3,7 +3,6 @@
 package com.singularhealth.android3dicom.view.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -14,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
@@ -34,17 +32,18 @@ fun SideMenu(
     val screenWidth = configuration.screenWidthDp.dp
     val menuWidth = (screenWidth * 0.7f).coerceAtMost(400.dp)
 
-    Box(
+    Surface(
         modifier =
             Modifier
                 .fillMaxHeight()
-                .width(menuWidth)
-                .background(MaterialTheme.colorScheme.surface),
+                .width(menuWidth),
+        color = Color.White,
     ) {
         Column(
             modifier =
                 Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars),
         ) {
             Column(
                 modifier =
@@ -139,7 +138,6 @@ fun SideMenu(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun MenuButton(
     icon: Int,
@@ -182,22 +180,5 @@ private fun MenuButton(
                 color = contentColor,
             )
         }
-    }
-}
-
-@Suppress("ktlint:standard:function-naming")
-@Preview(showBackground = true, widthDp = 360)
-@Composable
-fun SideMenuPreview() {
-    Android3DicomTheme {
-        SideMenu(
-            onCloseMenu = {},
-            onHomeClick = {},
-            onClearCacheClick = {},
-            onBiometricClick = {},
-            onAboutClick = {},
-            onSupportClick = {},
-            onLogoutClick = {},
-        )
     }
 }

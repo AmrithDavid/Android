@@ -1,4 +1,3 @@
-// Theme.kt
 package com.singularhealth.android3dicom.ui.theme
 
 import android.app.Activity
@@ -10,19 +9,18 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColorScheme =
-    lightColorScheme(
-        primary = DarkBlue,
-        secondary = PurpleGrey40,
-        tertiary = Pink40,
-        background = White,
-        surface = White,
-        onPrimary = White,
-        onSecondary = White,
-        onTertiary = White,
-        onBackground = TitleColor,
-        onSurface = TitleColor,
-    )
+private val LightColorScheme = lightColorScheme(
+    primary = DarkBlue,
+    secondary = PurpleGrey40,
+    tertiary = Pink40,
+    background = White,
+    surface = White,
+    onPrimary = White,
+    onSecondary = White,
+    onTertiary = White,
+    onBackground = TitleColor,
+    onSurface = TitleColor,
+)
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -32,8 +30,11 @@ fun Android3DicomTheme(content: @Composable () -> Unit) {
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            // Enable edge-to-edge display
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            // Remove static status bar color setting
+            // window.statusBarColor = colorScheme.primary.toArgb()
+            // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

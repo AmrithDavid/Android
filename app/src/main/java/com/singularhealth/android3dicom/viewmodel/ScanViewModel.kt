@@ -13,8 +13,11 @@ class ScanViewModel : ViewModel() {
     private val _patientCards = MutableStateFlow<List<PatientCardData>>(emptyList())
     val patientCards: StateFlow<List<PatientCardData>> = _patientCards.asStateFlow()
 
+    private val _isSideMenuVisible = MutableStateFlow(false)
+    val isSideMenuVisible: StateFlow<Boolean> = _isSideMenuVisible.asStateFlow()
+
     init {
-        // Initialise with placeholder data
+        // Initialize with placeholder data
         _patientCards.value =
             List(4) {
                 PatientCardData(
@@ -32,5 +35,38 @@ class ScanViewModel : ViewModel() {
         _greeting.value = "Hello $name"
     }
 
-    // will methods to fetch real data via res APIs
+    fun toggleSideMenu() {
+        _isSideMenuVisible.value = !_isSideMenuVisible.value
+    }
+
+    // Add methods to handle side menu actions
+    fun onHomeClick() {
+        // Implement home action
+        toggleSideMenu()
+    }
+
+    fun onClearCacheClick() {
+        // Implement clear cache action
+        toggleSideMenu()
+    }
+
+    fun onBiometricClick() {
+        // Implement biometric action
+        toggleSideMenu()
+    }
+
+    fun onAboutClick() {
+        // Implement about action
+        toggleSideMenu()
+    }
+
+    fun onSupportClick() {
+        // Implement support action
+        toggleSideMenu()
+    }
+
+    fun onLogoutClick() {
+        // Implement logout action
+        toggleSideMenu()
+    }
 }
