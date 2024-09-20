@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -100,6 +101,16 @@ fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
             )
         }
 
+        // Semi-transparent overlay
+        if (isSideMenuVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x52000000)) // #00000052
+            )
+        }
+
+        // SideMenu
         if (isSideMenuVisible) {
             SideMenu(
                 onCloseMenu = { viewModel.toggleSideMenu() },
