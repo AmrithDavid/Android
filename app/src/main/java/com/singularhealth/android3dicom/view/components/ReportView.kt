@@ -72,6 +72,7 @@ fun ReportScreen() {
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun PatientInfoCard() {
     Card(
@@ -105,6 +106,7 @@ fun PatientInfoCard() {
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun PatientInfoRow(
     label: String,
@@ -122,6 +124,7 @@ fun PatientInfoRow(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ReportSection(
     title: String,
