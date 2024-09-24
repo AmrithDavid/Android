@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,29 +27,25 @@ import com.singularhealth.android3dicom.ui.theme.TitleColor
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun ReportScreen() {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White),
+        Modifier
+            .fillMaxSize()
+            .background(Color.White),
     ) {
         ReportTopBar()
 
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(25.dp),
         ) {
-            Spacer(modifier = Modifier.height(screenHeight * 0.02f)) // 2% of screen height
+            Spacer(modifier = Modifier.height(13.dp))
 
             PatientInfoCard()
-
-            Spacer(modifier = Modifier.height(screenHeight * 0.02f))
 
             ReportSection("Indications", "Lorem ipsum dolor sit amet.")
             ReportSection(
@@ -63,11 +58,11 @@ fun ReportScreen() {
             )
             ReportSection("Impressions", "Lorem ipsum dolor sit amet.")
 
-            Spacer(modifier = Modifier.height(screenHeight * 0.04f)) // 4% of screen height
+            Spacer(modifier = Modifier.height(13.dp))
 
             ActionButtons()
 
-            Spacer(modifier = Modifier.height(screenHeight * 0.02f))
+
         }
     }
 }
@@ -77,13 +72,12 @@ fun ReportScreen() {
 fun PatientInfoCard() {
     Card(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(125.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = MaterialTheme.shapes.medium,
-                ),
+        Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = MaterialTheme.shapes.medium,
+            ),
         colors =
             CardDefaults.cardColors(
                 containerColor = Color.White,
@@ -92,9 +86,9 @@ fun PatientInfoCard() {
         Column(
             modifier =
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             PatientInfoRow("Study Description:", "CT Scan")
             PatientInfoRow("Patient name:", "Sam Kellahan :(")
@@ -130,31 +124,30 @@ fun ReportSection(
     title: String,
     content: String,
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-
-    Text(
-        text = title,
-        style = MaterialTheme.typography.headlineMedium.copy(color = TitleColor),
-    )
-    Text(
-        text = content,
-        style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
-    )
-    Spacer(modifier = Modifier.height(screenHeight * 0.02f)) // 2% of screen height
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall.copy(color = TitleColor),
+        )
+        Text(
+            text = content,
+            style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
+        )
+    }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ActionButtons() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Button(
             onClick = { /* TODO: Handle view images click */ },
             modifier =
                 Modifier
-                    .width(147.dp)
+                    .weight(1f)
                     .height(40.dp),
             colors =
                 ButtonDefaults.buttonColors(
@@ -162,12 +155,12 @@ fun ActionButtons() {
                 ),
             border = BorderStroke(2.dp, DarkBlue),
             shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(start = 8.dp, end = 16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_radiology),
@@ -184,23 +177,23 @@ fun ActionButtons() {
             }
         }
 
-        Spacer(modifier = Modifier.width(20.dp))
-
         Button(
             onClick = { /* TODO: Handle download PDF click */ },
             modifier =
                 Modifier
+                    .weight(1f)
                     .height(40.dp),
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = DarkBlue,
                 ),
             shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp),
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_download),
@@ -208,6 +201,7 @@ fun ActionButtons() {
                     tint = Color.White,
                     modifier = Modifier.size(24.dp),
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Download PDF",
                     style = MaterialTheme.typography.labelLarge,
