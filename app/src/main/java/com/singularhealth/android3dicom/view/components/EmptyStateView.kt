@@ -37,18 +37,18 @@ fun EmptyStateView() {
             contentDescription = "No scans available",
             contentScale = ContentScale.Fit,
             modifier =
-                Modifier
-                    .width(350.dp)
-                    .height(900.dp)
-                    .offset(y = 380.dp),
+            Modifier
+                .width(350.dp)
+                .height(800.dp)
+                .offset(y = 400.dp),
         )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier =
-                Modifier
-                    .padding(bottom = 100.dp)
-                    .offset(y = (-350).dp),
+            Modifier
+                .padding(bottom = 50.dp)
+                .offset(y = (-350).dp),
         ) {
             Text(
                 "There are currently no scans to view",
@@ -56,9 +56,9 @@ fun EmptyStateView() {
                 color = TitleColor,
                 textAlign = TextAlign.Center,
                 modifier =
-                    Modifier
-                        .padding(horizontal = 40.dp)
-                        .padding(bottom = 8.dp),
+                Modifier
+                    .padding(horizontal = 40.dp)
+                    .padding(bottom = 8.dp),
             )
             Text(
                 "Scans you upload via the web portal will be viewable here.",
@@ -66,9 +66,9 @@ fun EmptyStateView() {
                 color = SubheadingColor,
                 textAlign = TextAlign.Center,
                 modifier =
-                    Modifier
-                        .padding(horizontal = 40.dp)
-                        .padding(bottom = 16.dp),
+                Modifier
+                    .padding(horizontal = 40.dp)
+                    .padding(bottom = 16.dp),
             )
 
             Button(
