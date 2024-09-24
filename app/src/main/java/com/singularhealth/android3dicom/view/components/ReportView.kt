@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,7 +59,7 @@ fun ReportScreen() {
             )
             ReportSection("Impressions", "Lorem ipsum dolor sit amet.")
 
-            Spacer(modifier = Modifier.height(13.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             ActionButtons()
 
@@ -147,7 +148,7 @@ fun ActionButtons() {
             onClick = { /* TODO: Handle view images click */ },
             modifier =
                 Modifier
-                    .weight(1f)
+                    .width(147.dp)
                     .height(40.dp),
             colors =
                 ButtonDefaults.buttonColors(
@@ -181,7 +182,7 @@ fun ActionButtons() {
             onClick = { /* TODO: Handle download PDF click */ },
             modifier =
                 Modifier
-                    .weight(1f)
+                    .width(161.dp)
                     .height(40.dp),
             colors =
                 ButtonDefaults.buttonColors(
