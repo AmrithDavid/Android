@@ -56,9 +56,10 @@ fun LoginScreen() {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)  // This sets the background to pure white
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White), // This sets the background to pure white
     ) {
         // Top section with support icon and text
         Row(
@@ -147,7 +148,7 @@ fun LoginScreen() {
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_visiblity),
+                            painter = painterResource(id = R.drawable.ic_visibility),
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
                             tint = TextFieldTextColor,
                         )
@@ -211,14 +212,45 @@ fun LoginScreen() {
                     modifier = Modifier.weight(1f),
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.android_light_rd_na),
-                contentDescription = "Sign in with Google",
+            Row(
                 modifier =
                     Modifier
-                        .clickable { /* Trigger Google Sign-In */ }
-                        .size(60.dp), // Adjust size as needed
-            )
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(modifier = Modifier.offset(y = 6.dp)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.microsoft_logo),
+                        contentDescription = "Sign in with Microsoft",
+                        modifier =
+                            Modifier
+                                .clickable { /* Trigger Microsoft Sign-In */ }
+                                .size(40.dp),
+                    )
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.apple_logo),
+                    contentDescription = "Sign in with Apple",
+                    modifier =
+                        Modifier
+                            .clickable { /* Trigger Apple Sign-In */ }
+                            .size(120.dp),
+                )
+
+                Box(modifier = Modifier.offset(y = 1.dp)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.google_logo),
+                        contentDescription = "Sign in with Google",
+                        modifier =
+                            Modifier
+                                .clickable { /* Trigger Google Sign-In */ }
+                                .size(60.dp),
+                    )
+                }
+            }
         }
 
         // Bottom bar
