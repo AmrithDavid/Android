@@ -1,5 +1,3 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
 package com.singularhealth.android3dicom.view
 
 import androidx.compose.foundation.background
@@ -17,40 +15,81 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
+import com.singularhealth.android3dicom.view.components.MoreOptionsDropdown
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainImageMenu() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        MainImageMenuTopBar()
+    var showDropdown by remember { mutableStateOf(false) }
+    var selectedButton by remember { mutableStateOf("3D") }
 
-        // Content area
+    Android3DicomTheme {
         Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Text(
-                text = "Scan Image goes here",
-                style = MaterialTheme.typography.titleMedium,
+            MainImageMenuTopBar(
+                selectedButton = selectedButton,
+                onButtonSelected = { selectedButton = it },
+                onMoreClick = { showDropdown = true },
             )
-        }
 
-        MainImageMenuBottomBar()
+            // Content area
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(16.dp),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Text(
+                        text = "Scan Image goes here",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+
+                // Dropdown menu
+                Box(
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(y = (-76).dp),
+                ) {
+                    MoreOptionsDropdown(
+                        expanded = showDropdown,
+                        onDismissRequest = { showDropdown = false },
+                        onItemClick = { selectedOption ->
+                            // Handle the selected option
+                            when (selectedOption) {
+                                "More Info" -> { /* Handle More Info */ }
+                                "Delete" -> { /* Handle Delete */ }
+                                "Share" -> { /* Handle Share */ }
+                                "Report" -> { /* Handle Report */ }
+                                "Support" -> { /* Handle Support */ }
+                            }
+                            showDropdown = false
+                        },
+                    )
+                }
+            }
+
+            MainImageMenuBottomBar()
+        }
     }
 }
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun MainImageMenuTopBar() {
+fun MainImageMenuTopBar(
+    selectedButton: String,
+    onButtonSelected: (String) -> Unit,
+    onMoreClick: () -> Unit,
+) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    var selectedButton by remember { mutableStateOf("3D") }
 
     Column(
         modifier =
@@ -94,7 +133,13 @@ fun MainImageMenuTopBar() {
                 painter = painterResource(id = R.drawable.ic_more),
                 contentDescription = "More options",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(24.dp),
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { onMoreClick() },
             )
         }
 
@@ -108,7 +153,7 @@ fun MainImageMenuTopBar() {
                 TopBarButton(
                     text = buttonText,
                     isSelected = selectedButton == buttonText,
-                    onClick = { selectedButton = buttonText },
+                    onClick = { onButtonSelected(buttonText) },
                     modifier = Modifier.weight(1f),
                 )
             }
