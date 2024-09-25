@@ -4,14 +4,17 @@
 package com.singularhealth.android3dicom.view
 
 // Importing necessary libraries and components
-import MainImageMenu
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -108,4 +111,5 @@ class ScanLibraryActivity : ComponentActivity() {
             val navController = rememberNavController()
             ScanScreen(navController = navController)
         }
-    }}
+    } 
+}
