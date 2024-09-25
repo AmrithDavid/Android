@@ -56,44 +56,50 @@ fun LoginScreen() {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)  // This sets the background to pure white
     ) {
         // Top section with support icon and text
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = statusBarHeight + 10.dp, end = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = statusBarHeight + 10.dp, end = 16.dp),
             horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_support),
                 contentDescription = "Support",
                 tint = DarkBlue,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Support",
                 style = MaterialTheme.typography.titleMedium,
-                color = DarkBlue
+                color = DarkBlue,
             )
         }
 
         // Main content
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(top = 63.dp, start = 16.dp, end = 16.dp), // 73dp - 10dp (support row height)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(top = 63.dp, start = 16.dp, end = 16.dp),
+            // 73dp - 10dp (support row height)
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.img_logo),
                 contentDescription = "3Dicom Logo",
-                modifier = Modifier
-                    .size(width = 270.dp, height = 110.dp)
-                    .padding(bottom = 29.dp),
+                modifier =
+                    Modifier
+                        .size(width = 270.dp, height = 110.dp)
+                        .padding(bottom = 29.dp),
             )
 
             Text(
@@ -108,18 +114,20 @@ fun LoginScreen() {
                 onValueChange = { email = it },
                 label = { Text("Email", style = MaterialTheme.typography.bodyLarge, color = TextFieldTextColor) },
                 singleLine = true,
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(40.dp),
+                modifier =
+                    Modifier
+                        .width(300.dp)
+                        .height(40.dp),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = TextFieldTextColor),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = TextFieldTextColor,
-                    focusedBorderColor = TextFieldTextColor,
-                    unfocusedTextColor = TextFieldTextColor,
-                    focusedTextColor = TextFieldTextColor,
-                    cursorColor = TextFieldTextColor,
-                ),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = TextFieldTextColor,
+                        focusedBorderColor = TextFieldTextColor,
+                        unfocusedTextColor = TextFieldTextColor,
+                        focusedTextColor = TextFieldTextColor,
+                        cursorColor = TextFieldTextColor,
+                    ),
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -129,9 +137,10 @@ fun LoginScreen() {
                 onValueChange = { password = it },
                 label = { Text("Password", style = MaterialTheme.typography.bodyLarge, color = TextFieldTextColor) },
                 singleLine = true,
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(40.dp),
+                modifier =
+                    Modifier
+                        .width(300.dp)
+                        .height(40.dp),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = TextFieldTextColor),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -144,25 +153,28 @@ fun LoginScreen() {
                         )
                     }
                 },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = TextFieldTextColor,
-                    focusedBorderColor = TextFieldTextColor,
-                    unfocusedTextColor = TextFieldTextColor,
-                    focusedTextColor = TextFieldTextColor,
-                    cursorColor = TextFieldTextColor,
-                ),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = TextFieldTextColor,
+                        focusedBorderColor = TextFieldTextColor,
+                        unfocusedTextColor = TextFieldTextColor,
+                        focusedTextColor = TextFieldTextColor,
+                        cursorColor = TextFieldTextColor,
+                    ),
             )
 
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
                 onClick = { /* Handle login */ },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(40.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkBlue.copy(alpha = 0.5f),
-                ),
+                modifier =
+                    Modifier
+                        .width(300.dp)
+                        .height(40.dp),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = DarkBlue.copy(alpha = 0.5f),
+                    ),
                 shape = RoundedCornerShape(buttonCornerRadius.dp),
             ) {
                 Text("Log in", style = MaterialTheme.typography.bodyLarge)
@@ -182,33 +194,42 @@ fun LoginScreen() {
 
             Row(
                 modifier = Modifier.width(300.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 HorizontalDivider(
                     color = SubheadingColor,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 Text(
                     text = "Or Log in with",
                     style = MaterialTheme.typography.bodyMedium,
                     color = SubheadingColor,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 )
                 HorizontalDivider(
                     color = SubheadingColor,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
+            Image(
+                painter = painterResource(id = R.drawable.android_light_rd_na),
+                contentDescription = "Sign in with Google",
+                modifier =
+                    Modifier
+                        .clickable { /* Trigger Google Sign-In */ }
+                        .size(60.dp), // Adjust size as needed
+            )
         }
 
         // Bottom bar
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .background(Color(0xFFF0F3F5)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(Color(0xFFF0F3F5)),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "Don't have an account? ",
@@ -227,13 +248,11 @@ fun LoginScreen() {
     }
 }
 
-
-    @Suppress("ktlint:standard:function-naming")
-    @Preview(showBackground = true)
-    @Composable
-    fun LoginScreenPreview() {
-        Android3DicomTheme {
-            LoginScreen()
-        }
+@Suppress("ktlint:standard:function-naming")
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    Android3DicomTheme {
+        LoginScreen()
     }
-
+}
