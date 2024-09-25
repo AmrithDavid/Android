@@ -3,13 +3,13 @@
 package com.singularhealth.android3dicom.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -102,30 +102,16 @@ fun MainImageMenuTopBar() {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
                     .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            TopBarButton(
-                text = "3D",
-                isSelected = selectedButton == "3D",
-                onClick = { selectedButton = "3D" },
-            )
-            TopBarButton(
-                text = "Transverse",
-                isSelected = selectedButton == "Transverse",
-                onClick = { selectedButton = "Transverse" },
-            )
-            TopBarButton(
-                text = "Sagittal",
-                isSelected = selectedButton == "Sagittal",
-                onClick = { selectedButton = "Sagittal" },
-            )
-            TopBarButton(
-                text = "Coronal",
-                isSelected = selectedButton == "Coronal",
-                onClick = { selectedButton = "Coronal" },
-            )
+            listOf("3D", "Transverse", "Sagittal", "Coronal").forEach { buttonText ->
+                TopBarButton(
+                    text = buttonText,
+                    isSelected = selectedButton == buttonText,
+                    onClick = { selectedButton = buttonText },
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }
@@ -136,39 +122,44 @@ fun TopBarButton(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val contentColor =
-        if (isSelected) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+    Column(
+        modifier = modifier,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(36.dp),
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                    },
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onClick,
+                        ).wrapContentSize(Alignment.Center),
+            )
         }
 
-    TextButton(
-        onClick = onClick,
-        colors =
-            ButtonDefaults.textButtonColors(
-                contentColor = contentColor,
-            ),
-        modifier =
-            Modifier
-                .height(36.dp)
-                .drawBehind {
-                    if (isSelected) {
-                        val strokeWidth = 2.dp.toPx()
-                        val y = size.height - strokeWidth / 2
-                        drawLine(
-                            color = Color.White,
-                            start = Offset(0f, y),
-                            end = Offset(size.width, y),
-                            strokeWidth = strokeWidth,
-                        )
-                    }
-                },
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium,
+        // Drawing the line
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
         )
     }
 }
