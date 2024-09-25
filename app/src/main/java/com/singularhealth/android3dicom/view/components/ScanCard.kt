@@ -39,11 +39,10 @@ import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 @Suppress("ktlint:standard:function-naming")
 // ScanCard is a composable function that represents a single card in the list
 @Composable
-fun ScanCard(patientCardData: PatientCardData) {
-    val context = LocalContext.current
-    val imageResId = context.resources.getIdentifier(patientCardData.imageName, "drawable", context.packageName)
-
-    // Card composable for the main container
+fun ScanCard(
+    patientCardData: PatientCardData,
+    onImageButtonClick: () -> Unit,
+) {
     Card(
         modifier =
             Modifier
@@ -59,7 +58,6 @@ fun ScanCard(patientCardData: PatientCardData) {
             ),
         shape = RoundedCornerShape(8.dp),
     ) {
-        // Column to hold all card content
         Column(
             modifier =
                 Modifier
@@ -67,15 +65,21 @@ fun ScanCard(patientCardData: PatientCardData) {
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            // Row for patient image and details
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top,
             ) {
-                // Patient image
                 Image(
-                    painter = painterResource(id = imageResId),
+                    painter =
+                        painterResource(
+                            id =
+                                LocalContext.current.resources.getIdentifier(
+                                    patientCardData.imageName,
+                                    "drawable",
+                                    LocalContext.current.packageName,
+                                ),
+                        ),
                     contentDescription = "Patient Image",
                     modifier =
                         Modifier
@@ -85,7 +89,6 @@ fun ScanCard(patientCardData: PatientCardData) {
                     contentScale = ContentScale.Fit,
                 )
 
-                // Column for patient details
                 Column(
                     modifier =
                         Modifier
@@ -108,7 +111,6 @@ fun ScanCard(patientCardData: PatientCardData) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    // Patient details (Date, ID, Modality, Expiration)
                     Row {
                         Text("Date: ", style = MaterialTheme.typography.labelMedium.copy(color = SubheadingColor))
                         Text(patientCardData.date, style = MaterialTheme.typography.bodySmall.copy(color = SubheadingColor))
@@ -127,7 +129,6 @@ fun ScanCard(patientCardData: PatientCardData) {
                     }
                 }
 
-                // More options icon
                 Icon(
                     painter = painterResource(id = R.drawable.ic_more),
                     contentDescription = "More options",
@@ -138,7 +139,6 @@ fun ScanCard(patientCardData: PatientCardData) {
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            // Row for action buttons (Images, Report, Share)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -149,9 +149,9 @@ fun ScanCard(patientCardData: PatientCardData) {
                         Triple("Report", R.drawable.ic_report, "Report Icon"),
                         Triple("Share", R.drawable.ic_share, "Share Icon"),
                     )
-                buttonData.forEach { (text, iconRes, contentDescription) ->
+                buttonData.forEachIndexed { index, (text, iconRes, contentDescription) ->
                     OutlinedButton(
-                        onClick = { /* TODO */ },
+                        onClick = { if (index == 0) onImageButtonClick() },
                         modifier =
                             Modifier
                                 .weight(1f)

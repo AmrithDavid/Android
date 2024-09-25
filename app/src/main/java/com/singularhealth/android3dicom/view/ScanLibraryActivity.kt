@@ -4,6 +4,7 @@
 package com.singularhealth.android3dicom.view
 
 // Importing necessary libraries and components
+import MainImageMenu
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.NavigationBar
@@ -40,58 +45,67 @@ class ScanLibraryActivity : ComponentActivity() {
         setContent {
             // Composable to apply the custom theme to the entire app
             Android3DicomTheme {
-                // Scaffold composable provides a basic material design layout structure
-                // Takes several parameters with a last being a lambda function so it can be defined outside of parameter list (trailing lambda syntax)
-                // In Kotlin, when a function's last parameter is a lambda it can be placed
-                // All Scaffolds require a content lambda to define the content of the main area of the screen (between the top and possible bottom bar)
-                ScanScreen()
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "scanScreen") {
+                    composable("scanScreen") {
+                        ScanScreen(navController = navController)
+                    }
+                    composable("mainImageMenu") {
+                        MainImageMenu()
+                    }
+                }
             }
         }
     }
-}
 
-@Composable
-fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
-    val greeting by viewModel.greeting.collectAsState()
-    val patientCards by viewModel.patientCards.collectAsState()
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = { NavigationBar(greeting = greeting) },
-        containerColor = MaterialTheme.colorScheme.background,
-        // This content lambda defines the main content area
-        // innerPadding is not a parameter of Scaffold but a parameter provided by Scaffold to its content lambda
-        // Scaffold provides this lambda with a PaddingValues object (named innerPadding here)
-        // This innerPadding contains the padding values needed to avoid overlapping with Scaffold elements like top bar
-    ) { innerPadding ->
-        // here the innerPadding is applied to the CardList via its modifier (main area content)
-        CardList(modifier = Modifier.padding(innerPadding), patientCards = patientCards)
-    }
-}
-
-// CardList displays a list of ScanCard items
-@Composable
-fun CardList(
-    modifier: Modifier = Modifier,
-    patientCards: List<PatientCardData>,
-) {
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    @Composable
+    fun ScanScreen(
+        viewModel: ScanViewModel = viewModel(),
+        navController: NavController,
     ) {
-        // Create EmptyCard items for each patient card
-        items(patientCards.size) { index ->
-            ScanCard(patientCardData = patientCards[index])
+        val greeting by viewModel.greeting.collectAsState()
+        val patientCards by viewModel.patientCards.collectAsState()
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = { NavigationBar(greeting = greeting) },
+            containerColor = MaterialTheme.colorScheme.background,
+        ) { innerPadding ->
+            CardList(
+                modifier = Modifier.padding(innerPadding),
+                patientCards = patientCards,
+                onImageButtonClick = { navController.navigate("mainImageMenu") },
+            )
         }
     }
-}
 
-// Visualise the ScanScreen
-@Preview(showBackground = true)
-@Composable
-fun ScanScreenPreview() {
-    Android3DicomTheme {
-        ScanScreen()
+// CardList displays a list of ScanCard items
+    @Composable
+    fun CardList(
+        modifier: Modifier = Modifier,
+        patientCards: List<PatientCardData>,
+        onImageButtonClick: () -> Unit,
+    ) {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(patientCards.size) { index ->
+                ScanCard(
+                    patientCardData = patientCards[index],
+                    onImageButtonClick = onImageButtonClick,
+                )
+            }
+        }
     }
-}
+
+    // Visualise the ScanScreen
+    @Preview(showBackground = true)
+    @Composable
+    fun ScanScreenPreview() {
+        Android3DicomTheme {
+            val navController = rememberNavController()
+            ScanScreen(navController = navController)
+        }
+    }}
