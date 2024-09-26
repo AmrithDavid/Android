@@ -7,8 +7,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.navigation.compose.rememberNavController
 import health.singular.viewer3cr.android.sdk.FrontEndInterfaces
 import health.singular.viewer3cr.android.sdk.FrontEndPayload
 import health.singular.viewer3cr.android.sdk.ViewerSdkActivity
@@ -42,12 +44,15 @@ class MyNewActivityWithThe3crViewer : ViewerSdkActivity() {
         val linearContainer = LinearLayout(this)
         linearContainer.addView(
             ComposeView(this).apply {
-                setViewCompositionStrategy(ViewCompositionStrategy.Default)
-                setContent { MainImageMenu() }
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    MainImageMenuWrapper()
+                }
             },
         )
 
         addView(linearContainer)
+        addView(showMainButton)
     }
 
     override fun onCreateView(
@@ -84,5 +89,12 @@ class MyNewActivityWithThe3crViewer : ViewerSdkActivity() {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val configurationInfo = activityManager.deviceConfigurationInfo
         println("Device Supported OpenGL ES Version = " + configurationInfo.getGlEsVersion())
+    }
+
+    @Suppress("ktlint:standard:function-naming")
+    @Composable
+    private fun MainImageMenuWrapper() {
+        val navController = rememberNavController()
+        MainImageMenu(navController = navController)
     }
 }

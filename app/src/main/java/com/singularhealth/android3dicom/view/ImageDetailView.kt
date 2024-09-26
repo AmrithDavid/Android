@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package com.singularhealth.android3dicom.view
 
 import androidx.compose.foundation.background
@@ -13,13 +15,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.MoreOptionsDropdown
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun MainImageMenu() {
+fun MainImageMenu(navController: NavController) {
     var showDropdown by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
 
@@ -31,15 +35,15 @@ fun MainImageMenu() {
                 selectedButton = selectedButton,
                 onButtonSelected = { selectedButton = it },
                 onMoreClick = { showDropdown = true },
+                onBackClick = { navController.navigateUp() }
             )
 
             // Content area
             Box(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(16.dp),
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -54,20 +58,18 @@ fun MainImageMenu() {
 
                 // Dropdown menu
                 Box(
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(y = (-76).dp),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(y = (-76).dp),
                 ) {
                     MoreOptionsDropdown(
                         expanded = showDropdown,
                         onDismissRequest = { showDropdown = false },
                         onItemClick = { selectedOption ->
-                            // Handle the selected option
                             when (selectedOption) {
+                                "Share" -> navController.navigate("shareView")
                                 "More Info" -> { /* Handle More Info */ }
                                 "Delete" -> { /* Handle Delete */ }
-                                "Share" -> { /* Handle Share */ }
                                 "Report" -> { /* Handle Report */ }
                                 "Support" -> { /* Handle Support */ }
                             }
@@ -82,27 +84,25 @@ fun MainImageMenu() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainImageMenuTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
     onMoreClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(top = statusBarHeight),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(top = statusBarHeight),
     ) {
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -114,7 +114,9 @@ fun MainImageMenuTopBar(
                     painter = painterResource(id = R.drawable.ic_back),
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onBackClick() }
                 )
 
                 Spacer(modifier = Modifier.width(27.dp))
@@ -133,21 +135,19 @@ fun MainImageMenuTopBar(
                 painter = painterResource(id = R.drawable.ic_more),
                 contentDescription = "More options",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier =
-                    Modifier
-                        .size(24.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                        ) { onMoreClick() },
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) { onMoreClick() },
             )
         }
 
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
         ) {
             listOf("3D", "Transverse", "Sagittal", "Coronal").forEach { buttonText ->
                 TopBarButton(
@@ -161,7 +161,6 @@ fun MainImageMenuTopBar(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 fun TopBarButton(
     text: String,
@@ -173,43 +172,39 @@ fun TopBarButton(
         modifier = modifier,
     ) {
         Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(36.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(36.dp),
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelMedium,
-                color =
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-                    },
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onClick,
-                        ).wrapContentSize(Alignment.Center),
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
+                    MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick,
+                    )
+                    .wrapContentSize(Alignment.Center),
             )
         }
 
         // Drawing the line
         Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
         )
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainImageMenuBottomBar() {
     Surface(
@@ -217,10 +212,9 @@ fun MainImageMenuBottomBar() {
         contentColor = MaterialTheme.colorScheme.onPrimary,
     ) {
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             BottomBarButton(icon = R.drawable.ic_display, label = "Display")
@@ -230,7 +224,6 @@ fun MainImageMenuBottomBar() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 fun BottomBarButton(
     icon: Int,
@@ -254,11 +247,10 @@ fun BottomBarButton(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun MainImageMenuPreview() {
     Android3DicomTheme {
-        MainImageMenu()
+        MainImageMenu(rememberNavController())
     }
 }

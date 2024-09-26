@@ -30,23 +30,15 @@ import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.NavigationBar
 import com.singularhealth.android3dicom.view.components.ScanCard
+import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.ScanViewModel
 
 // ScanLibraryActivity is the main entry point of the app
 class ScanLibraryActivity : ComponentActivity() {
-    // onCreate is called when the activity is first created
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Override onCreate to set up the activity's user interface and initial state
-        // savedInstanceState: Bundle? parameter contains the activity's previously saved state, if available
-
-        // Call the superclass implementation to complete the creation of the activity
-        // This ensures all the basic setup from the parent class is performed
         super.onCreate(savedInstanceState)
-        // Enable edge-to-edge display, allowing app to draw behind system UI and apply the same colour as the top bar to integrate it visually
         enableEdgeToEdge()
-        // Method provided by ComponentActivity to set the content of the activity using Jetpack Compose
         setContent {
-            // Composable to apply the custom theme to the entire app
             Android3DicomTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "scanScreen") {
@@ -54,12 +46,16 @@ class ScanLibraryActivity : ComponentActivity() {
                         ScanScreen(navController = navController)
                     }
                     composable("mainImageMenu") {
-                        MainImageMenu()
+                        MainImageMenu(navController = navController)
+                    }
+                    composable("shareView") {
+                        ShareView()
                     }
                 }
             }
         }
     }
+}
 
     @Composable
     fun ScanScreen(
@@ -111,5 +107,5 @@ class ScanLibraryActivity : ComponentActivity() {
             val navController = rememberNavController()
             ScanScreen(navController = navController)
         }
-    } 
-}
+    }
+
