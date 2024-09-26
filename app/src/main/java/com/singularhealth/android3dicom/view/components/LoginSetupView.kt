@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
@@ -94,7 +95,7 @@ private fun LoginContent(
                 .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(180.dp))
+        Spacer(modifier = Modifier.height(150.dp))
 
         Text(
             text = "How would you like to log in?",
@@ -102,7 +103,7 @@ private fun LoginContent(
             color = TitleColor,
         )
 
-        Spacer(modifier = Modifier.height(43.dp))
+        Spacer(modifier = Modifier.height(56.dp))
 
         Row(
             modifier =
@@ -128,6 +129,51 @@ private fun LoginContent(
                 modifier = Modifier.weight(1f),
             )
         }
+
+        Spacer(modifier = Modifier.height(60.dp))
+
+        Button(
+            onClick = { /* TODO: Handle setup */ },
+            modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = DarkBlue.copy(alpha = 0.5f),
+                ),
+            shape = RoundedCornerShape(4.dp),
+        ) {
+            Text(
+                "Setup",
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(22.dp))
+
+        OutlinedButton(
+            onClick = { /* TODO: Handle cancel */ },
+            modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White,
+                ),
+            border = BorderStroke(2.dp, DarkBlue),
+            shape = RoundedCornerShape(4.dp),
+        ) {
+            Text(
+                "Cancel",
+                style = MaterialTheme.typography.labelLarge,
+                color = DarkBlue,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -167,7 +213,7 @@ private fun LoginOptionItem(
                 painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = textColor,
-                modifier = Modifier.size(30.dp),
+                modifier = Modifier.size(24.dp),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -181,6 +227,7 @@ private fun LoginOptionItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = SubheadingColor,
                 maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
