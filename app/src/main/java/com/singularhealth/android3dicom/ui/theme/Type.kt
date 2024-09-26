@@ -75,8 +75,8 @@ val Typography =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
                 letterSpacing = 0.1.sp,
             ),
         displayLarge =
