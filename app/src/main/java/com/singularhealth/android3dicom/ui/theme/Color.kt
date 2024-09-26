@@ -21,3 +21,8 @@ val BorderColor = Color(0xFFA2A2A9)
 val WebPortalBlue = Color(0xFF1E2163)
 val TextFieldTextColor = Color(0xFFA2A2A9)
 val LightBlue = Color(0xFF50A5DE)
+val ButtonBorderColor = Color(0xFFA2A2A9)
+
+// New colors for selected login option
+val SelectedOptionBackground = Color(0xFFE2F2FD)
+val SelectedOptionCircle = Color(0xFF50A5DE)

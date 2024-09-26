@@ -2,27 +2,27 @@
 
 package com.singularhealth.android3dicom.view.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
-import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
-import com.singularhealth.android3dicom.ui.theme.DarkBlue
+import com.singularhealth.android3dicom.ui.theme.*
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(onBackClick: () -> Unit = {}) {
+    var selectedOption by remember { mutableStateOf<String?>(null) }
+
     Column(
         modifier =
             Modifier
@@ -30,7 +30,10 @@ fun LoginSetupView(onBackClick: () -> Unit = {}) {
                 .background(Color.White),
     ) {
         LoginTopBar(onBackClick)
-        LoginContent()
+        LoginContent(
+            selectedOption = selectedOption,
+            onOptionSelected = { selectedOption = it },
+        )
     }
 }
 
@@ -79,17 +82,127 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-private fun LoginContent() {
+private fun LoginContent(
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit,
+) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(25.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
-        // Add your login form elements here
+        Spacer(modifier = Modifier.height(180.dp))
+
+        Text(
+            text = "How would you like to log in?",
+            style = MaterialTheme.typography.displayLarge,
+            color = TitleColor,
+        )
+
+        Spacer(modifier = Modifier.height(43.dp))
+
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            LoginOptionItem(
+                text = "Biometric",
+                description = "Log in using your fingerprint or face ID",
+                icon = R.drawable.ic_fingerprint,
+                isSelected = selectedOption == "Biometric",
+                onSelect = { onOptionSelected("Biometric") },
+                modifier = Modifier.weight(1f),
+            )
+            LoginOptionItem(
+                text = "PIN",
+                description = "Log in by setting up a 4-digit PIN",
+                icon = R.drawable.ic_pin,
+                isSelected = selectedOption == "PIN",
+                onSelect = { onOptionSelected("PIN") },
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Suppress("ktlint:standard:function-naming")
+@Composable
+private fun LoginOptionItem(
+    text: String,
+    description: String,
+    icon: Int,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val backgroundColor = if (isSelected) SelectedOptionBackground else Color.White
+    val textColor = if (isSelected) DarkBlue else TitleColor
+    val borderColor = if (isSelected) SelectedOptionBackground else ButtonBorderColor
+    val circleSize = 18.dp
+    val circleBorderWidth = 1.5.dp
+    val circlePadding = 1.5.dp
+
+    Box(
+        modifier =
+            modifier
+                .height(130.dp)
+                .border(1.dp, borderColor, RoundedCornerShape(8.dp))
+                .background(backgroundColor, RoundedCornerShape(8.dp))
+                .clickable(onClick = onSelect),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.Top,
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(30.dp),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge,
+                color = textColor,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = SubheadingColor,
+                maxLines = 2,
+            )
+        }
+
+        Box(
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp, end = 16.dp)
+                    .size(circleSize)
+                    .border(circleBorderWidth, SubheadingColor, CircleShape)
+                    .padding(circlePadding),
+        ) {
+            if (isSelected) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(SelectedOptionCircle),
+                )
+            }
+        }
     }
 }
 
