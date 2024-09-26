@@ -49,7 +49,7 @@ class ScanLibraryActivity : ComponentActivity() {
                         MainImageMenu(navController = navController)
                     }
                     composable("shareView") {
-                        ShareView()
+                        ShareView(navController = navController)
                     }
                 }
             }

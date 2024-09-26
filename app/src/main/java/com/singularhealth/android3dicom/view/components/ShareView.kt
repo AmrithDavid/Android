@@ -5,6 +5,7 @@ package com.singularhealth.android3dicom.view.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -18,31 +19,30 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.BorderColor
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
-fun ShareView() {
+fun ShareView(navController: NavController) {
     var searchText by remember { mutableStateOf("") }
     var includeReport by remember { mutableStateOf(false) }
     var hasConsent by remember { mutableStateOf(false) }
 
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
     ) {
-        ShareTopBar()
+        ShareTopBar(onBackClick = { navController.navigateUp() })
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(56.dp))
@@ -53,62 +53,42 @@ fun ShareView() {
             )
             Spacer(modifier = Modifier.height(50.dp))
             Text(
-                text =
-                    buildAnnotatedString {
-                        pushStyle(
-                            MaterialTheme.typography.bodyMedium
-                                .toSpanStyle()
-                                .copy(color = SubheadingColor),
-                        )
-                        append("Sharing this scan will cost ")
-                        pushStyle(
-                            MaterialTheme.typography.displayLarge
-                                .toSpanStyle()
-                                .copy(color = SubheadingColor),
-                        )
-                        append("1 credit")
-                        pop()
-                        append(".")
-                    },
+                text = buildAnnotatedString {
+                    pushStyle(MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = SubheadingColor))
+                    append("Sharing this scan will cost ")
+                    pushStyle(MaterialTheme.typography.displayLarge.toSpanStyle().copy(color = SubheadingColor))
+                    append("1 credit")
+                    pop()
+                    append(".")
+                },
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text =
-                    buildAnnotatedString {
-                        pushStyle(
-                            MaterialTheme.typography.bodyMedium
-                                .toSpanStyle()
-                                .copy(color = SubheadingColor),
-                        )
-                        append("After sharing you will have ")
-                        pushStyle(
-                            MaterialTheme.typography.displayLarge
-                                .toSpanStyle()
-                                .copy(color = SubheadingColor),
-                        )
-                        append("2 credit(s)")
-                        pop()
-                        append(" remaining.")
-                    },
+                text = buildAnnotatedString {
+                    pushStyle(MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = SubheadingColor))
+                    append("After sharing you will have ")
+                    pushStyle(MaterialTheme.typography.displayLarge.toSpanStyle().copy(color = SubheadingColor))
+                    append("2 credit(s)")
+                    pop()
+                    append(" remaining.")
+                },
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                modifier =
-                    Modifier
-                        .fillMaxWidth(0.75f)
-                        .height(50.dp)
-                        .border(1.dp, BorderColor, RoundedCornerShape(4.dp)),
-                colors =
-                    TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                    ),
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .height(50.dp)
+                    .border(1.dp, BorderColor, RoundedCornerShape(4.dp)),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
                 shape = RoundedCornerShape(8.dp),
                 placeholder = {
                     Text(
@@ -129,11 +109,10 @@ fun ShareView() {
                 Checkbox(
                     checked = includeReport,
                     onCheckedChange = { includeReport = it },
-                    colors =
-                        CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary,
-                            uncheckedColor = SubheadingColor,
-                        ),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = SubheadingColor,
+                    ),
                     modifier = Modifier.padding(end = 1.dp),
                 )
                 Text(
@@ -153,11 +132,10 @@ fun ShareView() {
                 Checkbox(
                     checked = hasConsent,
                     onCheckedChange = { hasConsent = it },
-                    colors =
-                        CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primary,
-                            uncheckedColor = SubheadingColor,
-                        ),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = SubheadingColor,
+                    ),
                     modifier = Modifier.padding(end = 1.dp),
                 )
                 Text(
@@ -180,7 +158,7 @@ fun ShareView() {
                     modifier = Modifier
                         .height(35.dp)
                         .fillMaxWidth(0.75f),
-                            shape = RoundedCornerShape(4.dp)
+                    shape = RoundedCornerShape(4.dp)
                 ) {
                     Text(
                         "Send(1 Credit)",
@@ -193,29 +171,28 @@ fun ShareView() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
-fun ShareTopBar() {
+fun ShareTopBar(onBackClick: () -> Unit) {
     Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(DarkBlue),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(DarkBlue),
     ) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onBackClick() }
             )
 
             Spacer(modifier = Modifier.width(20.dp))
@@ -237,11 +214,10 @@ fun ShareTopBar() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun ShareViewPreview() {
     Android3DicomTheme {
-        ShareView()
+        ShareView(rememberNavController())
     }
 }
