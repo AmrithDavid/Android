@@ -17,7 +17,7 @@ import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun MoreOptionsDropdown(
+fun ImageDetailOptionsMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onItemClick: (String) -> Unit,

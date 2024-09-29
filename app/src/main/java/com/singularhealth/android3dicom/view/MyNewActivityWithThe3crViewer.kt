@@ -15,6 +15,8 @@ import health.singular.viewer3cr.android.sdk.FrontEndInterfaces
 import health.singular.viewer3cr.android.sdk.FrontEndPayload
 import health.singular.viewer3cr.android.sdk.ViewerSdkActivity
 
+// NOTE: This file is for testing, not production.
+
 @Suppress("ktlint:standard:property-naming")
 const val sampleScanPayload =
     "{" +

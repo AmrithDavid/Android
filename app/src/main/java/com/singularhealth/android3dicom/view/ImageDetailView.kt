@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
-import com.singularhealth.android3dicom.view.components.MoreOptionsDropdown
+import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -35,15 +35,16 @@ fun MainImageMenu(navController: NavController) {
                 selectedButton = selectedButton,
                 onButtonSelected = { selectedButton = it },
                 onMoreClick = { showDropdown = true },
-                onBackClick = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() },
             )
 
             // Content area
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -56,13 +57,14 @@ fun MainImageMenu(navController: NavController) {
                     )
                 }
 
-                // Dropdown menu
+                // Options menu
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(y = (-76).dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(y = (-76).dp),
                 ) {
-                    MoreOptionsDropdown(
+                    ImageDetailOptionsMenu(
                         expanded = showDropdown,
                         onDismissRequest = { showDropdown = false },
                         onItemClick = { selectedOption ->
@@ -89,20 +91,22 @@ fun MainImageMenuTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
     onMoreClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(top = statusBarHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(top = statusBarHeight),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -114,9 +118,10 @@ fun MainImageMenuTopBar(
                     painter = painterResource(id = R.drawable.ic_back),
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { onBackClick() }
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .clickable { onBackClick() },
                 )
 
                 Spacer(modifier = Modifier.width(27.dp))
@@ -135,19 +140,21 @@ fun MainImageMenuTopBar(
                 painter = painterResource(id = R.drawable.ic_more),
                 contentDescription = "More options",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { onMoreClick() },
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { onMoreClick() },
             )
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
         ) {
             listOf("3D", "Transverse", "Sagittal", "Coronal").forEach { buttonText ->
                 TopBarButton(
@@ -172,35 +179,38 @@ fun TopBarButton(
         modifier = modifier,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(36.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(36.dp),
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClick,
-                    )
-                    .wrapContentSize(Alignment.Center),
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                    },
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onClick,
+                        ).wrapContentSize(Alignment.Center),
             )
         }
 
         // Drawing the line
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
         )
     }
 }
@@ -212,9 +222,10 @@ fun MainImageMenuBottomBar() {
         contentColor = MaterialTheme.colorScheme.onPrimary,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             BottomBarButton(icon = R.drawable.ic_display, label = "Display")
