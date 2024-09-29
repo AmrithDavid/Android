@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -27,20 +28,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
+import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun NavigationBar(greeting: String, onMenuClick: () -> Unit) {
+fun NavigationBar(
+    greeting: String,
+    onMenuClick: () -> Unit,
+) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(top = statusBarHeight)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(top = statusBarHeight)
+                .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -50,7 +57,11 @@ fun NavigationBar(greeting: String, onMenuClick: () -> Unit) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onMenuClick) {
+                IconButton(
+                    onClick = onMenuClick,
+                    modifier = Modifier
+                        .offset(x = (-8).dp)
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_menu),
                         contentDescription = "Menu",
@@ -59,7 +70,7 @@ fun NavigationBar(greeting: String, onMenuClick: () -> Unit) {
                     )
                 }
 
-                Spacer(modifier = Modifier.width(27.dp))
+                Spacer(modifier = Modifier.width(2.dp))
 
                 Text(
                     text = greeting,
@@ -83,20 +94,22 @@ fun NavigationBar(greeting: String, onMenuClick: () -> Unit) {
             TextField(
                 value = "",
                 onValueChange = { /* TODO: Handle search input */ },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE0E1FF).copy(alpha = 0.3f)),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                ),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFE0E1FF).copy(alpha = 0.3f)),
+                colors =
+                    TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        cursorColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    ),
                 placeholder = {
                     Text(
                         "Search",
@@ -130,12 +143,25 @@ fun NavigationBar(greeting: String, onMenuClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_filter_on),
                 contentDescription = "Filter",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE0E1FF).copy(alpha = 0.3f))
-                    .padding(12.dp),
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFE0E1FF).copy(alpha = 0.3f))
+                        .padding(12.dp),
             )
         }
+    }
+}
+
+@Suppress("ktlint:standard:function-naming")
+@Preview(showBackground = true)
+@Composable
+fun NavigationBarPreview() {
+    Android3DicomTheme {
+        NavigationBar(
+            greeting = "Hello Sam",
+            onMenuClick = {},
+        )
     }
 }
