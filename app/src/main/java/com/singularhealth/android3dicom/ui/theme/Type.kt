@@ -30,7 +30,7 @@ val Typography =
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                letterSpacing = 0.5.sp,
+
             ),
         titleLarge =
             TextStyle(
@@ -38,22 +38,20 @@ val Typography =
                 fontWeight = FontWeight.Normal, // changed from medium to normal despite wireframe info as it looks more similiar
                 fontSize = 20.sp,
                 lineHeight = 26.sp,
-                letterSpacing = 0.5.sp,
             ),
         labelSmall =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
                 lineHeight = 18.sp,
                 letterSpacing = 0.sp,
             ),
-        // Add more text styles as needed for your app
         titleMedium =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
                 fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.15.sp,
             ),
@@ -63,7 +61,6 @@ val Typography =
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                letterSpacing = 0.25.sp,
             ),
         labelMedium =
             TextStyle(
@@ -78,8 +75,15 @@ val Typography =
             TextStyle(
                 fontFamily = PlusJakartaSansFamily,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
                 letterSpacing = 0.1.sp,
             ),
+        displayLarge =
+            TextStyle(
+                fontFamily = PlusJakartaSansFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                lineHeight = 18.sp,
+            )
     )

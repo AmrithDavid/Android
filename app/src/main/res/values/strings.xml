@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">android3DicomViewer</string>
+    <string name="game_view_content_description">Core Renderer view</string>
 </resources>
