@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.singularhealth.android3dicom"
-        minSdk = 24
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -76,4 +76,5 @@ dependencies {
     implementation("com.github.singularhealth:3cr-sdk-android:1.2.9")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
     implementation("androidx.navigation:navigation-compose:2.8.1")
+    implementation("androidx.core:core-splashscreen:1.0.0")
 }
