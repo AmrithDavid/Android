@@ -91,12 +91,12 @@ fun PatientInfoCard() {
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            PatientInfoRow("Study Description:", "CT Scan")
-            PatientInfoRow("Patient name:", "Sam Kellahan :(")
-            PatientInfoRow("Patient ID:", "12345")
-            PatientInfoRow("Date of Birth:", "01/01/1980")
-            PatientInfoRow("Study Date:", "06/15/2023")
-            PatientInfoRow("Physician's name:", "David,Amrith")
+            PatientInfoRow("Study Description: ", "CT Scan")
+            PatientInfoRow("Patient name: ", "Sam Kellahan :(")
+            PatientInfoRow("Patient ID: ", "12345")
+            PatientInfoRow("Date of Birth: ", "01/01/1980")
+            PatientInfoRow("Study Date: ", "06/15/2023")
+            PatientInfoRow("Physician's name: ", "David, Amrith")
         }
     }
 }
