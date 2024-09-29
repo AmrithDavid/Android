@@ -118,25 +118,25 @@ class ScanLibraryActivity : ComponentActivity() {
     }
 
 // CardList displays a list of ScanCard items
-    @Composable
-    fun CardList(
-        modifier: Modifier = Modifier,
-        patientCards: List<PatientCardData>,
-        onImageButtonClick: () -> Unit,
+@Composable
+fun CardList(
+    modifier: Modifier = Modifier,
+    patientCards: List<PatientCardData>,
+    onImageButtonClick: () -> Unit,
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(patientCards.size) { index ->
-                ScanCard(
-                    patientCardData = patientCards[index],
-                    onImageButtonClick = onImageButtonClick,
-                )
-            }
+        items(patientCards.size) { index ->
+            ScanCard(
+                patientCardData = patientCards[index],
+                onImageButtonClick = onImageButtonClick,
+            )
         }
     }
+}
 
 // Visualise the ScanScreen
 @Preview(showBackground = true)

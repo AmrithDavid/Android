@@ -20,11 +20,11 @@ class ScanViewModel : ViewModel() {
     private fun loadPatientCards() {
         // Toggle between these two lines to test empty and non-empty states
         _patientCards.value = emptyList() // Uncomment this line to test EmptyStateView
-        //_patientCards.value = generateDummyData() // Uncomment this line to test CardList
+        // _patientCards.value = generateDummyData() // Uncomment this line to test CardList
     }
 
-    private fun generateDummyData(): List<PatientCardData> {
-        return List(4) {
+    private fun generateDummyData(): List<PatientCardData> =
+        List(4) {
             PatientCardData(
                 patientName = "Sam Kellahan",
                 date = "2024-09-10",
@@ -34,7 +34,6 @@ class ScanViewModel : ViewModel() {
                 imageName = "patient_image",
             )
         }
-    }
 
     fun updateGreeting(name: String) {
         _greeting.value = "Hello $name"
