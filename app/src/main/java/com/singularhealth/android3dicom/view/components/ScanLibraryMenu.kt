@@ -19,7 +19,7 @@ import com.singularhealth.android3dicom.ui.theme.*
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun SideMenu(
+fun ScanLibraryMenu(
     onCloseMenu: () -> Unit,
     onHomeClick: () -> Unit,
     onClearCacheClick: () -> Unit,
@@ -61,7 +61,7 @@ fun SideMenu(
                 ) {
                     // Logo
                     Image(
-                        painter = painterResource(id = R.drawable.img_logo_mod_01),
+                        painter = painterResource(id = R.drawable.img_logo_no_title),
                         contentDescription = "3DICOM Logo",
                         modifier =
                             Modifier

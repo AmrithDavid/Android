@@ -8,15 +8,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -36,9 +38,9 @@ import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.view.components.NavigationBar
 import com.singularhealth.android3dicom.view.components.ScanCard
-import com.singularhealth.android3dicom.view.components.SideMenu
+import com.singularhealth.android3dicom.view.components.ScanLibraryMenu
 import com.singularhealth.android3dicom.view.components.ShareView
-import com.singularhealth.android3dicom.viewmodel.ScanViewModel
+import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
 class ScanLibraryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +66,10 @@ class ScanLibraryActivity : ComponentActivity() {
 }
 
 @Composable
-fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
+fun ScanScreen(
+    viewModel: ScanLibraryViewModel = viewModel(),
+    navController: NavController,
+) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
@@ -74,11 +79,12 @@ fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = if (isSideMenuVisible) {
-                Color.Transparent.toArgb()
-            } else {
-                DarkBlue.toArgb()
-            }
+            window.statusBarColor =
+                if (isSideMenuVisible) {
+                    Color.Transparent.toArgb()
+                } else {
+                    DarkBlue.toArgb()
+                }
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isSideMenuVisible
         }
     }
@@ -89,7 +95,7 @@ fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
             topBar = {
                 NavigationBar(
                     greeting = greeting,
-                    onMenuClick = { viewModel.toggleSideMenu() }
+                    onMenuClick = { viewModel.toggleSideMenu() },
                 )
             },
             containerColor = MaterialTheme.colorScheme.background,
@@ -104,22 +110,23 @@ fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
         // Semi-transparent overlay
         if (isSideMenuVisible) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0x52000000)) // #00000052
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color(0x52000000)), // #00000052
             )
         }
 
         // SideMenu
         if (isSideMenuVisible) {
-            SideMenu(
+            ScanLibraryMenu(
                 onCloseMenu = { viewModel.toggleSideMenu() },
                 onHomeClick = { viewModel.onHomeClick() },
                 onClearCacheClick = { viewModel.onClearCacheClick() },
                 onBiometricClick = { viewModel.onBiometricClick() },
                 onAboutClick = { viewModel.onAboutClick() },
                 onSupportClick = { viewModel.onSupportClick() },
-                onLogoutClick = { viewModel.onLogoutClick() }
+                onLogoutClick = { viewModel.onLogoutClick() },
             )
         }
     }
@@ -129,6 +136,7 @@ fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
 fun CardList(
     modifier: Modifier = Modifier,
     patientCards: List<PatientCardData>,
+    onImageButtonClick: () -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -136,17 +144,20 @@ fun CardList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(patientCards.size) { index ->
-            ScanCard(patientCardData = patientCards[index])
+            ScanCard(
+                patientCardData = patientCards[index],
+                onImageButtonClick = onImageButtonClick,
+            )
         }
     }
 }
 
-    // Visualise the ScanScreen
-    @Preview(showBackground = true)
-    @Composable
-    fun ScanScreenPreview() {
-        Android3DicomTheme {
-            val navController = rememberNavController()
-            ScanScreen(navController = navController)
-        }
+// Visualise the ScanScreen
+@Preview(showBackground = true)
+@Composable
+fun ScanScreenPreview() {
+    Android3DicomTheme {
+        val navController = rememberNavController()
+        ScanScreen(navController = navController)
     }
+}

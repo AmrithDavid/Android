@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ScanViewModel : ViewModel() {
+class ScanLibraryViewModel : ViewModel() {
     private val _greeting = MutableStateFlow("Hello Sam")
     val greeting: StateFlow<String> = _greeting.asStateFlow()
 
