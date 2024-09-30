@@ -27,29 +27,36 @@ class ScanLibraryViewModel : ViewModel() {
             // Simulate data loading
             delay(2000) // Simulate a 2-second load time
 
-            // Initialize with placeholder data
-            _patientCards.value =
-                List(4) {
-                    PatientCardData(
-                        patientName = "Sam Kellahan",
-                        date = "2024-09-10",
-                        patientId = "123456789",
-                        modality = "CT",
-                        expiresIn = "7 days",
-                        imageName = "patient_image",
-                    )
-                }
+            loadPatientCards()
 
             _dataLoaded.value = true
         }
     }
+
+    private fun loadPatientCards() {
+        // Toggle between these two lines to test empty and non-empty states
+        // _patientCards.value = emptyList() // Uncomment this line to test EmptyStateView
+        _patientCards.value = generateDummyData() // Uncomment this line to test CardList
+    }
+
+    private fun generateDummyData(): List<PatientCardData> =
+        List(4) {
+            PatientCardData(
+                patientName = "Sam Kellahan",
+                date = "2024-09-10",
+                patientId = "123456789",
+                modality = "CT",
+                expiresIn = "7 days",
+                imageName = "patient_image",
+            )
+        }
 
     fun updateGreeting(name: String) {
         _greeting.value = "Hello $name"
     }
 
     fun isDataLoaded(): Boolean = _dataLoaded.value
-    
+
     fun toggleSideMenu() {
         _isSideMenuVisible.value = !_isSideMenuVisible.value
     }

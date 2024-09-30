@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
+import com.singularhealth.android3dicom.view.components.EmptyStateView
 import com.singularhealth.android3dicom.view.components.NavigationBar
 import com.singularhealth.android3dicom.view.components.ScanCard
 import com.singularhealth.android3dicom.view.components.ScanLibraryMenu
@@ -69,31 +70,30 @@ class ScanLibraryActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun ScanScreen(
-    viewModel: ScanLibraryViewModel = viewModel(),
-    navController: NavController,
-) {
-    val greeting by viewModel.greeting.collectAsState()
-    val patientCards by viewModel.patientCards.collectAsState()
-    val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
+    @Composable
+    fun ScanScreen(
+        viewModel: ScanLibraryViewModel = viewModel(),
+        navController: NavController,
+    ) {
+        val greeting by viewModel.greeting.collectAsState()
+        val patientCards by viewModel.patientCards.collectAsState()
+        val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
 
-    // Control system UI color
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor =
-                if (isSideMenuVisible) {
-                    Color.Transparent.toArgb()
-                } else {
-                    DarkBlue.toArgb()
-                }
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isSideMenuVisible
+        // Control system UI color
+        val view = LocalView.current
+        if (!view.isInEditMode) {
+            SideEffect {
+                val window = (view.context as Activity).window
+                window.statusBarColor =
+                    if (isSideMenuVisible) {
+                        Color.Transparent.toArgb()
+                    } else {
+                        DarkBlue.toArgb()
+                    }
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isSideMenuVisible
+            }
         }
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
@@ -104,20 +104,24 @@ fun ScanScreen(
             },
             containerColor = MaterialTheme.colorScheme.background,
         ) { innerPadding ->
-            CardList(
-                modifier = Modifier.padding(innerPadding),
-                patientCards = patientCards,
-                onImageButtonClick = { navController.navigate("mainImageMenu") },
-            )
+            
+            if (patientCards.isNotEmpty()) {
+                CardList(
+                    modifier = Modifier.padding(innerPadding),
+                    patientCards = patientCards,
+                    onImageButtonClick = { navController.navigate("mainImageMenu") },
+                )
+            } else {
+                EmptyStateView()
+            }
         }
-
         // Semi-transparent overlay
         if (isSideMenuVisible) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color(0x52000000)), // #00000052
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x52000000)), // #00000052
             )
         }
 
@@ -134,8 +138,9 @@ fun ScanScreen(
             )
         }
     }
-}
 
+
+// CardList displays a list of ScanCard items
 @Composable
 fun CardList(
     modifier: Modifier = Modifier,
