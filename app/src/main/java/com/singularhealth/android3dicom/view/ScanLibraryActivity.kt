@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
+import com.singularhealth.android3dicom.view.components.LoginSetupView
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.view.components.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
@@ -44,6 +45,16 @@ class ScanLibraryActivity : ComponentActivity() {
             Android3DicomTheme {
                 NavigationSetup()
             }
+
+            // ------- Test code for DMA-26 to be removed ---- 
+            val showLoginSetup = true
+
+            if (showLoginSetup) {
+                LoginSetupView(onBackClick = { /* TODO: Handle back click if needed */ })
+            } else {
+                ScanScreen()
+            }
+            //----------------------------------------------
         }
     }
 }

@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -87,20 +90,39 @@ private fun LoginContent(
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
 ) {
+    val typography = MaterialTheme.typography
+    val density = LocalDensity.current
+
+    // Calculate the actual SP value that results in 18 physical pixels
+    val intendedSp = with(density) { 18.dp.toPx().toSp() }
+
+    val normalizedTextStyle = typography.displayLarge.copy(
+        fontSize = intendedSp,
+        lineHeight = with(density) { 26.dp.toPx().toSp() }
+    )
+
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(150.dp))
 
         Text(
             text = "How would you like to log in?",
-            style = MaterialTheme.typography.displayLarge,
+            style = normalizedTextStyle,
             color = TitleColor,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Debug text
+        Text(
+            text = "Debug: fontSize=${normalizedTextStyle.fontSize}, lineHeight=${normalizedTextStyle.lineHeight}",
+            style = typography.bodySmall,
+            color = Color.Gray
         )
 
         Spacer(modifier = Modifier.height(56.dp))
