@@ -4,10 +4,13 @@ package com.singularhealth.android3dicom.view
 
 import android.app.Activity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -21,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -35,26 +39,70 @@ import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
+import com.singularhealth.android3dicom.view.components.NavigationBar
+import com.singularhealth.android3dicom.view.components.ScanCard
+
 class ScanLibraryActivity : ComponentActivity() {
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val executor = ContextCompat.getMainExecutor(this)
+        biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                Toast.makeText(applicationContext, "Authentication succeeded!", Toast.LENGTH_SHORT).show()
+                // TODO: Navigate to main screen or update state to show main content
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                Toast.makeText(applicationContext, "Authentication failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Biometric login for my app")
+            .setSubtitle("Log in using your biometric credential")
+            .setNegativeButtonText("Cancel")
+            .build()
 
         setContent {
             Android3DicomTheme {
                 NavigationSetup()
             }
 
-            // ------- Test code for DMA-26 to be removed ---- 
-            val showLoginSetup = true
+            // ------- Test code for DMA-26 
+            var showLoginSetup by remember { mutableStateOf(true) }
 
-            if (showLoginSetup) {
-                LoginSetupView(onBackClick = { /* TODO: Handle back click if needed */ })
-            } else {
-                ScanScreen()
+                if (showLoginSetup) {
+                    LoginSetupView(
+                        onBackClick = { /* TODO: Handle back click if needed */ },
+                        onBiometricLoginClick = {
+                            val biometricManager = BiometricManager.from(this@ScanLibraryActivity)
+                            when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+                                BiometricManager.BIOMETRIC_SUCCESS ->
+                                    biometricPrompt.authenticate(promptInfo)
+                                else -> {
+                                    Toast.makeText(this@ScanLibraryActivity,
+                                        "Biometric authentication not available",
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    )
+                } else {
+                    ScanScreen()
+                }
             }
-            //----------------------------------------------
         }
     }
 }

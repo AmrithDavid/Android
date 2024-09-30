@@ -7,66 +7,70 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
-fun LoginSetupView(onBackClick: () -> Unit = {}) {
+fun LoginSetupView(
+    onBackClick: () -> Unit = {},
+    onBiometricLoginClick: () -> Unit
+) {
     var selectedOption by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
     ) {
         LoginTopBar(onBackClick)
         LoginContent(
             selectedOption = selectedOption,
             onOptionSelected = { selectedOption = it },
+            onSetupClick = {
+                if (selectedOption == "Biometric") {
+                    onBiometricLoginClick()
+                } else {
+                    // Handle PIN setup
+                    // TODO: Implement PIN setup
+                }
+            }
         )
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginTopBar(onBackClick: () -> Unit) {
     Column(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(DarkBlue),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(DarkBlue),
     ) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier =
-                    Modifier
-                        .size(24.dp)
-                        .clickable(onClick = onBackClick),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(onClick = onBackClick),
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(
@@ -84,11 +88,11 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginContent(
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
+    onSetupClick: () -> Unit
 ) {
     val typography = MaterialTheme.typography
 
@@ -103,7 +107,7 @@ private fun LoginContent(
 
         Text(
             text = "How would you like to log in?",
-            style = typography.displayLarge,
+            style = typography.displayLarge.copy(fontSize = 24.sp),
             color = TitleColor,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -138,7 +142,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         Button(
-            onClick = { /* TODO: Handle setup */ },
+            onClick = onSetupClick,
             modifier = Modifier
                 .width(300.dp)
                 .height(40.dp),
@@ -180,7 +184,6 @@ private fun LoginContent(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginOptionItem(
     text: String,
@@ -255,11 +258,10 @@ private fun LoginOptionItem(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
-        LoginSetupView()
+        LoginSetupView(onBiometricLoginClick = {})
     }
 }

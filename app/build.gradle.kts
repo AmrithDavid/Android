@@ -90,6 +90,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
     implementation("androidx.credentials:credentials:1.5.0-alpha05")
     implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation("androidx.biometric:biometric:1.1.0")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 }
 
