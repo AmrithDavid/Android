@@ -72,7 +72,7 @@ class ScanLibraryActivity : ComponentActivity() {
 
     @Composable
     fun ScanScreen(
-        viewModel: ScanViewModel = viewModel(),
+        viewModel: ScanLibraryViewModel = viewModel(),
         navController: NavController,
     ) {
         val greeting by viewModel.greeting.collectAsState()
@@ -115,7 +115,30 @@ class ScanLibraryActivity : ComponentActivity() {
                 EmptyStateView()
             }
         }
+        // Semi-transparent overlay
+        if (isSideMenuVisible) {
+            Box(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x52000000)), // #00000052
+            )
+        }
+
+        // SideMenu
+        if (isSideMenuVisible) {
+            ScanLibraryMenu(
+                onCloseMenu = { viewModel.toggleSideMenu() },
+                onHomeClick = { viewModel.onHomeClick() },
+                onClearCacheClick = { viewModel.onClearCacheClick() },
+                onBiometricClick = { viewModel.onBiometricClick() },
+                onAboutClick = { viewModel.onAboutClick() },
+                onSupportClick = { viewModel.onSupportClick() },
+                onLogoutClick = { viewModel.onLogoutClick() },
+            )
+        }
     }
+
 
 // CardList displays a list of ScanCard items
 @Composable
