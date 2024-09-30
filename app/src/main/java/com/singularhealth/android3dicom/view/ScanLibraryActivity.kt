@@ -100,11 +100,7 @@ fun NavigationSetup() {
 }
 
 @Composable
-fun ScanScreen(
-    viewModel: ScanLibraryViewModel = viewModel(),
-    navController: NavController,
-    searchQuery: MutableState<String>,
-) {
+fun ScanScreen(viewModel: ScanViewModel = viewModel()) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()

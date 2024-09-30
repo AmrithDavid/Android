@@ -91,15 +91,6 @@ private fun LoginContent(
     onOptionSelected: (String) -> Unit,
 ) {
     val typography = MaterialTheme.typography
-    val density = LocalDensity.current
-
-    // Calculate the actual SP value that results in 18 physical pixels
-    val intendedSp = with(density) { 18.dp.toPx().toSp() }
-
-    val normalizedTextStyle = typography.displayLarge.copy(
-        fontSize = intendedSp,
-        lineHeight = with(density) { 26.dp.toPx().toSp() }
-    )
 
     Column(
         modifier = Modifier
@@ -112,26 +103,18 @@ private fun LoginContent(
 
         Text(
             text = "How would you like to log in?",
-            style = normalizedTextStyle,
+            style = typography.displayLarge,
             color = TitleColor,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Debug text
-        Text(
-            text = "Debug: fontSize=${normalizedTextStyle.fontSize}, lineHeight=${normalizedTextStyle.lineHeight}",
-            style = typography.bodySmall,
-            color = Color.Gray
-        )
-
         Spacer(modifier = Modifier.height(56.dp))
 
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             LoginOptionItem(
@@ -156,15 +139,15 @@ private fun LoginContent(
 
         Button(
             onClick = { /* TODO: Handle setup */ },
-            modifier =
-                Modifier
-                    .width(300.dp)
-                    .height(40.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = DarkBlue.copy(alpha = 0.5f),
-                ),
+            modifier = Modifier
+                .width(300.dp)
+                .height(40.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = DarkBlue,
+                disabledContainerColor = if (selectedOption != null) DarkBlue else DarkBlue.copy(alpha = 0.5f),
+            ),
             shape = RoundedCornerShape(4.dp),
+            enabled = selectedOption != null
         ) {
             Text(
                 "Setup",
@@ -177,14 +160,12 @@ private fun LoginContent(
 
         OutlinedButton(
             onClick = { /* TODO: Handle cancel */ },
-            modifier =
-                Modifier
-                    .width(300.dp)
-                    .height(40.dp),
-            colors =
-                ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White,
-                ),
+            modifier = Modifier
+                .width(300.dp)
+                .height(40.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.White,
+            ),
             border = BorderStroke(2.dp, DarkBlue),
             shape = RoundedCornerShape(4.dp),
         ) {
@@ -211,31 +192,31 @@ private fun LoginOptionItem(
 ) {
     val backgroundColor = if (isSelected) SelectedOptionBackground else Color.White
     val textColor = if (isSelected) DarkBlue else TitleColor
-    val borderColor = if (isSelected) SelectedOptionBackground else ButtonBorderColor
+    val borderColor = if (isSelected) DarkBlue else ButtonBorderColor
+    val borderWidth = if (isSelected) 2.dp else 1.dp
     val circleSize = 18.dp
     val circleBorderWidth = 1.5.dp
     val circlePadding = 1.5.dp
+    val innerCircleSize = 10.dp
 
     Box(
-        modifier =
-            modifier
-                .height(130.dp)
-                .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                .background(backgroundColor, RoundedCornerShape(8.dp))
-                .clickable(onClick = onSelect),
+        modifier = modifier
+            .height(130.dp)
+            .border(borderWidth, borderColor, RoundedCornerShape(8.dp))
+            .background(backgroundColor, RoundedCornerShape(8.dp))
+            .clickable(onClick = onSelect),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.Top,
         ) {
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = textColor,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(30.dp),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -254,21 +235,20 @@ private fun LoginOptionItem(
         }
 
         Box(
-            modifier =
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 16.dp, end = 16.dp)
-                    .size(circleSize)
-                    .border(circleBorderWidth, SubheadingColor, CircleShape)
-                    .padding(circlePadding),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp, end = 16.dp)
+                .size(circleSize)
+                .border(circleBorderWidth, SubheadingColor, CircleShape)
+                .padding(circlePadding),
         ) {
             if (isSelected) {
                 Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .background(SelectedOptionCircle),
+                    modifier = Modifier
+                        .size(innerCircleSize)
+                        .align(Alignment.Center)
+                        .clip(CircleShape)
+                        .background(SelectedOptionCircle),
                 )
             }
         }
