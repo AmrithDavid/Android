@@ -20,10 +20,15 @@ import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun MainImageMenu(navController: NavController) {
+fun MainImageMenu(
+    viewModel: ImageDetailViewModel = viewModel(),
+    navController: NavController,
+) {
     var showDropdown by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
 
@@ -34,6 +39,10 @@ fun MainImageMenu(navController: NavController) {
             MainImageMenuTopBar(
                 selectedButton = selectedButton,
                 onButtonSelected = { selectedButton = it },
+                on3DClick = { viewModel.on3DClick() },
+                onTransverseClick = { viewModel.onTransverseClick() },
+                onSagittalClick = { viewModel.onSagittalClick() },
+                onCoronalClick = { viewModel.onCoronalClick() },
                 onMoreClick = { showDropdown = true },
                 onBackClick = { navController.navigateUp() },
             )
@@ -90,6 +99,10 @@ fun MainImageMenu(navController: NavController) {
 fun MainImageMenuTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
+    on3DClick: () -> Unit,
+    onTransverseClick: () -> Unit,
+    onSagittalClick: () -> Unit,
+    onCoronalClick: () -> Unit,
     onMoreClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -160,7 +173,16 @@ fun MainImageMenuTopBar(
                 TopBarButton(
                     text = buttonText,
                     isSelected = selectedButton == buttonText,
-                    onClick = { onButtonSelected(buttonText) },
+                    onClick = {
+                        onButtonSelected(buttonText)
+                        // Call appropriate ViewModel method based on buttonText
+                        when (buttonText) {
+                            "3D" -> on3DClick()
+                            "Transverse" -> onTransverseClick()
+                            "Sagittal" -> onSagittalClick()
+                            "Coronal" -> onCoronalClick()
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -262,6 +284,7 @@ fun BottomBarButton(
 @Composable
 fun MainImageMenuPreview() {
     Android3DicomTheme {
-        MainImageMenu(rememberNavController())
+        //TODO: argument error below
+        MainImageMenu(navController = rememberNavController())
     }
 }
