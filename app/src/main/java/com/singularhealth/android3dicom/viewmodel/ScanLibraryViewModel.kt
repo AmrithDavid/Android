@@ -25,7 +25,7 @@ class ScanLibraryViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             // Simulate data loading
-            delay(2000) // Simulate a 2-second load time
+//            delay(2000) // Simulate a 2-second load time
 
             loadPatientCards()
 
@@ -40,7 +40,7 @@ class ScanLibraryViewModel : ViewModel() {
     }
 
     private fun generateDummyData(): List<PatientCardData> =
-        List(4) {
+        listOf(
             PatientCardData(
                 patientName = "Sam Kellahan",
                 date = "2024-09-10",
@@ -48,8 +48,45 @@ class ScanLibraryViewModel : ViewModel() {
                 modality = "CT",
                 expiresIn = "7 days",
                 imageName = "patient_image",
+            ),
+            PatientCardData(
+                patientName = "Luna Shin",
+                date = "2024-09-10",
+                patientId = "123488272",
+                modality = "Xray",
+                expiresIn = "7 days",
+                imageName = "patient_image",
+            ),
+            PatientCardData(
+                patientName = "testing name",
+                date = "2024-09-10",
+                patientId = "01010110",
+                modality = "CT",
+                expiresIn = "7 days",
+                imageName = "patient_image",
+            ),
+            PatientCardData(
+                patientName = "choco",
+                date = "1997-09-01",
+                patientId = "19970901",
+                modality = "3D",
+                expiresIn = "7 days",
+                imageName = "patient_image",
             )
-        }
+
+        )
+//        List(4) {
+//            PatientCardData(
+//                patientName = "Sam Kellahan",
+//                date = "2024-09-10",
+//                patientId = "123456789",
+//                modality = "CT",
+//                expiresIn = "7 days",
+//                imageName = "patient_image",
+//            )
+//        }
+
+
 
     fun updateGreeting(name: String) {
         _greeting.value = "Hello $name"

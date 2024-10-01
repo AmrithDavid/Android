@@ -23,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,8 +41,11 @@ import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 fun NavigationBar(
     greeting: String,
     onMenuClick: () -> Unit,
+    searchQuery: MutableState<String>, // Pass MutableState<String> here
+    onSearchQueryChange: (MutableState<String>) -> Unit // Lambda expects MutableState<String>
 ) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    //var queryState  = remember { mutableStateOf(searchQuery) }
 
     Column(
         modifier =
@@ -92,8 +98,11 @@ fun NavigationBar(
             modifier = Modifier.fillMaxWidth(),
         ) {
             TextField(
-                value = "",
-                onValueChange = { /* TODO: Handle search input */ },
+                value = searchQuery.value,
+                onValueChange = { /* TODO: Handle search input */
+                    searchQuery.value = it
+                    println("val changed")
+                    onSearchQueryChange(searchQuery)},
                 modifier =
                     Modifier
                         .weight(1f)
@@ -137,6 +146,10 @@ fun NavigationBar(
                 singleLine = true,
             )
 
+            //Text("The textfield has this text: " + searchQuery.value)
+
+            //TODO: call function here that modifies cards
+
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(
@@ -159,9 +172,14 @@ fun NavigationBar(
 @Composable
 fun NavigationBarPreview() {
     Android3DicomTheme {
+        val searchQuery = remember { mutableStateOf("") } // Create MutableState<String>
+
         NavigationBar(
             greeting = "Hello Sam",
             onMenuClick = {},
+            //TODO: parameter error below
+            searchQuery = searchQuery,
+            onSearchQueryChange = { /* No-op for preview */ }
         )
     }
 }
