@@ -128,7 +128,8 @@ class ScanLibraryActivity : ComponentActivity() {
             val filteredCards = patientCards.filter { card ->
                 card.patientName.contains(searchQuery.value, ignoreCase = true) ||
                 card.patientId.contains(searchQuery.value, ignoreCase = true) ||
-                card.modality.contains(searchQuery.value, ignoreCase = true)
+                card.modality.contains(searchQuery.value, ignoreCase = true) ||
+                card.fileName.contains(searchQuery.value, ignoreCase = true)
             }
             
             if (filteredCards.isNotEmpty()) {

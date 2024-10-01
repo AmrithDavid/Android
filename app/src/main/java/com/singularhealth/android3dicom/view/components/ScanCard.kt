@@ -75,7 +75,7 @@ fun ScanCard(
                         painterResource(
                             id =
                                 LocalContext.current.resources.getIdentifier(
-                                    patientCardData.imageName,
+                                    patientCardData.fileName,
                                     "drawable",
                                     LocalContext.current.packageName,
                                 ),
@@ -96,7 +96,7 @@ fun ScanCard(
                             .padding(start = 16.dp),
                 ) {
                     Text(
-                        text = "Study Description",
+                        text = patientCardData.fileName,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Spacer(modifier = Modifier.height(4.dp))

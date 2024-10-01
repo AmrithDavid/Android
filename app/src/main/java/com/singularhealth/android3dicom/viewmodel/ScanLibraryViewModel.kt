@@ -47,7 +47,7 @@ class ScanLibraryViewModel : ViewModel() {
                 patientId = "123456789",
                 modality = "CT",
                 expiresIn = "7 days",
-                imageName = "patient_image",
+                fileName = "img_logomark",
             ),
             PatientCardData(
                 patientName = "Luna Shin",
@@ -55,7 +55,7 @@ class ScanLibraryViewModel : ViewModel() {
                 patientId = "123488272",
                 modality = "Xray",
                 expiresIn = "7 days",
-                imageName = "patient_image",
+                fileName = "patient_image",
             ),
             PatientCardData(
                 patientName = "testing name",
@@ -63,7 +63,7 @@ class ScanLibraryViewModel : ViewModel() {
                 patientId = "01010110",
                 modality = "CT",
                 expiresIn = "7 days",
-                imageName = "patient_image",
+                fileName = "patient_image",
             ),
             PatientCardData(
                 patientName = "choco",
@@ -71,7 +71,7 @@ class ScanLibraryViewModel : ViewModel() {
                 patientId = "19970901",
                 modality = "3D",
                 expiresIn = "7 days",
-                imageName = "patient_image",
+                fileName = "patient_image",
             )
 
         )
