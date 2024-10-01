@@ -45,7 +45,6 @@ fun NavigationBar(
     onSearchQueryChange: (MutableState<String>) -> Unit // Lambda expects MutableState<String>
 ) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    //var queryState  = remember { mutableStateOf(searchQuery) }
 
     Column(
         modifier =
@@ -99,9 +98,9 @@ fun NavigationBar(
         ) {
             TextField(
                 value = searchQuery.value,
-                onValueChange = { /* TODO: Handle search input */
+                onValueChange = {
+                    //handle search query (input)
                     searchQuery.value = it
-                    println("val changed")
                     onSearchQueryChange(searchQuery)},
                 modifier =
                     Modifier
@@ -146,10 +145,6 @@ fun NavigationBar(
                 singleLine = true,
             )
 
-            //Text("The textfield has this text: " + searchQuery.value)
-
-            //TODO: call function here that modifies cards
-
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(
@@ -177,7 +172,6 @@ fun NavigationBarPreview() {
         NavigationBar(
             greeting = "Hello Sam",
             onMenuClick = {},
-            //TODO: parameter error below
             searchQuery = searchQuery,
             onSearchQueryChange = { /* No-op for preview */ }
         )

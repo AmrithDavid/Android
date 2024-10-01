@@ -118,19 +118,13 @@ class ScanLibraryActivity : ComponentActivity() {
                     onMenuClick = { viewModel.toggleSideMenu() },
                     searchQuery = searchQuery,
                     onSearchQueryChange = { newQuery ->
-                        // This is where you would update the state
-                        //TODO: value reference error
+                        // updates state
                         searchQuery.value = newQuery.value // Update the search query state
                     }
                 )
             },
             containerColor = MaterialTheme.colorScheme.background,
         ) { innerPadding ->
-
-//            val filteredCards = patientCards.filter {
-//                it.patientName.contains(searchQuery.value, ignoreCase = true)
-//            }
-
             val filteredCards = patientCards.filter { card ->
                 card.patientName.contains(searchQuery.value, ignoreCase = true) ||
                 card.patientId.contains(searchQuery.value, ignoreCase = true) ||
@@ -138,14 +132,12 @@ class ScanLibraryActivity : ComponentActivity() {
             }
             
             if (filteredCards.isNotEmpty()) {
-                println("not empty!")
                 CardList(
                     modifier = Modifier.padding(innerPadding),
                     patientCards = filteredCards,
                     onImageButtonClick = { navController.navigate("mainImageMenu") },
                 )
             } else {
-                println("empty!")
                 EmptyStateView()
             }
         }
