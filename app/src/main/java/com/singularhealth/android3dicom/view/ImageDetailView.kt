@@ -258,9 +258,27 @@ fun ImageDetailBottomBar() {
                     .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            BottomBarButton(icon = R.drawable.ic_display, label = "Display")
-            BottomBarButton(icon = R.drawable.ic_windowing, label = "Windowing")
-            BottomBarButton(icon = R.drawable.ic_slicer, label = "Slicer")
+            BottomBarButton(
+                icon = R.drawable.ic_display,
+                label = "Display",
+                clickAction = {
+                // Action to perform when button is clicked
+                println("Display button clicked!")
+            })
+            BottomBarButton(
+                icon = R.drawable.ic_windowing,
+                label = "Windowing",
+                clickAction = {
+                    // Action to perform when button is clicked
+                    println("Windowing button clicked!")
+                })
+            BottomBarButton(
+                icon = R.drawable.ic_slicer,
+                label = "Slicer",
+                clickAction = {
+                    // Action to perform when button is clicked
+                    println("Slicer button clicked!")
+                })
         }
     }
 }
@@ -269,11 +287,14 @@ fun ImageDetailBottomBar() {
 fun BottomBarButton(
     icon: Int,
     label: String,
+    clickAction: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(horizontal = 22.dp),
+        modifier = Modifier
+            .padding(horizontal = 22.dp)
+            .clickable(onClick = clickAction)
     ) {
         Icon(
             painter = painterResource(id = icon),
