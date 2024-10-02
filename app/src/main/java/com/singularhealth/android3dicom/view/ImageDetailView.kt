@@ -93,18 +93,32 @@ fun ImageDetailView(
                 // Conditionally display the Display UI
                 when (currentView) {
                     "Display" -> DisplayUI(
+                        brightnessValue = displayBrightness,
+                        onBrightnessChange = { displayBrightness = it },
+                        contrastValue = displayContrast,
+                        onContrastChange = { displayContrast = it },
+                        opacityValue = displayOpacity,
+                        onOpacityChange = { displayOpacity = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .offset(y = 16.dp)
                     )
                     "Windowing" -> WindowingUI(
+                        sliderRange = windowingRange,
+                        onRangeChange = { windowingRange = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .offset(y = 16.dp)
                     )
                     "Slicer" -> SlicerUI(
+                        transverseValue = slicerTransverse,
+                        onTransverseChange = { slicerTransverse = it },
+                        sagittalValue = slicerSagittal,
+                        onSagittalChange = { slicerSagittal = it },
+                        coronalValue = slicerCoronal,
+                        onCoronalChange = { slicerCoronal = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
@@ -332,12 +346,17 @@ fun ImageDetailBottomBar(
 }
 
 @Composable
-fun DisplayUI(modifier: Modifier = Modifier) {
+fun DisplayUI(
+    brightnessValue: Float,  // Shared value for brightness
+    onBrightnessChange: (Float) -> Unit,  // Callback to update brightness value
+    contrastValue: Float,  // Shared value for contrast
+    onContrastChange: (Float) -> Unit,  // Callback to update contrast value
+    opacityValue: Float,  // Shared value for opacity
+    onOpacityChange: (Float) -> Unit,  // Callback to update opacity value
+    modifier: Modifier = Modifier
+) {
     // interactive UI displayed when the "Display" button is clicked
     var selectedSetting by remember { mutableStateOf("Brightness") } // Default to Brightness
-    var brightnessValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
-    var contrastValue by remember { mutableStateOf(0.5f) }
-    var opacityValue by remember { mutableStateOf(0.5f) }
 
     // Main Box for Display UI
     Column(
@@ -354,19 +373,19 @@ fun DisplayUI(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ButtonOption(
-                icon = R.drawable.ic_brightness, // Placeholder icon for Brightness
+                icon = R.drawable.ic_brightness,
                 text = "Brightness",
                 isSelected = selectedSetting == "Brightness",
                 onClick = { selectedSetting = "Brightness" }
             )
             ButtonOption(
-                icon = R.drawable.ic_contrast, // Placeholder icon for Contrast
+                icon = R.drawable.ic_contrast,
                 text = "Contrast",
                 isSelected = selectedSetting == "Contrast",
                 onClick = { selectedSetting = "Contrast" }
             )
             ButtonOption(
-                icon = R.drawable.ic_opacity, // Placeholder icon for Opacity
+                icon = R.drawable.ic_opacity,
                 text = "Opacity",
                 isSelected = selectedSetting == "Opacity",
                 onClick = { selectedSetting = "Opacity" }
@@ -376,33 +395,30 @@ fun DisplayUI(modifier: Modifier = Modifier) {
         // Conditionally display the slider based on the selected setting
         when (selectedSetting) {
             "Brightness" -> {
-                // Brightness Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center // Centering the Brightness Slider
+                    contentAlignment = Alignment.Center
                 ) {
                     Slider(
-                        value = brightnessValue,
-                        onValueChange = { brightnessValue = it },
+                        value = brightnessValue,  // Use the shared state for brightness
+                        onValueChange = onBrightnessChange,  // Update brightness state
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
                             activeTrackColor = Color(0xFF50A5DE),
                             inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
                         )
-
                     )
                 }
             }
             "Contrast" -> {
-                // Contrast Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center // Centering the Brightness Slider
+                    contentAlignment = Alignment.Center
                 ) {
                     Slider(
-                        value = contrastValue,
-                        onValueChange = { contrastValue = it },
+                        value = contrastValue,  // Use the shared state for contrast
+                        onValueChange = onContrastChange,  // Update contrast state
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
@@ -413,14 +429,13 @@ fun DisplayUI(modifier: Modifier = Modifier) {
                 }
             }
             "Opacity" -> {
-                // Opacity Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center // Centering the Brightness Slider
+                    contentAlignment = Alignment.Center
                 ) {
                     Slider(
-                        value = opacityValue,
-                        onValueChange = { opacityValue = it },
+                        value = opacityValue,  // Use the shared state for opacity
+                        onValueChange = onOpacityChange,  // Update opacity state
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
@@ -451,7 +466,6 @@ fun ButtonOption(
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp), // Reduced padding inside the button
         modifier = Modifier.padding(horizontal = 4.dp) // Reduced padding between the buttons
-//        modifier = Modifier.padding(horizontal = 7.dp)
     ) {
         Icon(
             painter = painterResource(id = icon), // Use the icon before text
@@ -469,15 +483,19 @@ fun ButtonOption(
 }
 
 @Composable
-fun WindowingUI(modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableStateOf(30f..70f) }
+fun WindowingUI(
+    sliderRange: ClosedFloatingPointRange<Float>,  // Shared range for Windowing slider
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update the range
+    modifier: Modifier = Modifier
+) {
+
     var expanded by remember { mutableStateOf(false) }
     var selectedPreset by remember { mutableStateOf("Custom") }
     var selectedIcon by remember {mutableStateOf(R.drawable.ic_list)}
 
     // Presets dropdown options with corresponding icons
     val presets = listOf(
-        "Bone (100, 2400)" to R.drawable.ic_bone, // Assume you have a drawable for each
+        "Bone (100, 2400)" to R.drawable.ic_bone,
         "Brain (0, 80)" to R.drawable.ic_brain,
         "Liver (-45, 105)" to R.drawable.ic_liver,
         "Lungs (-1350, 150)" to R.drawable.ic_lung,
@@ -515,7 +533,7 @@ fun WindowingUI(modifier: Modifier = Modifier) {
                 // Presets Dropdown Button
                 Box (
                     //modify the spacing and padding here
-//                    modifier = Modifier.offset(x = 208.dp)
+                    //modifier = Modifier.offset(x = 208.dp)
                 ){
                     Button(
                         onClick = { expanded = !expanded },
@@ -524,7 +542,6 @@ fun WindowingUI(modifier: Modifier = Modifier) {
                             contentColor = Color.Black
                         ),
                         shape = MaterialTheme.shapes.medium,
-//                        modifier = Modifier.padding(horizontal = 8.dp)
                         modifier = Modifier
                             .width(188.dp) // Set width of the dropdown button
                             .height(32.dp),
@@ -545,12 +562,6 @@ fun WindowingUI(modifier: Modifier = Modifier) {
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(selectedPreset)
                             Spacer(modifier = Modifier.weight(1f)) // Push dropdown arrow to the end
-
-
-//                        // Left-align the Text and Icon within the button
-//                        Box(modifier = Modifier.fillMaxWidth().align(Alignment.Start)) {
-//                            Text(selectedPreset, modifier = Modifier.align(Alignment.CenterStart))
-//                        }
 
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_dropdown),
@@ -600,18 +611,18 @@ fun WindowingUI(modifier: Modifier = Modifier) {
 
 
 
-            Box(
+        Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             RangeSlider(
-                value = sliderPosition,
-                onValueChange = { range -> sliderPosition = range },
+                value = sliderRange,  // Use the shared state for the range slider
+                onValueChange = onRangeChange,  // Update the range
                 valueRange = 0f..100f,
                 modifier = Modifier.width(360.dp),
-                onValueChangeFinished = {
-                    // Handle what should happen when the user stops moving the slider
-                },
+//                onValueChangeFinished = {
+//                    // Handle what should happen when the user stops moving the slider
+//                },
                 colors = SliderDefaults.colors(
                     thumbColor = Color(0xFF50A5DE),
                     activeTrackColor = Color(0xFF50A5DE),
@@ -621,18 +632,23 @@ fun WindowingUI(modifier: Modifier = Modifier) {
         }
 
         // Log the current slider values
-        println("Min: ${sliderPosition.start}, Max: ${sliderPosition.endInclusive}")
+        println("Min: ${sliderRange.start}, Max: ${sliderRange.endInclusive}")
 
     }
 }
 
 @Composable
-fun SlicerUI(modifier: Modifier = Modifier) {
+fun SlicerUI(
+    transverseValue: ClosedFloatingPointRange<Float>,  // Shared range for Transverse
+    onTransverseChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Transverse range
+    sagittalValue: ClosedFloatingPointRange<Float>,  // Shared range for Sagittal
+    onSagittalChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Sagittal range
+    coronalValue: ClosedFloatingPointRange<Float>,  // Shared range for Coronal
+    onCoronalChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Coronal range
+    modifier: Modifier = Modifier
+) {
     // interactive UI displayed when the "Slicer" button is clicked
     var selectedSetting by remember { mutableStateOf("Transverse") } // Default to Brightness
-    var transverseValue by remember { mutableStateOf(30f..70f) } // Initial value for the slider
-    var sagittalValue by remember { mutableStateOf(30f..70f) }
-    var coronalValue by remember { mutableStateOf(30f..70f) }
 
     // Main Box for Display UI
     Column(
@@ -671,19 +687,16 @@ fun SlicerUI(modifier: Modifier = Modifier) {
         // Conditionally display the slider based on the selected setting
         when (selectedSetting) {
             "Transverse" -> {
-                // Brightness Slider
+                // Transverse Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     RangeSlider(
                         value = transverseValue,
-                        onValueChange = { range -> transverseValue = range },
+                        onValueChange = onTransverseChange,
                         valueRange = 0f..100f,
                         modifier = Modifier.width(360.dp),
-                        onValueChangeFinished = {
-                            // Handle what should happen when the user stops moving the slider
-                        },
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
                             activeTrackColor = Color(0xFF50A5DE),
@@ -700,7 +713,7 @@ fun SlicerUI(modifier: Modifier = Modifier) {
                 ) {
                     RangeSlider(
                         value = sagittalValue,
-                        onValueChange = { range -> sagittalValue = range },
+                        onValueChange = onSagittalChange,
                         valueRange = 0f..100f,
                         modifier = Modifier.width(360.dp),
                         onValueChangeFinished = {
@@ -722,7 +735,7 @@ fun SlicerUI(modifier: Modifier = Modifier) {
                 ) {
                     RangeSlider(
                         value = coronalValue,
-                        onValueChange = { range -> coronalValue = range },
+                        onValueChange = onCoronalChange,
                         valueRange = 0f..100f,
                         modifier = Modifier.width(360.dp),
                         onValueChangeFinished = {
