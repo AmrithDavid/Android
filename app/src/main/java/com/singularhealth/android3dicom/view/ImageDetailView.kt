@@ -284,7 +284,6 @@ fun BottomBarButton(
 @Composable
 fun MainImageMenuPreview() {
     Android3DicomTheme {
-        //TODO: argument error below
         MainImageMenu(navController = rememberNavController())
     }
 }
