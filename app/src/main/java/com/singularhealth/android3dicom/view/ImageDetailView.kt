@@ -344,7 +344,9 @@ fun DisplayUI(modifier: Modifier = Modifier) {
 //        )
 //    }
     var selectedSetting by remember { mutableStateOf("Brightness") } // Default to Brightness
-    var sliderValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
+    var brightnessValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
+    var contrastValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
+    var opacityValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
 
     // Main Box for Display UI
     Column(
@@ -357,42 +359,91 @@ fun DisplayUI(modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ButtonOption(
+                icon = R.drawable.ic_back, // Placeholder icon for Brightness
                 text = "Brightness",
                 isSelected = selectedSetting == "Brightness",
                 onClick = { selectedSetting = "Brightness" }
             )
             ButtonOption(
+                icon = R.drawable.ic_back, // Placeholder icon for Contrast
                 text = "Contrast",
                 isSelected = selectedSetting == "Contrast",
                 onClick = { selectedSetting = "Contrast" }
             )
             ButtonOption(
+                icon = R.drawable.ic_back, // Placeholder icon for Opacity
                 text = "Opacity",
                 isSelected = selectedSetting == "Opacity",
                 onClick = { selectedSetting = "Opacity" }
             )
         }
 
-        // Slider that changes based on the selected setting
-        Slider(
-            value = sliderValue,
-            onValueChange = { sliderValue = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = SliderDefaults.colors(
-                thumbColor = Color.Blue,
-                activeTrackColor = Color.Blue,
-                inactiveTrackColor = Color.LightGray
-            )
-        )
+//        // Slider that changes based on the selected setting
+//        Slider(
+//            value = sliderValue,
+//            onValueChange = { sliderValue = it },
+//            modifier = Modifier.fillMaxWidth(),
+//            colors = SliderDefaults.colors(
+//                thumbColor = Color(0xFF50A5DE),
+//                activeTrackColor = Color(0xFF50A5DE),
+//                inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+//            )
+//        )
+
+        // Conditionally display the slider based on the selected setting
+        when (selectedSetting) {
+            "Brightness" -> {
+                // Brightness Slider
+                Slider(
+                    value = brightnessValue,
+                    onValueChange = { brightnessValue = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SliderDefaults.colors(
+//                        thumbColor = Color(0xFF50A5DE),
+                        thumbColor = Color.Red,
+                        activeTrackColor = Color(0xFF50A5DE),
+                        inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                    )
+                )
+            }
+            "Contrast" -> {
+                // Contrast Slider
+                Slider(
+                    value = contrastValue,
+                    onValueChange = { contrastValue = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SliderDefaults.colors(
+//                        thumbColor = Color(0xFF50A5DE),
+                        thumbColor = Color.Yellow,
+                        activeTrackColor = Color(0xFF50A5DE),
+                        inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                    )
+                )
+            }
+            "Opacity" -> {
+                // Opacity Slider
+                Slider(
+                    value = opacityValue,
+                    onValueChange = { opacityValue = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color(0xFF50A5DE),
+                        activeTrackColor = Color(0xFF50A5DE),
+                        inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                    )
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun ButtonOption(
+    icon: Int,
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit
@@ -405,12 +456,22 @@ fun ButtonOption(
         ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(horizontal = 8.dp)
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp), // Reduced padding inside the button
+        modifier = Modifier.padding(horizontal = 4.dp) // Reduced padding between the buttons
+//        modifier = Modifier.padding(horizontal = 7.dp)
     ) {
+        Icon(
+            painter = painterResource(id = icon), // Use the icon before text
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = Color(0xFF2E3176)
+        )
+
         Text(
             text = text,
-            color = Color(0xFF2E3176)
-            )
+            color = Color(0xFF2E3176),
+            style = MaterialTheme.typography.labelLarge
+        )
     }
 }
 
@@ -467,6 +528,7 @@ fun BottomBarButton(
             contentDescription = label,
             modifier = Modifier.size(24.dp),
         )
+        // More options icon
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
