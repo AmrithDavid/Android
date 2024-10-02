@@ -629,17 +629,114 @@ fun WindowingUI(modifier: Modifier = Modifier) {
 @Composable
 fun SlicerUI(modifier: Modifier = Modifier) {
     // interactive UI displayed when the "Slicer" button is clicked
-    Box(
+    var selectedSetting by remember { mutableStateOf("Transverse") } // Default to Brightness
+    var transverseValue by remember { mutableStateOf(30f..70f) } // Initial value for the slider
+    var sagittalValue by remember { mutableStateOf(30f..70f) }
+    var coronalValue by remember { mutableStateOf(30f..70f) }
+
+    // Main Box for Display UI
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(0.dp)
-            .background(Color.LightGray)
+            .background(color = Color(0xFFFFFFFF))
+            .padding(16.dp)
     ) {
-        Text(
-            text = "Slicer settings and controls",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(20.dp)
-        )
+        // Row with three buttons for Brightness, Contrast, and Opacity
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ButtonOption(
+                icon = R.drawable.ic_transverse,
+                text = "Transverse",
+                isSelected = selectedSetting == "Transverse",
+                onClick = { selectedSetting = "Transverse" }
+            )
+            ButtonOption(
+                icon = R.drawable.ic_sagittal,
+                text = "Sagittal",
+                isSelected = selectedSetting == "Sagittal",
+                onClick = { selectedSetting = "Sagittal" }
+            )
+            ButtonOption(
+                icon = R.drawable.ic_coronal,
+                text = "Coronal",
+                isSelected = selectedSetting == "Coronal",
+                onClick = { selectedSetting = "Coronal" }
+            )
+        }
+
+        // Conditionally display the slider based on the selected setting
+        when (selectedSetting) {
+            "Transverse" -> {
+                // Brightness Slider
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    RangeSlider(
+                        value = transverseValue,
+                        onValueChange = { range -> transverseValue = range },
+                        valueRange = 0f..100f,
+                        modifier = Modifier.width(360.dp),
+                        onValueChangeFinished = {
+                            // Handle what should happen when the user stops moving the slider
+                        },
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color(0xFF50A5DE),
+                            activeTrackColor = Color(0xFF50A5DE),
+                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                        )
+                    )
+                }
+            }
+            "Sagittal" -> {
+                // Contrast Slider
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    RangeSlider(
+                        value = sagittalValue,
+                        onValueChange = { range -> sagittalValue = range },
+                        valueRange = 0f..100f,
+                        modifier = Modifier.width(360.dp),
+                        onValueChangeFinished = {
+                            // Handle what should happen when the user stops moving the slider
+                        },
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color(0xFF50A5DE),
+                            activeTrackColor = Color(0xFF50A5DE),
+                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                        )
+                    )
+                }
+            }
+            "Coronal" -> {
+                // Opacity Slider
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    RangeSlider(
+                        value = coronalValue,
+                        onValueChange = { range -> coronalValue = range },
+                        valueRange = 0f..100f,
+                        modifier = Modifier.width(360.dp),
+                        onValueChangeFinished = {
+                            // Handle what should happen when the user stops moving the slider
+                        },
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color(0xFF50A5DE),
+                            activeTrackColor = Color(0xFF50A5DE),
+                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
+                        )
+                    )
+                }
+            }
+        }
     }
 }
 
