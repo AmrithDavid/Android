@@ -32,6 +32,9 @@ fun ImageDetailView(
 ) {
     var showDropdown by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
+    var showDisplayUI by remember {mutableStateOf(false)}
+    var showWindowingUI by remember {mutableStateOf(false)}
+    var showSlicerUI by remember {mutableStateOf(false)}
     val isInitialLoading by viewModel.isInitialLoading.collectAsState()
 
     Android3DicomTheme {
@@ -73,6 +76,21 @@ fun ImageDetailView(
                         )
                     }
 
+                // Conditionally display the slicer UI
+                if (showDisplayUI) {
+                    DisplayUI() // Display your custom UI here
+                }
+
+                // Conditionally display the slicer UI
+                if (showWindowingUI) {
+                    WindowingUI() // Display your custom UI here
+                }
+
+                // Conditionally display the slicer UI
+                if (showSlicerUI) {
+                    SlicerUI() // Display your custom UI here
+                }
+
                     // Options menu
                     Box(
                         modifier =
@@ -98,7 +116,11 @@ fun ImageDetailView(
                 }
             }
 
-            ImageDetailBottomBar()
+            ImageDetailBottomBar(
+                onDisplayClick = { showDisplayUI = !showDisplayUI }, // Toggle slicer UI visibility
+                onWindowingClick = { showWindowingUI = !showWindowingUI }, // Toggle slicer UI visibility
+                onSlicerClick = { showSlicerUI = !showSlicerUI }, // Toggle slicer UI visibility
+            )
         }
     }
 }
@@ -246,7 +268,11 @@ fun TopBarButton(
 }
 
 @Composable
-fun ImageDetailBottomBar() {
+fun ImageDetailBottomBar(
+    onDisplayClick: () -> Unit,
+    onWindowingClick: () -> Unit,
+    onSlicerClick: () -> Unit,
+) {
     Surface(
         color = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -262,15 +288,17 @@ fun ImageDetailBottomBar() {
                 icon = R.drawable.ic_display,
                 label = "Display",
                 clickAction = {
-                // Action to perform when button is clicked
-                println("Display button clicked!")
-            })
+                    // Action to perform when button is clicked
+                    println("Display button clicked!")
+                    onDisplayClick()
+                })
             BottomBarButton(
                 icon = R.drawable.ic_windowing,
                 label = "Windowing",
                 clickAction = {
                     // Action to perform when button is clicked
                     println("Windowing button clicked!")
+                    onWindowingClick()
                 })
             BottomBarButton(
                 icon = R.drawable.ic_slicer,
@@ -278,10 +306,63 @@ fun ImageDetailBottomBar() {
                 clickAction = {
                     // Action to perform when button is clicked
                     println("Slicer button clicked!")
+                    onSlicerClick()
                 })
         }
     }
 }
+
+@Composable
+fun DisplayUI() {
+    // Example of interactive UI displayed when the "Display" button is clicked
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(Color.LightGray)
+    ) {
+        Text(
+            text = "Display settings and controls",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Composable
+fun WindowingUI() {
+    // Example of interactive UI displayed when the "Windowing" button is clicked
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(Color.LightGray)
+    ) {
+        Text(
+            text = "Windowing settings and controls",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Composable
+fun SlicerUI() {
+    // Example of interactive UI displayed when the "Slicer" button is clicked
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(Color.LightGray)
+    ) {
+        Text(
+            text = "Slicer settings and controls",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
 
 @Composable
 fun BottomBarButton(
