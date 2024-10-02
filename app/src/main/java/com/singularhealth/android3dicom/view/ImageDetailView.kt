@@ -54,11 +54,10 @@ fun ImageDetailView(
 
             // Content area
             Box(
-                modifier =
-                    Modifier
+                modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(vertical = 16.dp, horizontal = 0.dp),
             ) {
                 if (isInitialLoading) {
                     LoadingSpinner(
@@ -76,19 +75,35 @@ fun ImageDetailView(
                         )
                     }
 
-                // Conditionally display the slicer UI
+                // Conditionally display the Display UI
                 if (showDisplayUI) {
-                    DisplayUI() // Display your custom UI here
+                    DisplayUI(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .offset(y = 16.dp)
+                    )
                 }
 
-                // Conditionally display the slicer UI
+                // Conditionally display the Windowing UI
                 if (showWindowingUI) {
-                    WindowingUI() // Display your custom UI here
+                    WindowingUI(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .offset(y = 16.dp)
+                    )
                 }
 
-                // Conditionally display the slicer UI
+                // Conditionally display the Slicer UI
                 if (showSlicerUI) {
-                    SlicerUI() // Display your custom UI here
+                    // Align it just above the BottomBar
+                    SlicerUI(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .offset(y = 16.dp)
+                    )
                 }
 
                     // Options menu
@@ -276,6 +291,7 @@ fun ImageDetailBottomBar(
     Surface(
         color = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier =
@@ -313,12 +329,12 @@ fun ImageDetailBottomBar(
 }
 
 @Composable
-fun DisplayUI() {
-    // Example of interactive UI displayed when the "Display" button is clicked
+fun DisplayUI(modifier: Modifier = Modifier) {
+    // interactive UI displayed when the "Display" button is clicked
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(0.dp)
             .background(Color.LightGray)
     ) {
         Text(
@@ -330,12 +346,12 @@ fun DisplayUI() {
 }
 
 @Composable
-fun WindowingUI() {
-    // Example of interactive UI displayed when the "Windowing" button is clicked
+fun WindowingUI(modifier: Modifier = Modifier) {
+    // interactive UI displayed when the "Windowing" button is clicked
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(0.dp)
             .background(Color.LightGray)
     ) {
         Text(
@@ -347,12 +363,12 @@ fun WindowingUI() {
 }
 
 @Composable
-fun SlicerUI() {
-    // Example of interactive UI displayed when the "Slicer" button is clicked
+fun SlicerUI(modifier: Modifier = Modifier) {
+    // interactive UI displayed when the "Slicer" button is clicked
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(0.dp)
             .background(Color.LightGray)
     ) {
         Text(
