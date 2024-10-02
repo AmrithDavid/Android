@@ -331,17 +331,86 @@ fun ImageDetailBottomBar(
 @Composable
 fun DisplayUI(modifier: Modifier = Modifier) {
     // interactive UI displayed when the "Display" button is clicked
-    Box(
+//    Box(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .padding(0.dp)
+//            .background(Color.LightGray)
+//    ) {
+//        Text(
+//            text = "Display settings and controls",
+//            style = MaterialTheme.typography.bodyLarge,
+//            modifier = Modifier.padding(20.dp)
+//        )
+//    }
+    var selectedSetting by remember { mutableStateOf("Brightness") } // Default to Brightness
+    var sliderValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
+
+    // Main Box for Display UI
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(0.dp)
-            .background(Color.LightGray)
+            .background(color = Color(0xFFFFFFFF))
+            .padding(16.dp)
+    ) {
+        // Row with three buttons for Brightness, Contrast, and Opacity
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ButtonOption(
+                text = "Brightness",
+                isSelected = selectedSetting == "Brightness",
+                onClick = { selectedSetting = "Brightness" }
+            )
+            ButtonOption(
+                text = "Contrast",
+                isSelected = selectedSetting == "Contrast",
+                onClick = { selectedSetting = "Contrast" }
+            )
+            ButtonOption(
+                text = "Opacity",
+                isSelected = selectedSetting == "Opacity",
+                onClick = { selectedSetting = "Opacity" }
+            )
+        }
+
+        // Slider that changes based on the selected setting
+        Slider(
+            value = sliderValue,
+            onValueChange = { sliderValue = it },
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = Color.Blue,
+                activeTrackColor = Color.Blue,
+                inactiveTrackColor = Color.LightGray
+            )
+        )
+    }
+}
+
+@Composable
+fun ButtonOption(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) Color(0xFFE0E7FF) else Color.Transparent,
+            contentColor = Color(0xFFF0F1FF)
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.padding(horizontal = 8.dp)
     ) {
         Text(
-            text = "Display settings and controls",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(16.dp)
-        )
+            text = text,
+            color = Color(0xFF2E3176)
+            )
     }
 }
 
@@ -357,7 +426,7 @@ fun WindowingUI(modifier: Modifier = Modifier) {
         Text(
             text = "Windowing settings and controls",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         )
     }
 }
@@ -374,7 +443,7 @@ fun SlicerUI(modifier: Modifier = Modifier) {
         Text(
             text = "Slicer settings and controls",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         )
     }
 }
