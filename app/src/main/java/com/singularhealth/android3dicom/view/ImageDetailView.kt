@@ -23,6 +23,8 @@ import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
 import com.singularhealth.android3dicom.view.components.LoadingSpinner
 import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -65,7 +67,7 @@ fun ImageDetailView(
                 onCoronalClick = { viewModel.onCoronalClick() },
                 onMoreClick = { showDropdown = true },
                 onBackClick = { navController.navigateUp() },
-            )
+                )
 
             // Content area
             Box(
@@ -174,6 +176,10 @@ fun ImageDetailView(
 fun ImageDetailTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
+    on3DClick: () -> Unit,
+    onTransverseClick: () -> Unit,
+    onSagittalClick: () -> Unit,
+    onCoronalClick: () -> Unit,
     onMoreClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -244,7 +250,16 @@ fun ImageDetailTopBar(
                 TopBarButton(
                     text = buttonText,
                     isSelected = selectedButton == buttonText,
-                    onClick = { onButtonSelected(buttonText) },
+                    onClick = {
+                        onButtonSelected(buttonText)
+                        // Call appropriate ViewModel method based on buttonText
+                        when (buttonText) {
+                            "3D" -> on3DClick()
+                            "Transverse" -> onTransverseClick()
+                            "Sagittal" -> onSagittalClick()
+                            "Coronal" -> onCoronalClick()
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                 )
             }
