@@ -70,9 +70,9 @@ fun ImageDetailView(
             // Content area
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 0.dp),
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 0.dp),
             ) {
                 if (isInitialLoading) {
                     LoadingSpinner(
@@ -93,32 +93,18 @@ fun ImageDetailView(
                 // Conditionally display the Display UI
                 when (currentView) {
                     "Display" -> DisplayUI(
-                        brightnessValue = displayBrightness,
-                        onBrightnessChange = { displayBrightness = it },
-                        contrastValue = displayContrast,
-                        onContrastChange = { displayContrast = it },
-                        opacityValue = displayOpacity,
-                        onOpacityChange = { displayOpacity = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .offset(y = 16.dp)
                     )
                     "Windowing" -> WindowingUI(
-                        sliderRange = windowingRange,
-                        onRangeChange = { windowingRange = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .offset(y = 16.dp)
                     )
                     "Slicer" -> SlicerUI(
-                        transverseValue = slicerTransverse,
-                        onTransverseChange = { slicerTransverse = it },
-                        sagittalValue = slicerSagittal,
-                        onSagittalChange = { slicerSagittal = it },
-                        coronalValue = slicerCoronal,
-                        onCoronalChange = { slicerCoronal = it },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
@@ -174,10 +160,6 @@ fun ImageDetailView(
 fun ImageDetailTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
-    on3DClick: () -> Unit,
-    onTransverseClick: () -> Unit,
-    onSagittalClick: () -> Unit,
-    onCoronalClick: () -> Unit,
     onMoreClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -185,16 +167,16 @@ fun ImageDetailTopBar(
 
     Column(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(top = statusBarHeight),
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(top = statusBarHeight),
     ) {
         Row(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -207,9 +189,9 @@ fun ImageDetailTopBar(
                     contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier =
-                    Modifier
-                        .size(24.dp)
-                        .clickable { onBackClick() },
+                        Modifier
+                            .size(24.dp)
+                            .clickable { onBackClick() },
                 )
 
                 Spacer(modifier = Modifier.width(27.dp))
@@ -229,35 +211,26 @@ fun ImageDetailTopBar(
                 contentDescription = "More options",
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier =
-                Modifier
-                    .size(24.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { onMoreClick() },
+                    Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { onMoreClick() },
             )
         }
 
         Row(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
         ) {
             listOf("3D", "Transverse", "Sagittal", "Coronal").forEach { buttonText ->
                 TopBarButton(
                     text = buttonText,
                     isSelected = selectedButton == buttonText,
-                    onClick = {
-                        onButtonSelected(buttonText)
-                        // Call appropriate ViewModel method based on buttonText
-                        when (buttonText) {
-                            "3D" -> on3DClick()
-                            "Transverse" -> onTransverseClick()
-                            "Sagittal" -> onSagittalClick()
-                            "Coronal" -> onCoronalClick()
-                        }
-                    },
+                    onClick = { onButtonSelected(buttonText) },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -277,37 +250,37 @@ fun TopBarButton(
     ) {
         Box(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(36.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .height(36.dp),
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelMedium,
                 color =
-                if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-                },
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                    },
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClick,
-                    ).wrapContentSize(Alignment.Center),
+                    Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onClick,
+                        ).wrapContentSize(Alignment.Center),
             )
         }
 
         // Drawing the line
         Box(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Transparent),
         )
     }
 }
@@ -325,9 +298,9 @@ fun ImageDetailBottomBar(
     ) {
         Row(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             BottomBarButton(
@@ -359,17 +332,12 @@ fun ImageDetailBottomBar(
 }
 
 @Composable
-fun DisplayUI(
-    brightnessValue: Float,  // Shared value for brightness
-    onBrightnessChange: (Float) -> Unit,  // Callback to update brightness value
-    contrastValue: Float,  // Shared value for contrast
-    onContrastChange: (Float) -> Unit,  // Callback to update contrast value
-    opacityValue: Float,  // Shared value for opacity
-    onOpacityChange: (Float) -> Unit,  // Callback to update opacity value
-    modifier: Modifier = Modifier
-) {
+fun DisplayUI(modifier: Modifier = Modifier) {
     // interactive UI displayed when the "Display" button is clicked
     var selectedSetting by remember { mutableStateOf("Brightness") } // Default to Brightness
+    var brightnessValue by remember { mutableStateOf(0.5f) } // Initial value for the slider
+    var contrastValue by remember { mutableStateOf(0.5f) }
+    var opacityValue by remember { mutableStateOf(0.5f) }
 
     // Main Box for Display UI
     Column(
@@ -386,19 +354,19 @@ fun DisplayUI(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ButtonOption(
-                icon = R.drawable.ic_brightness,
+                icon = R.drawable.ic_brightness, // Placeholder icon for Brightness
                 text = "Brightness",
                 isSelected = selectedSetting == "Brightness",
                 onClick = { selectedSetting = "Brightness" }
             )
             ButtonOption(
-                icon = R.drawable.ic_contrast,
+                icon = R.drawable.ic_contrast, // Placeholder icon for Contrast
                 text = "Contrast",
                 isSelected = selectedSetting == "Contrast",
                 onClick = { selectedSetting = "Contrast" }
             )
             ButtonOption(
-                icon = R.drawable.ic_opacity,
+                icon = R.drawable.ic_opacity, // Placeholder icon for Opacity
                 text = "Opacity",
                 isSelected = selectedSetting == "Opacity",
                 onClick = { selectedSetting = "Opacity" }
@@ -408,30 +376,33 @@ fun DisplayUI(
         // Conditionally display the slider based on the selected setting
         when (selectedSetting) {
             "Brightness" -> {
+                // Brightness Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center // Centering the Brightness Slider
                 ) {
                     Slider(
-                        value = brightnessValue,  // Use the shared state for brightness
-                        onValueChange = onBrightnessChange,  // Update brightness state
+                        value = brightnessValue,
+                        onValueChange = { brightnessValue = it },
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
                             activeTrackColor = Color(0xFF50A5DE),
                             inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
                         )
+
                     )
                 }
             }
             "Contrast" -> {
+                // Contrast Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center // Centering the Brightness Slider
                 ) {
                     Slider(
-                        value = contrastValue,  // Use the shared state for contrast
-                        onValueChange = onContrastChange,  // Update contrast state
+                        value = contrastValue,
+                        onValueChange = { contrastValue = it },
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
@@ -442,13 +413,14 @@ fun DisplayUI(
                 }
             }
             "Opacity" -> {
+                // Opacity Slider
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center // Centering the Brightness Slider
                 ) {
                     Slider(
-                        value = opacityValue,  // Use the shared state for opacity
-                        onValueChange = onOpacityChange,  // Update opacity state
+                        value = opacityValue,
+                        onValueChange = { opacityValue = it },
                         modifier = Modifier.width(360.dp),
                         colors = SliderDefaults.colors(
                             thumbColor = Color(0xFF50A5DE),
@@ -461,7 +433,6 @@ fun DisplayUI(
         }
     }
 }
-
 
 @Composable
 fun ButtonOption(
@@ -480,6 +451,7 @@ fun ButtonOption(
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp), // Reduced padding inside the button
         modifier = Modifier.padding(horizontal = 4.dp) // Reduced padding between the buttons
+//        modifier = Modifier.padding(horizontal = 7.dp)
     ) {
         Icon(
             painter = painterResource(id = icon), // Use the icon before text
@@ -497,18 +469,15 @@ fun ButtonOption(
 }
 
 @Composable
-fun WindowingUI(
-    sliderRange: ClosedFloatingPointRange<Float>,  // Shared range for Windowing slider
-    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update the range
-    modifier: Modifier = Modifier
-) {
+fun WindowingUI(modifier: Modifier = Modifier) {
+    var sliderPosition by remember { mutableStateOf(30f..70f) }
     var expanded by remember { mutableStateOf(false) }
     var selectedPreset by remember { mutableStateOf("Custom") }
     var selectedIcon by remember {mutableStateOf(R.drawable.ic_list)}
 
     // Presets dropdown options with corresponding icons
     val presets = listOf(
-        "Bone (100, 2400)" to R.drawable.ic_bone,
+        "Bone (100, 2400)" to R.drawable.ic_bone, // Assume you have a drawable for each
         "Brain (0, 80)" to R.drawable.ic_brain,
         "Liver (-45, 105)" to R.drawable.ic_liver,
         "Lungs (-1350, 150)" to R.drawable.ic_lung,
@@ -546,7 +515,7 @@ fun WindowingUI(
                 // Presets Dropdown Button
                 Box (
                     //modify the spacing and padding here
-                    //modifier = Modifier.offset(x = 208.dp)
+//                    modifier = Modifier.offset(x = 208.dp)
                 ){
                     Button(
                         onClick = { expanded = !expanded },
@@ -555,6 +524,7 @@ fun WindowingUI(
                             contentColor = Color.Black
                         ),
                         shape = MaterialTheme.shapes.medium,
+//                        modifier = Modifier.padding(horizontal = 8.dp)
                         modifier = Modifier
                             .width(188.dp) // Set width of the dropdown button
                             .height(32.dp),
@@ -575,6 +545,12 @@ fun WindowingUI(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(selectedPreset)
                             Spacer(modifier = Modifier.weight(1f)) // Push dropdown arrow to the end
+
+
+//                        // Left-align the Text and Icon within the button
+//                        Box(modifier = Modifier.fillMaxWidth().align(Alignment.Start)) {
+//                            Text(selectedPreset, modifier = Modifier.align(Alignment.CenterStart))
+//                        }
 
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_dropdown),
@@ -624,18 +600,18 @@ fun WindowingUI(
 
 
 
-        Box(
+            Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             RangeSlider(
-                value = sliderRange,  // Use the shared state for the range slider
-                onValueChange = onRangeChange,  // Update the range
+                value = sliderPosition,
+                onValueChange = { range -> sliderPosition = range },
                 valueRange = 0f..100f,
                 modifier = Modifier.width(360.dp),
-//                onValueChangeFinished = {
-//                    // Handle what should happen when the user stops moving the slider
-//                },
+                onValueChangeFinished = {
+                    // Handle what should happen when the user stops moving the slider
+                },
                 colors = SliderDefaults.colors(
                     thumbColor = Color(0xFF50A5DE),
                     activeTrackColor = Color(0xFF50A5DE),
@@ -645,124 +621,25 @@ fun WindowingUI(
         }
 
         // Log the current slider values
-        println("Min: ${sliderRange.start}, Max: ${sliderRange.endInclusive}")
+        println("Min: ${sliderPosition.start}, Max: ${sliderPosition.endInclusive}")
 
     }
 }
 
 @Composable
-fun SlicerUI(
-    transverseValue: ClosedFloatingPointRange<Float>,  // Shared range for Transverse
-    onTransverseChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Transverse range
-    sagittalValue: ClosedFloatingPointRange<Float>,  // Shared range for Sagittal
-    onSagittalChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Sagittal range
-    coronalValue: ClosedFloatingPointRange<Float>,  // Shared range for Coronal
-    onCoronalChange: (ClosedFloatingPointRange<Float>) -> Unit,  // Callback to update Coronal range
-    modifier: Modifier = Modifier
-) {
+fun SlicerUI(modifier: Modifier = Modifier) {
     // interactive UI displayed when the "Slicer" button is clicked
-    var selectedSetting by remember { mutableStateOf("Transverse") } // Default to Brightness
-
-    // Main Box for Display UI
-    Column(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color(0xFFFFFFFF))
-            .padding(16.dp)
+            .padding(0.dp)
+            .background(Color.LightGray)
     ) {
-        // Row with three buttons for Brightness, Contrast, and Opacity
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ButtonOption(
-                icon = R.drawable.ic_transverse,
-                text = "Transverse",
-                isSelected = selectedSetting == "Transverse",
-                onClick = { selectedSetting = "Transverse" }
-            )
-            ButtonOption(
-                icon = R.drawable.ic_sagittal,
-                text = "Sagittal",
-                isSelected = selectedSetting == "Sagittal",
-                onClick = { selectedSetting = "Sagittal" }
-            )
-            ButtonOption(
-                icon = R.drawable.ic_coronal,
-                text = "Coronal",
-                isSelected = selectedSetting == "Coronal",
-                onClick = { selectedSetting = "Coronal" }
-            )
-        }
-
-        // Conditionally display the slider based on the selected setting
-        when (selectedSetting) {
-            "Transverse" -> {
-                // Transverse Slider
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    RangeSlider(
-                        value = transverseValue,
-                        onValueChange = onTransverseChange,
-                        valueRange = 0f..100f,
-                        modifier = Modifier.width(360.dp),
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF50A5DE),
-                            activeTrackColor = Color(0xFF50A5DE),
-                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
-                        )
-                    )
-                }
-            }
-            "Sagittal" -> {
-                // Contrast Slider
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    RangeSlider(
-                        value = sagittalValue,
-                        onValueChange = onSagittalChange,
-                        valueRange = 0f..100f,
-                        modifier = Modifier.width(360.dp),
-                        onValueChangeFinished = {
-                            // Handle what should happen when the user stops moving the slider
-                        },
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF50A5DE),
-                            activeTrackColor = Color(0xFF50A5DE),
-                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
-                        )
-                    )
-                }
-            }
-            "Coronal" -> {
-                // Opacity Slider
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    RangeSlider(
-                        value = coronalValue,
-                        onValueChange = onCoronalChange,
-                        valueRange = 0f..100f,
-                        modifier = Modifier.width(360.dp),
-                        onValueChangeFinished = {
-                            // Handle what should happen when the user stops moving the slider
-                        },
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF50A5DE),
-                            activeTrackColor = Color(0xFF50A5DE),
-                            inactiveTrackColor = Color(0xFF50A5DE).copy(alpha = 0.5f)
-                        )
-                    )
-                }
-            }
-        }
+        Text(
+            text = "Slicer settings and controls",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(20.dp)
+        )
     }
 }
 
