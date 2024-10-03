@@ -20,4 +20,3 @@ val HomeButtonBackground = Color(0xFFF0F1FF)
 val BorderColor = Color(0xFFA2A2A9)
 val WebPortalBlue = Color(0xFF1E2163)
 val TextFieldTextColor = Color(0xFFA2A2A9)
-

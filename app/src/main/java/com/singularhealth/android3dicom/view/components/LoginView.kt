@@ -8,6 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,19 +27,29 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 import com.singularhealth.android3dicom.ui.theme.TextFieldTextColor
 import com.singularhealth.android3dicom.ui.theme.TitleColor
+import com.singularhealth.android3dicom.viewmodel.LoginViewModel
+import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
+import kotlinx.coroutines.launch
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(LocalContext.current)),
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
     val buttonCornerRadius = 8
 
@@ -59,7 +72,7 @@ fun LoginScreen() {
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(Color.White), // This sets the background to pure white
+                .background(Color.White),
     ) {
         // Top section with support icon and text
         Row(
@@ -91,7 +104,6 @@ fun LoginScreen() {
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(top = 63.dp, start = 16.dp, end = 16.dp),
-            // 73dp - 10dp (support row height)
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
@@ -113,61 +125,56 @@ fun LoginScreen() {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email", style = MaterialTheme.typography.bodyLarge, color = TextFieldTextColor) },
+                label = { Text("Email") },
                 singleLine = true,
-                modifier =
-                    Modifier
-                        .width(300.dp)
-                        .height(40.dp),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = TextFieldTextColor),
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = TextFieldTextColor,
-                        focusedBorderColor = TextFieldTextColor,
-                        unfocusedTextColor = TextFieldTextColor,
-                        focusedTextColor = TextFieldTextColor,
-                        cursorColor = TextFieldTextColor,
-                    ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                )
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password", style = MaterialTheme.typography.bodyLarge, color = TextFieldTextColor) },
+                label = { Text("Password") },
                 singleLine = true,
-                modifier =
-                    Modifier
-                        .width(300.dp)
-                        .height(40.dp),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = TextFieldTextColor),
+                modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_visibility),
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = TextFieldTextColor,
+                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
                         )
                     }
                 },
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = TextFieldTextColor,
-                        focusedBorderColor = TextFieldTextColor,
-                        unfocusedTextColor = TextFieldTextColor,
-                        focusedTextColor = TextFieldTextColor,
-                        cursorColor = TextFieldTextColor,
-                    ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                )
             )
 
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
-                onClick = { /* Handle login */ },
+                onClick = {
+                    errorMessage = null
+                    isLoading = true
+                    scope.launch {
+                        val success = viewModel.loginUser(email, password)
+                        isLoading = false
+                        if (success) {
+                            onLoginSuccess()
+                        } else {
+                            errorMessage = "Login failed. Please check your credentials and try again."
+                        }
+                    }
+                },
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -177,8 +184,16 @@ fun LoginScreen() {
                         containerColor = DarkBlue.copy(alpha = 0.5f),
                     ),
                 shape = RoundedCornerShape(buttonCornerRadius.dp),
+                enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
             ) {
-                Text("Log in", style = MaterialTheme.typography.bodyLarge)
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    Text("Log in", style = MaterialTheme.typography.bodyLarge)
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -190,6 +205,15 @@ fun LoginScreen() {
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable { /* Handle forgot password */ },
             )
+
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
 
             Spacer(modifier = Modifier.height(45.dp))
 
@@ -280,7 +304,7 @@ fun LoginScreen() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
+/*@Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
@@ -288,3 +312,4 @@ fun LoginScreenPreview() {
         LoginScreen()
     }
 }
+*/

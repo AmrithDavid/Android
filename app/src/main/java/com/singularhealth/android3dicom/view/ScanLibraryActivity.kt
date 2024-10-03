@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -38,48 +39,64 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
+import com.singularhealth.android3dicom.view.components.LoginScreen
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.view.components.EmptyStateView
 import com.singularhealth.android3dicom.view.components.NavigationBar
 import com.singularhealth.android3dicom.view.components.ScanCard
 import com.singularhealth.android3dicom.view.components.ScanLibraryMenu
 import com.singularhealth.android3dicom.view.components.ShareView
+import com.singularhealth.android3dicom.viewmodel.LoginViewModel
+import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
 class ScanLibraryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
-
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             Android3DicomTheme {
-                val navController = rememberNavController()
-                val searchQuery = remember { mutableStateOf("") }
+@Composable
+fun NavigationSetup() {
+    val navController = rememberNavController()
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(LocalContext.current))
+    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val searchQuery = remember { mutableStateOf("") }
 
-                NavHost(navController = navController, startDestination = "scanScreen") {
-                    composable("scanScreen") {
-                        ScanScreen(
-                            navController = navController,
-                            searchQuery = searchQuery
-                        )
-                    }
-                    composable("mainImageMenu") {
-                        MainImageMenu(navController = navController)
-                    }
-                    composable("shareView") {
-                        ShareView(navController = navController)
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) "scanScreen" else "login"
+    ) {
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate("scanScreen") {
+                        popUpTo("login") { inclusive = true }
                     }
                 }
+            )
+        }
+        composable("scanScreen") {
+            ScanScreen(
+                navController = navController,
+                searchQuery = searchQuery
+            )
+        }
+        composable("mainImageMenu") {
+            MainImageMenu(navController = navController)
+        }
+        composable("shareView") {
+            ShareView(navController = navController)
+        }
+    }
 
-                // Pass a lambda to update the search query
-                SideEffect {
-                    searchQuery.value = searchQuery.value
-                }
-
+    // Pass a lambda to update the search query
+    SideEffect {
+        searchQuery.value = searchQuery.value
+    }
+}
             }
         }
     }
