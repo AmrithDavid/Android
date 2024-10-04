@@ -35,7 +35,7 @@ class LoginViewModel(
 
     companion object {
         // Set this to true to work on the login UI
-        private const val FORCE_LOGIN_SCREEN = true
+        private const val FORCE_LOGIN_SCREEN = false
     }
 
     private val _isDebugMode = MutableStateFlow(FORCE_LOGIN_SCREEN)
@@ -120,7 +120,6 @@ class LoginViewModel(
         Log.d("LoginViewModel", "User logged out")
     }
 
-    // This function is kept for potential future use
     fun toggleDebugMode() {
         _isDebugMode.value = !_isDebugMode.value
         Log.d("LoginViewModel", "Debug mode toggled. New value: ${_isDebugMode.value}")
