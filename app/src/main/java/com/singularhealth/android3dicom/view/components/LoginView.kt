@@ -8,15 +8,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -24,16 +23,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.R
-import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
-import com.singularhealth.android3dicom.ui.theme.DarkBlue
-import com.singularhealth.android3dicom.ui.theme.SubheadingColor
-import com.singularhealth.android3dicom.ui.theme.TextFieldTextColor
-import com.singularhealth.android3dicom.ui.theme.TitleColor
+import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import kotlinx.coroutines.launch
@@ -47,6 +41,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isEmailFocused by remember { mutableStateOf(false) }
+    var isPasswordFocused by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -55,14 +51,13 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val view = LocalView.current
-    val statusBarColor = MaterialTheme.colorScheme.primary
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (context as? android.app.Activity)?.window
-            window?.statusBarColor = statusBarColor.toArgb()
-            window?.let {
-                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
-            }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+    SideEffect {
+        val window = (context as? android.app.Activity)?.window
+        window?.statusBarColor = Color.White.toArgb()
+        window?.let {
+            WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true
         }
     }
 
@@ -127,36 +122,59 @@ fun LoginScreen(
                 onValueChange = { email = it },
                 label = { Text("Email") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(0.8f)
+                        .onFocusChanged { isEmailFocused = it.isFocused },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
-                )
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedBorderColor = LightBlue,
+                        unfocusedBorderColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedLabelColor = LightBlue,
+                        unfocusedLabelColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
+                    ),
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(0.8f)
+                        .onFocusChanged { isPasswordFocused = it.isFocused },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_visibility_off else R.drawable.ic_visibility),
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                            tint =
+                                when {
+                                    isPasswordFocused -> TitleColor
+                                    password.isNotBlank() -> TitleColor
+                                    else -> TextFieldTextColor
+                                },
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                 },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
-                )
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedBorderColor = LightBlue,
+                        unfocusedBorderColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedLabelColor = LightBlue,
+                        unfocusedLabelColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
+                    ),
             )
 
             Spacer(modifier = Modifier.height(60.dp))
@@ -181,7 +199,8 @@ fun LoginScreen(
                         .height(40.dp),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = DarkBlue.copy(alpha = 0.5f),
+                        containerColor = if (email.isNotBlank() && password.isNotBlank()) DarkBlue else DarkBlue.copy(alpha = 0.5f),
+                        disabledContainerColor = DarkBlue.copy(alpha = 0.5f),
                     ),
                 shape = RoundedCornerShape(buttonCornerRadius.dp),
                 enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
@@ -189,10 +208,14 @@ fun LoginScreen(
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = Color.White,
                     )
                 } else {
-                    Text("Log in", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        "Log in",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White,
+                    )
                 }
             }
 
@@ -282,7 +305,7 @@ fun LoginScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(80.dp)
                     .background(Color(0xFFF0F3F5)),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,

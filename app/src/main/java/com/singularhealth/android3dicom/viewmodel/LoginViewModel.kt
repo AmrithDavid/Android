@@ -12,8 +12,10 @@ import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.LoginRequest
 import com.singularhealth.android3dicom.network.ApiService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
@@ -31,10 +33,23 @@ class LoginViewModel(
 ) : ViewModel() {
     private val apiService: ApiService
 
+    companion object {
+        // Set this to true to work on the login UI
+        private const val FORCE_LOGIN_SCREEN = true
+    }
+
+    private val _isDebugMode = MutableStateFlow(FORCE_LOGIN_SCREEN)
+    val isDebugMode: StateFlow<Boolean> = _isDebugMode.asStateFlow()
+
     val isLoggedIn: StateFlow<Boolean> =
         context.dataStore.data
             .map { preferences ->
-                preferences[booleanPreferencesKey("is_logged_in")] ?: false
+                // Only check logged in state if not in debug mode
+                if (_isDebugMode.value) {
+                    false
+                } else {
+                    preferences[booleanPreferencesKey("is_logged_in")] ?: false
+                }
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
@@ -103,6 +118,12 @@ class LoginViewModel(
             preferences[booleanPreferencesKey("is_logged_in")] = false
         }
         Log.d("LoginViewModel", "User logged out")
+    }
+
+    // This function is kept for potential future use
+    fun toggleDebugMode() {
+        _isDebugMode.value = !_isDebugMode.value
+        Log.d("LoginViewModel", "Debug mode toggled. New value: ${_isDebugMode.value}")
     }
 }
 
