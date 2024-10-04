@@ -189,7 +189,7 @@ fun LoginScreen(
                         if (success) {
                             onLoginSuccess()
                         } else {
-                            errorMessage = "Login failed. Please check your credentials and try again."
+                            errorMessage = "Login failed"
                         }
                     }
                 },
@@ -267,14 +267,18 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(modifier = Modifier.offset(y = 6.dp)) {
+                Box(
+                    modifier =
+                        Modifier
+                            .offset(x = 47.dp, y = (-30).dp),
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.microsoft_logo),
                         contentDescription = "Sign in with Microsoft",
                         modifier =
                             Modifier
                                 .clickable { /* Trigger Microsoft Sign-In */ }
-                                .size(40.dp),
+                                .size(38.dp),
                     )
                 }
 
@@ -283,18 +287,23 @@ fun LoginScreen(
                     contentDescription = "Sign in with Apple",
                     modifier =
                         Modifier
+                            .offset(x = 15.dp, y = (-28).dp)
                             .clickable { /* Trigger Apple Sign-In */ }
                             .size(120.dp),
                 )
 
-                Box(modifier = Modifier.offset(y = 1.dp)) {
+                Box(
+                    modifier =
+                        Modifier
+                            .offset(x = (-30).dp, y = (-30).dp),
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.google_logo),
                         contentDescription = "Sign in with Google",
                         modifier =
                             Modifier
                                 .clickable { /* Trigger Google Sign-In */ }
-                                .size(60.dp),
+                                .size(70.dp),
                     )
                 }
             }
@@ -327,12 +336,13 @@ fun LoginScreen(
     }
 }
 
-/*@Suppress("ktlint:standard:function-naming")
-@Preview(showBackground = true)
+/* @Suppress("ktlint:standard:function-naming")
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 fun LoginScreenPreview() {
     Android3DicomTheme {
-        LoginScreen()
+        LoginScreen(
+            onLoginSuccess = {},
+        )
     }
-}
-*/
+} */
