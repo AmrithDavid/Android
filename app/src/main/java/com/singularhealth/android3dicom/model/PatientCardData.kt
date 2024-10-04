@@ -6,5 +6,5 @@ data class PatientCardData(
     val patientId: String,
     val modality: String,
     val expiresIn: String,
-    val imageName: String,
+    val fileName: String,
 )

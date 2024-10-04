@@ -18,9 +18,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -46,6 +49,7 @@ import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 class ScanLibraryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         enableEdgeToEdge()
@@ -54,9 +58,14 @@ class ScanLibraryActivity : ComponentActivity() {
         setContent {
             Android3DicomTheme {
                 val navController = rememberNavController()
+                val searchQuery = remember { mutableStateOf("") }
+
                 NavHost(navController = navController, startDestination = "scanScreen") {
                     composable("scanScreen") {
-                        ScanScreen(navController = navController)
+                        ScanScreen(
+                            navController = navController,
+                            searchQuery = searchQuery
+                        )
                     }
                     composable("mainImageMenu") {
                         MainImageMenu(navController = navController)
@@ -65,6 +74,12 @@ class ScanLibraryActivity : ComponentActivity() {
                         ShareView(navController = navController)
                     }
                 }
+
+                // Pass a lambda to update the search query
+                SideEffect {
+                    searchQuery.value = searchQuery.value
+                }
+
             }
         }
     }
@@ -74,6 +89,7 @@ class ScanLibraryActivity : ComponentActivity() {
     fun ScanScreen(
         viewModel: ScanLibraryViewModel = viewModel(),
         navController: NavController,
+        searchQuery: MutableState<String>,
     ) {
         val greeting by viewModel.greeting.collectAsState()
         val patientCards by viewModel.patientCards.collectAsState()
@@ -100,15 +116,26 @@ class ScanLibraryActivity : ComponentActivity() {
                 NavigationBar(
                     greeting = greeting,
                     onMenuClick = { viewModel.toggleSideMenu() },
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { newQuery ->
+                        // updates state
+                        searchQuery.value = newQuery.value // Update the search query state
+                    }
                 )
             },
             containerColor = MaterialTheme.colorScheme.background,
         ) { innerPadding ->
+            val filteredCards = patientCards.filter { card ->
+                card.patientName.contains(searchQuery.value, ignoreCase = true) ||
+                card.patientId.contains(searchQuery.value, ignoreCase = true) ||
+                card.modality.contains(searchQuery.value, ignoreCase = true) ||
+                card.fileName.contains(searchQuery.value, ignoreCase = true)
+            }
             
-            if (patientCards.isNotEmpty()) {
+            if (filteredCards.isNotEmpty()) {
                 CardList(
                     modifier = Modifier.padding(innerPadding),
-                    patientCards = patientCards,
+                    patientCards = filteredCards,
                     onImageButtonClick = { navController.navigate("mainImageMenu") },
                 )
             } else {
@@ -167,6 +194,11 @@ fun CardList(
 fun ScanScreenPreview() {
     Android3DicomTheme {
         val navController = rememberNavController()
-        ScanScreen(navController = navController)
+        val searchQuery = remember { mutableStateOf("") } // Create MutableState<String>
+
+        ScanScreen(
+            navController = navController,
+            searchQuery = searchQuery
+        )
     }
 }
