@@ -3,7 +3,6 @@ package com.singularhealth.android3dicom.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.PatientCardData
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +46,7 @@ class ScanLibraryViewModel : ViewModel() {
                 patientId = "123456789",
                 modality = "CT",
                 expiresIn = "7 days",
-                fileName = "img_logomark",
+                fileName = "patient_image",
             ),
             PatientCardData(
                 patientName = "Luna Shin",
@@ -72,8 +71,7 @@ class ScanLibraryViewModel : ViewModel() {
                 modality = "3D",
                 expiresIn = "7 days",
                 fileName = "patient_image",
-            )
-
+            ),
         )
 //        List(4) {
 //            PatientCardData(
@@ -85,8 +83,6 @@ class ScanLibraryViewModel : ViewModel() {
 //                imageName = "patient_image",
 //            )
 //        }
-
-
 
     fun updateGreeting(name: String) {
         _greeting.value = "Hello $name"

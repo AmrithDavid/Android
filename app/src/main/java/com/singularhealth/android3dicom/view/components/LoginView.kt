@@ -100,7 +100,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                painter = painterResource(id = R.drawable.img_logo),
+                painter = painterResource(id = R.drawable.img_logo_no_title),
                 contentDescription = "3Dicom Logo",
                 modifier =
                     Modifier

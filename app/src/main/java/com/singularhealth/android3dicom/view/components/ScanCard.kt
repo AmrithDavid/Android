@@ -96,7 +96,8 @@ fun ScanCard(
                             .padding(start = 16.dp),
                 ) {
                     Text(
-                        text = patientCardData.fileName,
+                        // text = patientCardData.fileName,
+                        text = "Study Description", // changes this so each card was titled study description
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
