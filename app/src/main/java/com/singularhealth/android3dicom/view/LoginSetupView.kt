@@ -1,7 +1,10 @@
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
-package com.singularhealth.android3dicom.view.components
+package com.singularhealth.android3dicom.view
 
+import android.content.Context
+import android.util.Log
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,26 +15,77 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavHostController
+import com.mun.bonecci.biometrics.biometric.BiometricAuthListener
+import com.mun.bonecci.biometrics.biometric.BiometricConstants.CIPHERTEXT_WRAPPER
+import com.mun.bonecci.biometrics.biometric.BiometricConstants.SHARED_PREFS_FILENAME
+import com.mun.bonecci.biometrics.biometric.CiphertextWrapper
+import com.mun.bonecci.biometrics.biometric.CryptographyManager
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
+import com.singularhealth.android3dicom.utilities.BiometricUtils
 
+private lateinit var biometricPrompt: BiometricPrompt
+private val cryptographyManager = CryptographyManager()
+private lateinit var promptInfo: BiometricPrompt.PromptInfo
+private var ciphertextWrapper: CiphertextWrapper? = null
+
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(
     onBackClick: () -> Unit = {},
-    onBiometricLoginClick: () -> Unit
+    onBiometricLoginClick: () -> Unit,
+    navController: NavHostController,
 ) {
     var selectedOption by remember { mutableStateOf<String?>(null) }
 
+    // State variables to store user input for name and age
+    var email by remember { mutableStateOf(TextFieldValue()) }
+    var isEmailValid by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf(TextFieldValue()) }
+    var isPasswordValid by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val isBiometricReady = BiometricUtils.isBiometricReady(context)
+    var isLoginFromModal by remember { mutableStateOf(false) }
+
+    // Execute the provided initialization function
+    InitBiometrics(
+        context = context as FragmentActivity,
+        callback =
+            object : BiometricAuthListener {
+                override fun onBiometricAuthenticateError(
+                    error: Int,
+                    errMsg: String,
+                ) {
+                    when (error) {
+                        BiometricPrompt.ERROR_USER_CANCELED -> {}
+                        BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
+                        BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
+                    }
+                }
+
+                override fun onAuthenticationFailed() {}
+
+                override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
+                    Log.d("LoginSetupView", "Authentication success, proceeding to ScanLibraryView...")
+                    navController.navigate("scanScreen")
+                }
+            },
+    )
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
     ) {
         LoginTopBar(onBackClick)
         LoginContent(
@@ -40,11 +94,12 @@ fun LoginSetupView(
             onSetupClick = {
                 if (selectedOption == "Biometric") {
                     onBiometricLoginClick()
+                    biometricPrompt.authenticate(promptInfo)
                 } else {
                     // Handle PIN setup
                     // TODO: Implement PIN setup
                 }
-            }
+            },
         )
     }
 }
@@ -52,25 +107,28 @@ fun LoginSetupView(
 @Composable
 private fun LoginTopBar(onBackClick: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(DarkBlue),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(DarkBlue),
     ) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(onClick = onBackClick),
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .clickable(onClick = onBackClick),
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(
@@ -92,15 +150,16 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
 private fun LoginContent(
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
-    onSetupClick: () -> Unit
+    onSetupClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(150.dp))
@@ -110,15 +169,16 @@ private fun LoginContent(
             style = typography.displayLarge.copy(fontSize = 24.sp),
             color = TitleColor,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(56.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 0.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             LoginOptionItem(
@@ -143,15 +203,17 @@ private fun LoginContent(
 
         Button(
             onClick = onSetupClick,
-            modifier = Modifier
-                .width(300.dp)
-                .height(40.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = DarkBlue,
-                disabledContainerColor = if (selectedOption != null) DarkBlue else DarkBlue.copy(alpha = 0.5f),
-            ),
+            modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = DarkBlue,
+                    disabledContainerColor = if (selectedOption != null) DarkBlue else DarkBlue.copy(alpha = 0.5f),
+                ),
             shape = RoundedCornerShape(4.dp),
-            enabled = selectedOption != null
+            enabled = selectedOption != null,
         ) {
             Text(
                 "Setup",
@@ -164,12 +226,14 @@ private fun LoginContent(
 
         OutlinedButton(
             onClick = { /* TODO: Handle cancel */ },
-            modifier = Modifier
-                .width(300.dp)
-                .height(40.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.White,
-            ),
+            modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp),
+            colors =
+                ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.White,
+                ),
             border = BorderStroke(2.dp, DarkBlue),
             shape = RoundedCornerShape(4.dp),
         ) {
@@ -203,16 +267,18 @@ private fun LoginOptionItem(
     val innerCircleSize = 10.dp
 
     Box(
-        modifier = modifier
-            .height(130.dp)
-            .border(borderWidth, borderColor, RoundedCornerShape(8.dp))
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .clickable(onClick = onSelect),
+        modifier =
+            modifier
+                .height(130.dp)
+                .border(borderWidth, borderColor, RoundedCornerShape(8.dp))
+                .background(backgroundColor, RoundedCornerShape(8.dp))
+                .clickable(onClick = onSelect),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.Top,
         ) {
             Icon(
@@ -238,30 +304,56 @@ private fun LoginOptionItem(
         }
 
         Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                .size(circleSize)
-                .border(circleBorderWidth, SubheadingColor, CircleShape)
-                .padding(circlePadding),
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp, end = 16.dp)
+                    .size(circleSize)
+                    .border(circleBorderWidth, SubheadingColor, CircleShape)
+                    .padding(circlePadding),
         ) {
             if (isSelected) {
                 Box(
-                    modifier = Modifier
-                        .size(innerCircleSize)
-                        .align(Alignment.Center)
-                        .clip(CircleShape)
-                        .background(SelectedOptionCircle),
+                    modifier =
+                        Modifier
+                            .size(innerCircleSize)
+                            .align(Alignment.Center)
+                            .clip(CircleShape)
+                            .background(SelectedOptionCircle),
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+private fun InitBiometrics(
+    context: FragmentActivity,
+    callback: BiometricAuthListener,
+) {
+    biometricPrompt =
+        BiometricUtils.initBiometricPrompt(context, callback)
+
+    promptInfo =
+        BiometricUtils.createPromptInfo(
+            title = "Biometric Example",
+            description = "Touch your Fingerprint sensor",
+            negativeText = "Cancel",
+        )
+
+    ciphertextWrapper =
+        cryptographyManager.getCiphertextWrapperFromSharedPrefs(
+            context,
+            SHARED_PREFS_FILENAME,
+            Context.MODE_PRIVATE,
+            CIPHERTEXT_WRAPPER,
+        )
+}
+
+/*@Preview(showBackground = true)
 @Composable
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
-        LoginSetupView(onBiometricLoginClick = {})
+        LoginSetupView(onBiometricLoginClick = {}, navController)
     }
-}
+}*/

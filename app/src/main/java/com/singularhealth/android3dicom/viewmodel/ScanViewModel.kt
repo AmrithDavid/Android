@@ -25,7 +25,7 @@ class ScanViewModel : ViewModel() { // inherits from ViewModel class
                     patientId = "123456789",
                     modality = "CT",
                     expiresIn = "7 days",
-                    imageName = "patient_image",
+                    fileName = "patient_image",
                 )
             }
     }
