@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
-import com.mun.bonecci.biometrics.biometric.BiometricAuthListener
-import com.mun.bonecci.biometrics.biometric.BiometricConstants.CIPHERTEXT_WRAPPER
-import com.mun.bonecci.biometrics.biometric.BiometricConstants.SHARED_PREFS_FILENAME
 import com.mun.bonecci.biometrics.biometric.CiphertextWrapper
 import com.mun.bonecci.biometrics.biometric.CryptographyManager
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
+import com.singularhealth.android3dicom.utilities.BiometricAuthListener
+import com.singularhealth.android3dicom.utilities.BiometricConstants.CIPHERTEXT_WRAPPER
+import com.singularhealth.android3dicom.utilities.BiometricConstants.SHARED_PREFS_FILENAME
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 
 private lateinit var biometricPrompt: BiometricPrompt

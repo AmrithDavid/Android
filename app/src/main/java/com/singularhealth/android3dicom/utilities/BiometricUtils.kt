@@ -14,9 +14,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.mun.bonecci.biometrics.biometric.BiometricAuthListener
-import com.mun.bonecci.biometrics.biometric.BiometricConstants
-import com.mun.bonecci.biometrics.biometric.CryptographyManager
 
 object BiometricUtils {
     private lateinit var biometricManager: BiometricManager
@@ -176,57 +173,5 @@ object BiometricUtils {
                 .setConfirmationRequired(false)
                 .build()
         return promptInfo
-    }
-
-    /**
-     * Encrypt and store credentials in preferences with cipher
-     */
-    fun encryptAndStoreServerToken(
-        token: String,
-        context: Context,
-        authResult: BiometricPrompt.AuthenticationResult,
-    ) {
-        authResult.cryptoObject?.cipher?.apply {
-            val cryptographyManagerForEncryption = CryptographyManager()
-            val encryptedServerTokenWrapper =
-                cryptographyManagerForEncryption.encryptData(token, this)
-            cryptographyManagerForEncryption.persistCiphertextWrapperToSharedPrefs(
-                encryptedServerTokenWrapper,
-                context,
-                BiometricConstants.SHARED_PREFS_FILENAME,
-                Context.MODE_PRIVATE,
-                BiometricConstants.CIPHERTEXT_WRAPPER,
-            )
-        }
-    }
-
-    /**
-     * Decrypt credentials stored in preferences
-     */
-    fun decryptServerToken(
-        context: Context,
-        result: BiometricPrompt.AuthenticationResult,
-    ): Pair<String, String> {
-        val cryptographyManager = CryptographyManager()
-        val ciphertextWrapper =
-            cryptographyManager.getCiphertextWrapperFromSharedPrefs(
-                context,
-                BiometricConstants.SHARED_PREFS_FILENAME,
-                Context.MODE_PRIVATE,
-                BiometricConstants.CIPHERTEXT_WRAPPER,
-            )
-        var email = ""
-        var password = ""
-
-        ciphertextWrapper?.let { textWrapper ->
-            result.cryptoObject?.cipher?.let {
-                val plaintext =
-                    cryptographyManager.decryptData(textWrapper.ciphertext, it)
-                val userCredentials = plaintext.split(" ")
-                email = userCredentials[0]
-                password = userCredentials[1]
-            }
-        }
-        return email to password
     }
 }

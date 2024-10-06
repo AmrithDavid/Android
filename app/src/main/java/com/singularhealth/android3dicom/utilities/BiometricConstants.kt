@@ -1,4 +1,4 @@
-package com.mun.bonecci.biometrics.biometric
+package com.singularhealth.android3dicom.utilities
 
 object BiometricConstants {
     const val SHARED_PREFS_FILENAME = "biometric_prefs"
