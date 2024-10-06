@@ -48,7 +48,7 @@ fun NavigationGraph() {
             )
         }
         composable("scanScreen") {
-            ScanScreen(
+            ScanLibraryView(
                 navController = navController,
                 searchQuery = searchQuery,
             )
