@@ -97,6 +97,6 @@ class MyNewActivityWithThe3crViewer : ViewerSdkActivity() {
     @Composable
     private fun MainImageMenuWrapper() {
         val navController = rememberNavController()
-        MainImageMenu(navController = navController)
+        ImageDetailView(navController = navController)
     }
 }

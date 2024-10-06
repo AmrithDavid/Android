@@ -2,8 +2,6 @@
 
 package com.singularhealth.android3dicom.view
 
-import android.content.Context
-import android.util.Log
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,19 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
-import com.mun.bonecci.biometrics.biometric.CiphertextWrapper
-import com.mun.bonecci.biometrics.biometric.CryptographyManager
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.utilities.BiometricAuthListener
-import com.singularhealth.android3dicom.utilities.BiometricConstants.CIPHERTEXT_WRAPPER
-import com.singularhealth.android3dicom.utilities.BiometricConstants.SHARED_PREFS_FILENAME
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 
 private lateinit var biometricPrompt: BiometricPrompt
-private val cryptographyManager = CryptographyManager()
 private lateinit var promptInfo: BiometricPrompt.PromptInfo
-private var ciphertextWrapper: CiphertextWrapper? = null
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -75,8 +67,7 @@ fun LoginSetupView(
                 override fun onAuthenticationFailed() {}
 
                 override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
-                    Log.d("LoginSetupView", "Authentication success, proceeding to ScanLibraryView...")
-                    navController.navigate("scanScreen")
+                    navController.navigate("scanLibraryView")
                 }
             },
     )
@@ -339,14 +330,6 @@ private fun InitBiometrics(
             title = "Biometric Example",
             description = "Touch your Fingerprint sensor",
             negativeText = "Cancel",
-        )
-
-    ciphertextWrapper =
-        cryptographyManager.getCiphertextWrapperFromSharedPrefs(
-            context,
-            SHARED_PREFS_FILENAME,
-            Context.MODE_PRIVATE,
-            CIPHERTEXT_WRAPPER,
         )
 }
 

@@ -27,7 +27,7 @@ fun NavigationGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = "loginSetup", // if (isLoggedIn) "scanScreen" else "login"
+        startDestination = "loginSetup", // if (isLoggedIn) "scanLibraryView" else "login"
     ) {
         composable("loginSetup") {
             LoginSetupView(
@@ -41,20 +41,20 @@ fun NavigationGraph() {
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate("scanScreen") {
+                    navController.navigate("scanLibraryView") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
             )
         }
-        composable("scanScreen") {
+        composable("scanLibraryView") {
             ScanLibraryView(
                 navController = navController,
                 searchQuery = searchQuery,
             )
         }
         composable("mainImageMenu") {
-            MainImageMenu(navController = navController)
+            ImageDetailView(navController = navController)
         }
         composable("shareView") {
             ShareView(navController = navController)
