@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
+import com.singularhealth.android3dicom.view.components.LoadingSpinner
 import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
 @Suppress("ktlint:standard:function-naming")
@@ -31,6 +32,7 @@ fun ImageDetailView(
 ) {
     var showDropdown by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
+    val isInitialLoading by viewModel.isInitialLoading.collectAsState()
 
     Android3DicomTheme {
         Column(
@@ -55,38 +57,44 @@ fun ImageDetailView(
                         .fillMaxWidth()
                         .padding(16.dp),
             ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Text(
-                        text = "Scan Image goes here",
-                        style = MaterialTheme.typography.titleMedium,
+                if (isInitialLoading) {
+                    LoadingSpinner(
+                        modifier = Modifier.align(Alignment.Center),
                     )
-                }
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        Text(
+                            text = "Scan Image goes here",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
 
-                // Options menu
-                Box(
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(y = (-76).dp),
-                ) {
-                    ImageDetailOptionsMenu(
-                        expanded = showDropdown,
-                        onDismissRequest = { showDropdown = false },
-                        onItemClick = { selectedOption ->
-                            when (selectedOption) {
-                                "Share" -> navController.navigate("shareView")
-                                "More Info" -> { /* Handle More Info */ }
-                                "Delete" -> { /* Handle Delete */ }
-                                "Report" -> { /* Handle Report */ }
-                                "Support" -> { /* Handle Support */ }
-                            }
-                            showDropdown = false
-                        },
-                    )
+                    // Options menu
+                    Box(
+                        modifier =
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(y = (-76).dp),
+                    ) {
+                        ImageDetailOptionsMenu(
+                            expanded = showDropdown,
+                            onDismissRequest = { showDropdown = false },
+                            onItemClick = { selectedOption ->
+                                when (selectedOption) {
+                                    "Share" -> navController.navigate("shareView")
+                                    "More Info" -> { /* Handle More Info */ }
+                                    "Delete" -> { /* Handle Delete */ }
+                                    "Report" -> { /* Handle Report */ }
+                                    "Support" -> { /* Handle Support */ }
+                                }
+                                showDropdown = false
+                            },
+                        )
+                    }
                 }
             }
 
