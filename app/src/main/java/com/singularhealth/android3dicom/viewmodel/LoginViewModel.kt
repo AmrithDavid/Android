@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -118,6 +119,12 @@ class LoginViewModel(
             preferences[booleanPreferencesKey("is_logged_in")] = false
         }
         Log.d("LoginViewModel", "User logged out")
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            logout()
+        }
     }
 
     fun toggleDebugMode() {
