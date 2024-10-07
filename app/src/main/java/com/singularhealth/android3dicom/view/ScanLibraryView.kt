@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -63,7 +65,7 @@ fun ScanLibraryView(
                 onMenuClick = { viewModel.toggleSideMenu() },
                 searchQuery = searchQuery,
                 onSearchQueryChange = { newQuery ->
-                    searchQuery.value = newQuery.value // Update the search query state
+                    searchQuery.value = newQuery.value
                 },
             )
         },
@@ -87,6 +89,7 @@ fun ScanLibraryView(
             EmptyStateView()
         }
     }
+
     // Semi-transparent overlay
     if (isSideMenuVisible) {
         Box(
@@ -94,7 +97,6 @@ fun ScanLibraryView(
                 Modifier
                     .fillMaxSize()
                     .background(Color(0x52000000)),
-            // #00000052
         )
     }
 
@@ -103,7 +105,7 @@ fun ScanLibraryView(
         ScanLibraryMenu(
             onCloseMenu = { viewModel.toggleSideMenu() },
             onHomeClick = { viewModel.onHomeClick() },
-            onClearCacheClick = { viewModel.onClearCacheClick() },
+            onClearCacheClick = { showClearCacheDialog = true },
             onBiometricClick = { viewModel.onBiometricClick() },
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
@@ -111,7 +113,7 @@ fun ScanLibraryView(
             isBiometricEnabled = isBiometricEnabled,
         )
     }
-
+    
     if (showLogoutDialog) {
         LogoutConfirmationDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -120,6 +122,54 @@ fun ScanLibraryView(
                 onLogout()
             },
         )
+    }
+
+    // Clear Cache Dialog
+    if (showClearCacheDialog) {
+        ClearCacheDialog(
+            onDismissRequest = { showClearCacheDialog = false },
+            onConfirmLogout = {
+                viewModel.onClearCacheClick()
+                showClearCacheDialog = false
+            },
+        )
+    }
+
+    // Loading indicator for cache clearing
+    if (isClearingCache) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    // Clear Cache Dialog
+    if (showClearCacheDialog) {
+        ClearCacheDialog(
+            onDismissRequest = { showClearCacheDialog = false },
+            onConfirmLogout = {
+                viewModel.onClearCacheClick()
+                showClearCacheDialog = false
+            },
+        )
+    }
+
+    // Loading indicator for cache clearing
+    if (isClearingCache) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 

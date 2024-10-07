@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
+import com.singularhealth.android3dicom.data.CacheManager
 import com.singularhealth.android3dicom.model.PatientCardData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModelimport javax.inject.Inject
+
 @HiltViewModel
 class ScanLibraryViewModel
     @Inject
     constructor(
         private val appState: AppState,
+        private val cacheManager: CacheManager,
     ) : ViewModel() {
         private val _greeting = MutableStateFlow("Hello Sam")
         val greeting: StateFlow<String> = _greeting.asStateFlow()
@@ -33,10 +37,11 @@ class ScanLibraryViewModel
         private var _isBiometricLoginActive = MutableStateFlow(false)
         val isBiometricLoginActive: StateFlow<Boolean> = _isBiometricLoginActive.asStateFlow()
 
+        private val _isClearingCache = MutableStateFlow(false)
+        val isClearingCache: StateFlow<Boolean> = _isClearingCache.asStateFlow()
+
         init {
             viewModelScope.launch {
-                // Simulate data loading
-//            delay(2000) // Simulate a 2-second load time
                 loadData()
                 _dataLoaded.value = true
             }
@@ -88,16 +93,6 @@ class ScanLibraryViewModel
                     fileName = "patient_image",
                 ),
             )
-//        List(4) {
-//            PatientCardData(
-//                patientName = "Sam Kellahan",
-//                date = "2024-09-10",
-//                patientId = "123456789",
-//                modality = "CT",
-//                expiresIn = "7 days",
-//                imageName = "patient_image",
-//            )
-//        }
 
         fun updateGreeting(name: String) {
             _greeting.value = "Hello $name"
@@ -116,8 +111,12 @@ class ScanLibraryViewModel
         }
 
         fun onClearCacheClick() {
-            // Implement clear cache action
-            toggleSideMenu()
+            viewModelScope.launch {
+                _isClearingCache.value = true
+                cacheManager.clearCache()
+                _isClearingCache.value = false
+                toggleSideMenu()
+            }
         }
 
         fun onBiometricClick() {
