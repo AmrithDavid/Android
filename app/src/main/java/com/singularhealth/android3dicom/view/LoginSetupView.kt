@@ -2,6 +2,7 @@
 
 package com.singularhealth.android3dicom.view
 
+import android.util.Log
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -21,10 +22,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
+import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.utilities.BiometricAuthListener
 import com.singularhealth.android3dicom.utilities.BiometricUtils
+import com.singularhealth.android3dicom.viewmodel.LoginSetupViewModel
 
 private lateinit var biometricPrompt: BiometricPrompt
 private lateinit var promptInfo: BiometricPrompt.PromptInfo
@@ -32,6 +36,7 @@ private lateinit var promptInfo: BiometricPrompt.PromptInfo
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(
+    viewModel: LoginSetupViewModel = hiltViewModel(),
     onBackClick: () -> Unit = {},
     onBiometricLoginClick: () -> Unit,
     onSetupSuccess: () -> Unit,
@@ -50,10 +55,14 @@ fun LoginSetupView(
     ) {
         LoginTopBar(onBackClick)
         LoginContent(
+            viewModel,
             selectedOption = selectedOption,
-            onOptionSelected = { selectedOption = it },
+            onOptionSelected = {
+                selectedOption = it.toString()
+                viewModel.saveLoginPreference(it)
+            },
             onSetupClick = {
-                if (selectedOption == "Biometric") {
+                if (selectedOption == LoginPreferenceOption.BIOMETRIC.toString()) {
                     onBiometricLoginClick()
                 } else {
                     // Handle PIN setup
@@ -108,8 +117,9 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
 
 @Composable
 private fun LoginContent(
+    viewModel: LoginSetupViewModel,
     selectedOption: String?,
-    onOptionSelected: (String) -> Unit,
+    onOptionSelected: (LoginPreferenceOption) -> Unit,
     onSetupClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
@@ -145,16 +155,16 @@ private fun LoginContent(
                 text = "Biometric",
                 description = "Log in using your fingerprint or face ID",
                 icon = R.drawable.ic_fingerprint,
-                isSelected = selectedOption == "Biometric",
-                onSelect = { onOptionSelected("Biometric") },
+                isSelected = selectedOption == LoginPreferenceOption.BIOMETRIC.toString(),
+                onSelect = { onOptionSelected(LoginPreferenceOption.BIOMETRIC) },
                 modifier = Modifier.weight(1f),
             )
             LoginOptionItem(
                 text = "PIN",
                 description = "Log in by setting up a 4-digit PIN",
                 icon = R.drawable.ic_pin,
-                isSelected = selectedOption == "PIN",
-                onSelect = { onOptionSelected("PIN") },
+                isSelected = selectedOption == LoginPreferenceOption.PIN.toString(),
+                onSelect = { onOptionSelected(LoginPreferenceOption.PIN) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -162,7 +172,10 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         Button(
-            onClick = onSetupClick,
+            onClick = {
+                Log.d("LoginSetupView", "The selected login type is: ${viewModel.getLoginPreference()}")
+                onSetupClick()
+            },
             modifier =
                 Modifier
                     .width(300.dp)

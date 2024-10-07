@@ -8,7 +8,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.utilities.BiometricUtils
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val startForResult =
         registerForActivityResult(

@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.hilt.android.v2511)
     implementation(libs.androidx.biometric)
+    implementation(libs.androidx.hilt.navigation.compose.v120)
     kapt(libs.hilt.android.compiler.v2511)
 }
 
