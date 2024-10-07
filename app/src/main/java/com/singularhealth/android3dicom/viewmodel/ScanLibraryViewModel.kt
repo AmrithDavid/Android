@@ -1,10 +1,12 @@
 package com.singularhealth.android3dicom.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.data.CacheManager
+import com.singularhealth.android3dicom.data.CacheManagerImpl
 import com.singularhealth.android3dicom.model.PatientCardData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +46,7 @@ class ScanLibraryViewModel
             viewModelScope.launch {
                 loadData()
                 _dataLoaded.value = true
+                logCacheSize()
             }
         }
 
@@ -53,9 +56,7 @@ class ScanLibraryViewModel
         }
 
         private fun loadPatientCards() {
-            // Toggle between these two lines to test empty and non-empty states
-            // _patientCards.value = emptyList() // Uncomment this line to test EmptyStateView
-            _patientCards.value = generateDummyData() // Uncomment this line to test CardList
+            _patientCards.value = generateDummyData()
         }
 
         private fun generateDummyData(): List<PatientCardData> =
@@ -104,7 +105,6 @@ class ScanLibraryViewModel
             _isSideMenuVisible.value = !_isSideMenuVisible.value
         }
 
-        // Add methods to handle side menu actions
         fun onHomeClick() {
             // Implement home action
             toggleSideMenu()
@@ -113,7 +113,23 @@ class ScanLibraryViewModel
         fun onClearCacheClick() {
             viewModelScope.launch {
                 _isClearingCache.value = true
-                cacheManager.clearCache()
+                Log.d(TAG, "Starting cache clearing process")
+
+                // Add test files (optional, for testing purposes)
+                if (cacheManager is CacheManagerImpl) {
+                    cacheManager.addTestCacheFiles()
+                }
+
+                val initialCacheSize = cacheManager.getCacheSize()
+                Log.d(TAG, "Initial cache size: ${formatSize(initialCacheSize)}")
+
+                val clearedSize = cacheManager.clearCache()
+
+                val finalCacheSize = cacheManager.getCacheSize()
+                Log.d(TAG, "Cache clearing completed")
+                Log.d(TAG, "Cleared cache size: ${formatSize(clearedSize)}")
+                Log.d(TAG, "Final cache size: ${formatSize(finalCacheSize)}")
+
                 _isClearingCache.value = false
                 toggleSideMenu()
             }
@@ -140,5 +156,21 @@ class ScanLibraryViewModel
         fun onLogoutClick() {
             // Implement logout action
             toggleSideMenu()
+        }
+
+        private suspend fun logCacheSize() {
+            val size = cacheManager.getCacheSize()
+            Log.d(TAG, "Current cache size: ${formatSize(size)}")
+        }
+
+        private fun formatSize(size: Long): String {
+            if (size < 1024) return "$size B"
+            val units = listOf("B", "KB", "MB", "GB", "TB")
+            val digitGroups = (Math.log10(size.toDouble()) / Math.log10(1024.0)).toInt()
+            return String.format("%.1f %s", size / Math.pow(1024.0, digitGroups.toDouble()), units[digitGroups])
+        }
+
+        companion object {
+            private const val TAG = "ScanLibraryViewModel"
         }
     }
