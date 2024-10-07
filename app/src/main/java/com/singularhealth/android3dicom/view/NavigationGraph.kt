@@ -88,7 +88,7 @@ fun NavigationGraph() {
                         }
                         LoginPreferenceOption.BIOMETRIC -> {
                             // replace with biometric login
-                            navController.navigate(ViewRoute.IMAGE_DETAIL.toString()) {
+                            navController.navigate(ViewRoute.SCAN_LIBRARY.toString()) {
                                 popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
                             }
                         }
@@ -106,6 +106,12 @@ fun NavigationGraph() {
             ScanLibraryView(
                 navController = navController,
                 searchQuery = searchQuery,
+                onLogout = {
+                    loginViewModel.logoutUser()
+                    navController.navigate("login") {
+                        popUpTo("scanScreen") { inclusive = true }
+                    }
+                },
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {
@@ -133,7 +139,7 @@ fun getStartRoute(): String {
 
     return when (appState.loginPreference) {
         LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
-        LoginPreferenceOption.BIOMETRIC -> ViewRoute.IMAGE_DETAIL.toString() // replace with biometric login
+        LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString() // replace with biometric login
         LoginPreferenceOption.PIN -> ViewRoute.REPORT.toString() // replace with PIN login
     }
 }
