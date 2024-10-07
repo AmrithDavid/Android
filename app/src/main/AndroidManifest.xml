@@ -4,8 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
     <application
+        android:name=".HiltApplication"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -19,7 +23,7 @@
             android:name=".view.MyNewActivityWithThe3crViewer"
             android:exported="true" />
         <activity
-            android:name=".view.ScanLibraryActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.android3dicom">
             <intent-filter>

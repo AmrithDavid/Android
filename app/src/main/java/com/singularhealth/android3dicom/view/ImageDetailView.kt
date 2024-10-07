@@ -15,17 +15,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun MainImageMenu(
+fun ImageDetailView(
     viewModel: ImageDetailViewModel = viewModel(),
     navController: NavController,
 ) {
@@ -36,7 +36,7 @@ fun MainImageMenu(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            MainImageMenuTopBar(
+            ImageDetailTopBar(
                 selectedButton = selectedButton,
                 onButtonSelected = { selectedButton = it },
                 on3DClick = { viewModel.on3DClick() },
@@ -90,13 +90,13 @@ fun MainImageMenu(
                 }
             }
 
-            MainImageMenuBottomBar()
+            ImageDetailBottomBar()
         }
     }
 }
 
 @Composable
-fun MainImageMenuTopBar(
+fun ImageDetailTopBar(
     selectedButton: String,
     onButtonSelected: (String) -> Unit,
     on3DClick: () -> Unit,
@@ -238,7 +238,7 @@ fun TopBarButton(
 }
 
 @Composable
-fun MainImageMenuBottomBar() {
+fun ImageDetailBottomBar() {
     Surface(
         color = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -282,8 +282,8 @@ fun BottomBarButton(
 
 @Preview(showBackground = true)
 @Composable
-fun MainImageMenuPreview() {
+fun ImageDetailViewPreview() {
     Android3DicomTheme {
-        MainImageMenu(navController = rememberNavController())
+        ImageDetailView(navController = rememberNavController())
     }
 }

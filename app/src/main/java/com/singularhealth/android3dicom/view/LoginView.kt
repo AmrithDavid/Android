@@ -1,6 +1,6 @@
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
-package com.singularhealth.android3dicom.view.components
+package com.singularhealth.android3dicom.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
