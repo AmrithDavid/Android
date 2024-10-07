@@ -1,10 +1,12 @@
 package com.singularhealth.android3dicom.utilities
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -20,6 +22,7 @@ object BiometricUtils {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
     private lateinit var promptActivity: FragmentActivity
+    private lateinit var onSuccess: () -> Unit
 
     lateinit var startForResult: ActivityResultLauncher<Intent>
 
@@ -57,9 +60,11 @@ object BiometricUtils {
     fun initBiometricPrompt(
         activity: FragmentActivity,
         listener: BiometricAuthListener,
+        successListener: () -> Unit,
     ): BiometricPrompt {
         promptActivity = activity
         biometricManager = BiometricManager.from(activity)
+        onSuccess = successListener
         val executor = ContextCompat.getMainExecutor(activity)
         val callback =
             object : BiometricPrompt.AuthenticationCallback() {
@@ -105,30 +110,36 @@ object BiometricUtils {
                 Log.d("MY_APP_TAG", "App can authenticate using biometrics.")
                 biometricPrompt.authenticate(promptInfo)
             }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                Log.e("MY_APP_TAG", "No biometric features available on this device.")
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                Log.e("MY_APP_TAG", "Biometric features are currently unavailable.")
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                val errMsg = "No biometric features available on this device."
+                Log.e("MY_APP_TAG", errMsg)
+                Toast.makeText(promptActivity, errMsg, Toast.LENGTH_LONG).show()
+            }
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                val errMsg = "Biometric features are currently unavailable."
+                Log.e("MY_APP_TAG", errMsg)
+                Toast.makeText(promptActivity, errMsg, Toast.LENGTH_LONG).show()
+            }
             BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
                 Log.e("MY_APP_TAG", "Biometric features require enrolment.")
-                val enrollIntent =
-                    Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-                        putExtra(
-                            Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                            BIOMETRIC_STRONG or DEVICE_CREDENTIAL,
-                        )
-                    }
-
+                val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL)
                 startForResult.launch(enrollIntent)
             }
             else -> {
-                Toast
-                    .makeText(
-                        promptActivity,
-                        "Biometric authentication not available",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                val errMsg = "Biometric authentication not available"
+                Toast.makeText(promptActivity, errMsg, Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    fun onEnrolAttempt(result: ActivityResult) {
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d("ENROL_INTENT", "Returned result from activity")
+            onSuccess()
+        } else {
+            val errMsg = "The biometric enrolment failed with code: + ${result.resultCode}"
+            Log.e("ENROL_INTENT", errMsg)
+            Toast.makeText(promptActivity, errMsg, Toast.LENGTH_LONG).show()
         }
     }
 

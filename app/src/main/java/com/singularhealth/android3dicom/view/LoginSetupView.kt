@@ -15,13 +15,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
-import androidx.navigation.NavHostController
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.utilities.BiometricAuthListener
@@ -35,42 +34,13 @@ private lateinit var promptInfo: BiometricPrompt.PromptInfo
 fun LoginSetupView(
     onBackClick: () -> Unit = {},
     onBiometricLoginClick: () -> Unit,
-    navController: NavHostController,
+    onSetupSuccess: () -> Unit,
 ) {
     var selectedOption by remember { mutableStateOf<String?>(null) }
-
-    // State variables to store user input for name and age
-    var email by remember { mutableStateOf(TextFieldValue()) }
-    var isEmailValid by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-    var isPasswordValid by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val isBiometricReady = BiometricUtils.isBiometricReady(context)
-    var isLoginFromModal by remember { mutableStateOf(false) }
 
     // Execute the provided initialization function
-    InitBiometrics(
-        context = context as FragmentActivity,
-        callback =
-            object : BiometricAuthListener {
-                override fun onBiometricAuthenticateError(
-                    error: Int,
-                    errMsg: String,
-                ) {
-                    when (error) {
-                        BiometricPrompt.ERROR_USER_CANCELED -> {}
-                        BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
-                        BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
-                    }
-                }
-
-                override fun onAuthenticationFailed() {}
-
-                override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
-                    navController.navigate("scanLibraryView")
-                }
-            },
-    )
+    InitBiometrics(context as FragmentActivity, onSetupSuccess)
 
     Column(
         modifier =
@@ -85,7 +55,6 @@ fun LoginSetupView(
             onSetupClick = {
                 if (selectedOption == "Biometric") {
                     onBiometricLoginClick()
-                    biometricPrompt.authenticate(promptInfo)
                 } else {
                     // Handle PIN setup
                     // TODO: Implement PIN setup
@@ -320,10 +289,10 @@ private fun LoginOptionItem(
 @Composable
 private fun InitBiometrics(
     context: FragmentActivity,
-    callback: BiometricAuthListener,
+    successListener: () -> Unit,
 ) {
-    biometricPrompt =
-        BiometricUtils.initBiometricPrompt(context, callback)
+    val callback = makeBiometricCallbacks(successListener)
+    biometricPrompt = BiometricUtils.initBiometricPrompt(context, callback, successListener)
 
     promptInfo =
         BiometricUtils.createPromptInfo(
@@ -333,10 +302,34 @@ private fun InitBiometrics(
         )
 }
 
-/*@Preview(showBackground = true)
+private fun makeBiometricCallbacks(onSuccess: () -> Unit): BiometricAuthListener =
+    object : BiometricAuthListener {
+        override fun onBiometricAuthenticateError(
+            error: Int,
+            errMsg: String,
+        ) {
+            when (error) {
+                BiometricPrompt.ERROR_USER_CANCELED -> {}
+                BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
+                BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
+            }
+        }
+
+        override fun onAuthenticationFailed() {}
+
+        override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
+            onSuccess()
+        }
+    }
+
+@Preview(showBackground = true)
 @Composable
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
-        LoginSetupView(onBiometricLoginClick = {}, navController)
+        LoginSetupView(
+            onBackClick = {},
+            onBiometricLoginClick = {},
+            onSetupSuccess = {},
+        )
     }
-}*/
+}

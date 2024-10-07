@@ -35,7 +35,9 @@ fun NavigationGraph() {
                 onBiometricLoginClick = {
                     BiometricUtils.authenticate()
                 },
-                navController,
+                onSetupSuccess = {
+                    navController.navigate("scanLibraryView")
+                },
             )
         }
         composable("login") {
@@ -53,7 +55,7 @@ fun NavigationGraph() {
                 searchQuery = searchQuery,
             )
         }
-        composable("mainImageMenu") {
+        composable("imageDetailView") {
             ImageDetailView(navController = navController)
         }
         composable("shareView") {

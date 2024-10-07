@@ -1,8 +1,6 @@
 package com.singularhealth.android3dicom.view
 
-import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
@@ -16,9 +14,7 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                Log.d("MY_APP_TAG", "Returned result from activity")
-            }
+            BiometricUtils.onEnrolAttempt(result)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
