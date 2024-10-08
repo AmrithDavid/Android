@@ -302,6 +302,7 @@ private fun LoginOptionItem(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun InitBiometrics(
     context: FragmentActivity,
