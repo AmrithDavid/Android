@@ -1,26 +1,17 @@
-package com.singularhealth.android3dicom.data
+package com.singularhealth.android3dicom.utilities
 
 import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-import javax.inject.Singleton
 
-interface CacheManager {
-    suspend fun clearCache(): Long
-
-    suspend fun getCacheSize(): Long
-}
-
-@Singleton
-class CacheManagerImpl
+class CacheManager
     @Inject
     constructor(
-        @ApplicationContext private val context: Context,
-    ) : CacheManager {
-        override suspend fun clearCache(): Long =
+        private val context: Context,
+    ) {
+        suspend fun clearCache(): Long =
             withContext(Dispatchers.IO) {
                 val initialSize = getCacheSize()
 
@@ -32,7 +23,7 @@ class CacheManagerImpl
                 return@withContext initialSize - finalSize
             }
 
-        override suspend fun getCacheSize(): Long =
+        suspend fun getCacheSize(): Long =
             withContext(Dispatchers.IO) {
                 var totalSize = context.cacheDir.calculateSize()
                 context.externalCacheDir?.let { totalSize += it.calculateSize() }

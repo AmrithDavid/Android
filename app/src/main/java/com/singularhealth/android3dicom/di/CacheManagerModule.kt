@@ -1,8 +1,7 @@
 package com.singularhealth.android3dicom.di
 
 import android.content.Context
-import com.singularhealth.android3dicom.data.CacheManager
-import com.singularhealth.android3dicom.data.CacheManagerImpl
+import com.singularhealth.android3dicom.utilities.CacheManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,12 +11,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
-    @Provides
+object CacheManagerModule {
     @Singleton
+    @Provides
     fun provideCacheManager(
         @ApplicationContext context: Context,
-    ): CacheManager = CacheManagerImpl(context)
-
-    // can add more provider methods here for other dependencies
+    ): CacheManager = CacheManager(context)
 }

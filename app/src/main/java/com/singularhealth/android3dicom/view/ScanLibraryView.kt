@@ -35,12 +35,15 @@ fun ScanLibraryView(
     navController: NavController,
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
+    onImageButtonClick: () -> Unit,
 ) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
     val isBiometricEnabled by viewModel.isBiometricLoginActive.collectAsState()
+    var showClearCacheDialog by remember { mutableStateOf(false) }
+    val isClearingCache by viewModel.isClearingCache.collectAsStateWithLifecycle()
 
     // Control system UI color
     val view = LocalView.current
@@ -83,7 +86,7 @@ fun ScanLibraryView(
             CardList(
                 modifier = Modifier.padding(innerPadding),
                 patientCards = filteredCards,
-                onImageButtonClick = { navController.navigate("mainImageMenu") },
+                onImageButtonClick = { onImageButtonClick() },
             )
         } else {
             EmptyStateView()
@@ -109,11 +112,11 @@ fun ScanLibraryView(
             onBiometricClick = { viewModel.onBiometricClick() },
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
-            onLogoutClick = { showLogoutDialog = true },
+            onLogoutClick = { viewModel.onLogoutClick() },
             isBiometricEnabled = isBiometricEnabled,
         )
     }
-    
+
     if (showLogoutDialog) {
         LogoutConfirmationDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -204,6 +207,7 @@ fun ScanScreenPreview() {
             navController = navController,
             searchQuery = searchQuery,
             onLogout = {}, // Add this line
+            onImageButtonClick = {},
         )
     }
 }

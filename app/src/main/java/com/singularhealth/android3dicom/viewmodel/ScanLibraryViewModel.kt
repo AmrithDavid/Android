@@ -6,6 +6,7 @@ import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.data.CacheManager
 import com.singularhealth.android3dicom.model.PatientCardData
+import com.singularhealth.android3dicom.utilities.CacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -26,6 +26,8 @@ interface IDataStoreRepository {
     )
 
     suspend fun getInt(key: String): Int?
+
+    fun getInstance(): DataStore<Preferences>
 }
 
 class DataStoreRepository
@@ -33,6 +35,8 @@ class DataStoreRepository
     constructor(
         private val context: Context,
     ) : IDataStoreRepository {
+        override fun getInstance(): DataStore<Preferences> = context.dataStore
+
         override suspend fun setString(
             key: String,
             value: String,
