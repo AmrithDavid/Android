@@ -32,6 +32,10 @@ fun ShareView(navController: NavController) {
     var searchText by remember { mutableStateOf("") }
     var includeReport by remember { mutableStateOf(false) }
     var hasConsent by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+
+    // A regular expression for basic email validation
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
 
     Column(
         modifier = Modifier
@@ -78,11 +82,18 @@ fun ShareView(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 value = searchText,
-                onValueChange = { searchText = it },
+                onValueChange = {
+                    searchText = it
+                    emailError = if (!emailRegex.matches(it)) {
+                        "Invalid email format"
+                    } else {
+                        null
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.75f)
                     .height(50.dp)
-                    .border(1.dp, BorderColor, RoundedCornerShape(4.dp)),
+                    .border(1.dp, if (emailError == null) BorderColor else Color.Red, RoundedCornerShape(4.dp)),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
@@ -94,11 +105,21 @@ fun ShareView(navController: NavController) {
                     Text(
                         "Recipient's Email",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = BorderColor,
+                        color = if (emailError == null) BorderColor else Color.Red,
                     )
                 },
                 textStyle = MaterialTheme.typography.bodyLarge,
             )
+
+            // Display email error message if invalid
+            if (emailError != null) {
+                Text(
+                    text = emailError!!,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(50.dp))
 
