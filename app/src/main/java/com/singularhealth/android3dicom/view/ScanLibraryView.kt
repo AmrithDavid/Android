@@ -37,6 +37,8 @@ fun ScanLibraryView(
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var isBiometricEnabled by remember { mutableStateOf(true) }
+
 
     // Control system UI color
     val view = LocalView.current
@@ -102,10 +104,14 @@ fun ScanLibraryView(
             onCloseMenu = { viewModel.toggleSideMenu() },
             onHomeClick = { viewModel.onHomeClick() },
             onClearCacheClick = { viewModel.onClearCacheClick() },
-            onBiometricClick = { viewModel.onBiometricClick() },
+            onBiometricClick = {
+                // Toggle between biometric and pin
+                isBiometricEnabled = !isBiometricEnabled
+            },
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
             onLogoutClick = { showLogoutDialog = true },
+            isBiometricEnabled = isBiometricEnabled // Pass the state to the menu
         )
     }
 
