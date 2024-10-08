@@ -124,7 +124,6 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .width(144.dp)
                             .height(36.dp),
-                            //.padding(horizontal = 24.dp, vertical = 16.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
 
@@ -162,35 +161,6 @@ fun LoginScreen(
             )
         }
 
-
-//        Row(
-//            modifier =
-//                Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = statusBarHeight + 10.dp, end = 16.dp),
-//            horizontalArrangement = Arrangement.End,
-//            verticalAlignment = Alignment.CenterVertically,
-//        ) {
-//            Icon(
-//                painter = painterResource(id = R.drawable.ic_support),
-//                contentDescription = "Support",
-//                tint = DarkBlue,
-//                modifier =
-//                Modifier
-//                    .size(24.dp)
-//                    .clickable { showDialog = true }, // Apply clickable only to the icon
-//            )
-//            Spacer(modifier = Modifier.width(4.dp))
-//            Text(
-//                text = "Support",
-//                style = MaterialTheme.typography.titleMedium,
-//                color = DarkBlue,
-//                modifier =
-//                Modifier
-//                    .clickable { showDialog = true }, // Apply clickable only to the text
-//            )
-//        }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -225,7 +195,6 @@ fun LoginScreen(
                 }
             }
         }
-
 
         // Main content
         Column(
