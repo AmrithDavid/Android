@@ -25,6 +25,8 @@ class AppState
         dataStore: IDataStoreRepository,
     ) {
         private val appStateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+        @Suppress("ktlint:standard:backing-property-naming")
         private val _dataStore = dataStore
 
         private var _loginPreference = LoginPreferenceOption.NONE

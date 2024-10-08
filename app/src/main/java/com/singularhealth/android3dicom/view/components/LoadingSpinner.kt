@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package com.singularhealth.android3dicom.view.components
 
 import androidx.compose.animation.core.*
