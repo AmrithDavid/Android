@@ -21,8 +21,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.R
@@ -30,6 +33,11 @@ import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import kotlinx.coroutines.launch
+
+//required for
+import android.content.Intent
+import android.net.Uri
+
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -68,27 +76,156 @@ fun LoginScreen(
                 .background(Color.White),
     ) {
         // Top section with support icon and text
+        var showDialog by remember { mutableStateOf(false) }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_support),
+                            contentDescription = "Support",
+                            tint = Color.Black,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Visit the customer support website?",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .width(232.dp)
+                                .height(50.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center // Center text inside the pop-up
+                        )
+                    }
+                },
+                text = {
+                    Text(
+                        "Got a question or need some help? We are here to help.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .width(232.dp)
+                            .height(36.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Left,
+                        lineHeight = 15.sp
+                    )
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .width(144.dp)
+                            .height(36.dp),
+                            //.padding(horizontal = 24.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+
+                        TextButton(onClick = { showDialog = false }) {
+                            Text(
+                                "Cancel",
+                                color = Color(0xFF606066), // Gray color for Cancel button
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+
+                        TextButton(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/knowledgebase"))
+                                context.startActivity(intent) // Launch the browser with the URL
+                            }
+                        ) {
+                            Text(
+                                "OK",
+                                color = Color(0xFF50A5DE), // Blue color for OK button
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+                },
+                properties = DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true
+                ),
+                shape = RoundedCornerShape(16.dp), // Rounded corners
+                containerColor = Color.White, // Solid white background for the pop-up
+                modifier = Modifier
+                    .width(280.dp)
+                    .height(252.dp)
+            )
+        }
+
+
+//        Row(
+//            modifier =
+//                Modifier
+//                    .fillMaxWidth()
+//                    .padding(top = statusBarHeight + 10.dp, end = 16.dp),
+//            horizontalArrangement = Arrangement.End,
+//            verticalAlignment = Alignment.CenterVertically,
+//        ) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.ic_support),
+//                contentDescription = "Support",
+//                tint = DarkBlue,
+//                modifier =
+//                Modifier
+//                    .size(24.dp)
+//                    .clickable { showDialog = true }, // Apply clickable only to the icon
+//            )
+//            Spacer(modifier = Modifier.width(4.dp))
+//            Text(
+//                text = "Support",
+//                style = MaterialTheme.typography.titleMedium,
+//                color = DarkBlue,
+//                modifier =
+//                Modifier
+//                    .clickable { showDialog = true }, // Apply clickable only to the text
+//            )
+//        }
+
         Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = statusBarHeight + 10.dp, end = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = statusBarHeight + 10.dp, end = 16.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_support),
-                contentDescription = "Support",
-                tint = DarkBlue,
-                modifier = Modifier.size(24.dp),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "Support",
-                style = MaterialTheme.typography.titleMedium,
-                color = DarkBlue,
-            )
+            TextButton(
+                onClick = { showDialog = true }, // Action on click
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color(0xFF2E3176), // Set text and icon color
+                    containerColor = Color.Transparent,
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                // Icon and Text inside the button
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_support),
+                        contentDescription = "Support",
+                        tint = Color(0xFF2E3176),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Support",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color(0xFF2E3176) // Text color
+                    )
+                }
+            }
         }
+
 
         // Main content
         Column(
