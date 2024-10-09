@@ -5,26 +5,36 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.singularhealth.android3dicom.R
-import com.singularhealth.android3dicom.ui.theme.BackgroundGray
-import com.singularhealth.android3dicom.ui.theme.BorderColor
+import com.singularhealth.android3dicom.model.ErrorState
+import com.singularhealth.android3dicom.model.PinState
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
+import com.singularhealth.android3dicom.view.components.PinInputVisual
+import com.singularhealth.android3dicom.viewmodel.PinViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun PinSetupScreen() {
+fun PinSetupScreen(
+    viewModel: PinViewModel = hiltViewModel(),
+    onSetupSuccess: () -> Unit,
+) {
+    val firstPin by viewModel.firstPin.collectAsStateWithLifecycle()
+    val secondPin by viewModel.secondPin.collectAsStateWithLifecycle()
+    val pinState by viewModel.pinState.collectAsStateWithLifecycle()
+
+    val isPinComplete = firstPin.length == 4 && secondPin.length == 4
+
     Column(
         modifier =
             Modifier
@@ -56,7 +66,11 @@ fun PinSetupScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            PinInputVisual()
+            PinInputVisual(
+                pin = firstPin,
+                onPinChange = viewModel::updateFirstPin,
+                isError = pinState is PinState.Error,
+            )
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -64,23 +78,45 @@ fun PinSetupScreen() {
                 text = "Confirm your PIN",
                 style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            PinInputVisual()
+            PinInputVisual(
+                pin = secondPin,
+                onPinChange = viewModel::updateSecondPin,
+                isError = pinState is PinState.Error,
+            )
+
+            if (pinState is PinState.Error) {
+                Text(
+                    text =
+                        when ((pinState as PinState.Error).errorState) {
+                            ErrorState.PinTooShort -> "PIN must be 4 digits"
+                            ErrorState.PinsDoNotMatch -> "PINs do not match"
+                            else -> "An error occurred"
+                        },
+                    color = Color.Red,
+                )
+            }
 
             Spacer(modifier = Modifier.height(76.dp))
 
             Button(
-                onClick = { /* TODO: Handle confirm click */ },
+                onClick = {
+                    if (isPinComplete) {
+                        viewModel.savePinAndUpdatePreference()
+                    }
+                },
                 modifier =
                     Modifier
                         .width(300.dp)
                         .height(40.dp),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = DarkBlue.copy(alpha = 0.5f),
+                        containerColor = if (isPinComplete) DarkBlue else DarkBlue.copy(alpha = 0.5f),
+                        disabledContainerColor = DarkBlue.copy(alpha = 0.5f),
                     ),
-                shape = RoundedCornerShape(4.dp),
+                shape = RoundedCornerShape(8.dp),
             ) {
                 Text(
                     text = "Confirm",
@@ -92,7 +128,7 @@ fun PinSetupScreen() {
             Spacer(modifier = Modifier.height(22.dp))
 
             OutlinedButton(
-                onClick = { /* TODO: Handle cancel click */ },
+                onClick = { viewModel.clearPins() },
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -102,8 +138,8 @@ fun PinSetupScreen() {
                         containerColor = Color.White,
                         contentColor = DarkBlue,
                     ),
-                border = BorderStroke(1.dp, DarkBlue), // border parameter of outlined button which overrides default modifier border
-                shape = RoundedCornerShape(4.dp),
+                border = BorderStroke(1.dp, DarkBlue),
+                shape = RoundedCornerShape(8.dp),
             ) {
                 Text(
                     text = "Cancel",
@@ -113,33 +149,10 @@ fun PinSetupScreen() {
             }
         }
     }
-}
 
-@Suppress("ktlint:standard:function-naming")
-@Composable
-fun PinInputVisual() {
-    Box(
-        modifier =
-            Modifier
-                .width(200.dp)
-                .height(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(BackgroundGray),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        ) {
-            repeat(4) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(26.dp)
-                            .border(2.dp, BorderColor, CircleShape)
-                            .clip(CircleShape),
-                )
-            }
+    LaunchedEffect(pinState) {
+        if (pinState is PinState.Success) {
+            onSetupSuccess()
         }
     }
 }
@@ -188,11 +201,11 @@ fun SetupPinTopBar() {
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
+/* @Suppress("ktlint:standard:function-naming")
 @Preview(showBackground = true)
 @Composable
 fun PinSetupScreenPreview() {
     MaterialTheme {
         PinSetupScreen()
     }
-}
+} */

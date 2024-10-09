@@ -19,6 +19,28 @@ enum class LoginPreferenceOption {
     }
 }
 
+sealed class PinState {
+    object Initial : PinState()
+
+    object Loading : PinState()
+
+    object Valid : PinState()
+
+    object Success : PinState()
+
+    data class Error(
+        val errorState: ErrorState,
+    ) : PinState()
+}
+
+enum class ErrorState {
+    None,
+    PinTooShort,
+    PinsDoNotMatch,
+    IncorrectPin,
+    SaveFailed,
+}
+
 class AppState
     @Inject
     constructor(
@@ -52,4 +74,6 @@ class AppState
                 if (opt != null) _loginPreference = opt
             }
         }
+
+        fun isPinSet(): Boolean = runBlocking { _dataStore.getString("USER_PIN") != null }
     }
