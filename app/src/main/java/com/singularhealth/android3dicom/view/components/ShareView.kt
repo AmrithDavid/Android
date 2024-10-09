@@ -42,6 +42,7 @@ fun ShareView(navController: NavController) {
             .fillMaxSize()
             .background(Color.White),
     ) {
+
         ShareTopBar(onBackClick = { navController.navigateUp() })
         Column(
             modifier = Modifier
@@ -80,46 +81,81 @@ fun ShareView(navController: NavController) {
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    emailError = if (!emailRegex.matches(it)) {
-                        "Invalid email format"
-                    } else {
-                        null
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                ) {
+                TextField(
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                        emailError = if (!emailRegex.matches(it)) {
+                            "Invalid email format"
+                        } else {
+                            null
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .width(300.dp)
+                        .padding(start = 56.dp, end = 56.dp)
+
+                        .border(1.dp, if (emailError == null) BorderColor else Color(0xFFB21717), RoundedCornerShape(4.dp)),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    placeholder = {
+                        Text(
+                            "Recipient's Email",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (emailError == null) BorderColor else Color.Transparent,
+                        )
+                    },
+
+                    textStyle = MaterialTheme.typography.bodyLarge,
+
+                    // Use trailingIcon to display the icon inside the text box
+                    trailingIcon = {
+                        if (emailError != null) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_warning), // Replace with your icon
+                                contentDescription = "Warning icon",
+                                tint = Color(0xFFB21717)
+                            )
+                        }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.75f)
-                    .height(50.dp)
-                    .border(1.dp, if (emailError == null) BorderColor else Color.Red, RoundedCornerShape(4.dp)),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                shape = RoundedCornerShape(8.dp),
-                placeholder = {
-                    Text(
-                        "Recipient's Email",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (emailError == null) BorderColor else Color.Red,
-                    )
-                },
-                textStyle = MaterialTheme.typography.bodyLarge,
-            )
+                )
+
+                Text(
+                    text = "Recipient's Email",
+                    color = if (emailError == null) Color.Transparent else Color(0xFFB21717),
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier
+                        .padding(start = 72.dp)
+                        .background(if (emailError == null) Color.Transparent else Color.White)
+                        .offset(y = (-7).dp)
+                )
+
+            }
 
             // Display email error message if invalid
             if (emailError != null) {
                 Text(
                     text = emailError!!,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 4.dp)
+                    color = Color(0xFFB21717),
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .fillMaxWidth()
+                        .offset(x = 72.dp),
+                    textAlign = TextAlign.Left
                 )
             }
+
 
             Spacer(modifier = Modifier.height(50.dp))
 
