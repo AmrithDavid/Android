@@ -1,6 +1,5 @@
 package com.singularhealth.android3dicom.view
 
-import PinSetupScreen
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -14,7 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
-import com.singularhealth.android3dicom.utilities.BiometricUtils
+import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
+import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
 import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
@@ -34,6 +34,7 @@ enum class ViewRoute {
     LOGIN_SETUP,
     BIOMETRIC_LOGIN,
     PIN_SETUP,
+    BIOMETRIC_SETUP_PLACEHOLDER,
     SCAN_LIBRARY,
     IMAGE_DETAIL,
     SHARE,
@@ -48,7 +49,6 @@ fun NavigationGraph() {
     val loginViewModel: LoginViewModel = hiltViewModel()
     val searchQuery = remember { mutableStateOf("") }
 
-    // Inject the AppState via the entrypoint defined above
     val appState: AppState =
         EntryPoints
             .get(
@@ -63,7 +63,7 @@ fun NavigationGraph() {
         composable(ViewRoute.LOGIN.toString()) {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(ViewRoute.PIN_SETUP.toString()) {
+                    navController.navigate(ViewRoute.LOGIN_SETUP.toString()) {
                         popUpTo(ViewRoute.LOGIN.toString()) { inclusive = true }
                     }
                 },
@@ -72,26 +72,15 @@ fun NavigationGraph() {
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(
                 onBackClick = { navController.popBackStack() },
-                onBiometricLoginClick = {
-                    BiometricUtils.authenticate()
-                    // Handle biometric authentication success here
+                onNavigateToPinSetup = {
+                    navController.navigate(ViewRoute.PIN_SETUP.toString())
                 },
-                onSetupSuccess = {
-                    when (appState.loginPreference) {
-                        LoginPreferenceOption.NONE -> {
-                            navController.navigate(ViewRoute.SCAN_LIBRARY.toString()) {
-                                popUpTo(ViewRoute.LOGIN.toString()) { inclusive = true }
-                            }
-                        }
-                        LoginPreferenceOption.BIOMETRIC -> {
-                            // replace with biometric login
-                            navController.navigate(ViewRoute.BIOMETRIC_LOGIN.toString()) {
-                                popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
-                            }
-                        }
-                        LoginPreferenceOption.PIN -> {
-                            navController.navigate(ViewRoute.PIN_SETUP.toString())
-                        }
+                onNavigateToBiometricSetup = {
+                    navController.navigate(ViewRoute.BIOMETRIC_SETUP_PLACEHOLDER.toString())
+                },
+                onNavigateToLogin = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
                     }
                 },
             )
@@ -102,8 +91,23 @@ fun NavigationGraph() {
         composable(ViewRoute.PIN_SETUP.toString()) {
             PinSetupScreen(
                 onSetupSuccess = {
-                    navController.navigate(ViewRoute.PIN_VERIFICATION.toString()) {
-                        popUpTo(ViewRoute.PIN_SETUP.toString()) { inclusive = true }
+                    navController.navigate(ViewRoute.PIN_VERIFICATION.toString())
+                },
+                onCancel = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.LOGIN.toString()) { inclusive = true }
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack() // This will navigate back to the previous screen (LOGIN_SETUP)
+                },
+            )
+        }
+        composable(ViewRoute.BIOMETRIC_SETUP_PLACEHOLDER.toString()) {
+            BiometricSetupPlaceholderScreen(
+                onSetupComplete = {
+                    navController.navigate(ViewRoute.SCAN_LIBRARY.toString()) {
+                        popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
                     }
                 },
             )
@@ -140,21 +144,20 @@ fun NavigationGraph() {
         }
     }
 
-    // Pass a lambda to update the search query
     SideEffect {
         searchQuery.value = searchQuery.value
     }
 }
 
-// @Composable
-// fun getStartRoute(appState: AppState): String = ViewRoute.PIN_SETUP.toString()
-
-// Normal flow
 @Composable
 fun getStartRoute(appState: AppState): String =
-    when {
-        appState.loginPreference == LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
-        appState.loginPreference == LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString()
-        appState.loginPreference == LoginPreferenceOption.PIN && appState.isPinSet() -> ViewRoute.PIN_VERIFICATION.toString()
-        else -> ViewRoute.LOGIN_SETUP.toString()
+    when (appState.loginPreference) {
+        LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
+        LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString()
+        LoginPreferenceOption.PIN ->
+            if (appState.isPinSet()) {
+                ViewRoute.PIN_VERIFICATION.toString()
+            } else {
+                ViewRoute.LOGIN.toString()
+            }
     }

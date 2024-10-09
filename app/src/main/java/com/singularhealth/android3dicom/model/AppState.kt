@@ -1,5 +1,6 @@
 package com.singularhealth.android3dicom.model
 
+import com.singularhealth.android3dicom.utilities.KeystorePinHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -67,13 +68,18 @@ class AppState
 
         init {
             // Checks for existing login preference stored in settings and loads if available
-            // Replace with equivalent logic but more concise
-            var storedLoginPref = runBlocking { _dataStore.getString(::_loginPreference.name) }
+            val storedLoginPref = runBlocking { _dataStore.getString(::_loginPreference.name) }
             if (storedLoginPref != null) {
-                var opt = LoginPreferenceOption from storedLoginPref
+                val opt = LoginPreferenceOption.from(storedLoginPref)
                 if (opt != null) _loginPreference = opt
             }
         }
 
-        fun isPinSet(): Boolean = runBlocking { _dataStore.getString("USER_PIN") != null }
+        fun isPinSet(): Boolean =
+            try {
+                KeystorePinHandler.isPinSet()
+            } catch (e: IllegalStateException) {
+                // KeystorePinHandler is not initialised, assume no PIN is set
+                false
+            }
     }

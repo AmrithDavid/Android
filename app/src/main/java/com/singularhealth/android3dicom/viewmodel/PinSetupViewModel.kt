@@ -5,10 +5,10 @@ package com.singularhealth.android3dicom.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
-import com.singularhealth.android3dicom.model.DataStoreRepository
 import com.singularhealth.android3dicom.model.ErrorState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.model.PinState
+import com.singularhealth.android3dicom.utilities.KeystorePinHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +21,6 @@ class PinViewModel
     @Inject
     constructor(
         private val appState: AppState,
-        private val dataStoreRepository: DataStoreRepository,
     ) : ViewModel() {
         private val _firstPin = MutableStateFlow("")
         val firstPin: StateFlow<String> = _firstPin.asStateFlow()
@@ -32,8 +31,12 @@ class PinViewModel
         private val _pinState = MutableStateFlow<PinState>(PinState.Initial)
         val pinState: StateFlow<PinState> = _pinState.asStateFlow()
 
+        private val _isFirstPinComplete = MutableStateFlow(false)
+        val isFirstPinComplete: StateFlow<Boolean> = _isFirstPinComplete.asStateFlow()
+
         fun updateFirstPin(pin: String) {
             _firstPin.value = pin
+            _isFirstPinComplete.value = pin.length == 4
             validatePins()
         }
 
@@ -45,9 +48,9 @@ class PinViewModel
         private fun validatePins() {
             _pinState.value =
                 when {
-                    firstPin.value.length < 4 || secondPin.value.length < 4 -> PinState.Error(ErrorState.PinTooShort)
-                    firstPin.value != secondPin.value -> PinState.Error(ErrorState.PinsDoNotMatch)
-                    else -> PinState.Valid
+                    _firstPin.value.length == 4 && _secondPin.value.length == 4 && _firstPin.value != _secondPin.value ->
+                        PinState.Error(ErrorState.PinsDoNotMatch)
+                    else -> PinState.Initial
                 }
         }
 
@@ -55,7 +58,7 @@ class PinViewModel
             viewModelScope.launch {
                 _pinState.value = PinState.Loading
                 try {
-                    dataStoreRepository.setString("USER_PIN", firstPin.value)
+                    KeystorePinHandler.setPin(_firstPin.value)
                     appState.loginPreference = LoginPreferenceOption.PIN
                     _pinState.value = PinState.Success
                 } catch (e: Exception) {
@@ -67,15 +70,16 @@ class PinViewModel
         fun clearPins() {
             _firstPin.value = ""
             _secondPin.value = ""
+            _isFirstPinComplete.value = false
             _pinState.value = PinState.Initial
         }
 
         fun verifyPin(enteredPin: String) {
             viewModelScope.launch {
                 _pinState.value = PinState.Loading
-                val storedPin = dataStoreRepository.getString("USER_PIN")
+                val isPinCorrect = KeystorePinHandler.verifyPin(enteredPin)
                 _pinState.value =
-                    if (enteredPin == storedPin) {
+                    if (isPinCorrect) {
                         PinState.Success
                     } else {
                         PinState.Error(ErrorState.IncorrectPin)

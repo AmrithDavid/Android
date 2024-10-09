@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,7 +26,6 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.singularhealth.android3dicom.R
-import com.singularhealth.android3dicom.model.ErrorState
 import com.singularhealth.android3dicom.model.PinState
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.viewmodel.PinViewModel
@@ -45,7 +44,7 @@ fun PinVerificationScreen(
 
     SideEffect {
         val window = (context as? android.app.Activity)?.window
-        window?.statusBarColor = Color.White.toArgb()
+        window?.statusBarColor = White.toArgb()
         WindowCompat.getInsetsController(window!!, view).isAppearanceLightStatusBars = true
     }
 
@@ -127,35 +126,60 @@ fun PinVerificationScreen(
                             Modifier
                                 .size(26.dp)
                                 .background(
-                                    if (index < pin.length) DarkBlue else Color.Transparent,
+                                    when {
+                                        pinState is PinState.Error && pin.length == 4 -> Color.Transparent
+                                        index < pin.length -> DarkBlue
+                                        else -> Color.Transparent
+                                    },
                                     CircleShape,
-                                ).border(2.dp, BorderColor, CircleShape),
+                                ).border(
+                                    width = 2.dp,
+                                    color =
+                                        when {
+                                            pinState is PinState.Error && pin.length == 4 -> Color(0xFFB21817)
+                                            index >= pin.length -> BorderColor
+                                            else -> Color.Transparent
+                                        },
+                                    shape = CircleShape,
+                                ),
                     )
+                }
+            }
+
+            // Fixed space for error message
+            Box(
+                modifier =
+                    Modifier
+                        .height(60.dp)
+                        .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (pinState is PinState.Error && pin.length == 4) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .width(300.dp)
+                                .height(38.dp)
+                                .background(
+                                    color = OtherErrorRed,
+                                    shape = RoundedCornerShape(4.dp),
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "The PIN values you entered was incorrect",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White,
+                        )
+                    }
                 }
             }
 
             when (pinState) {
                 is PinState.Loading -> CircularProgressIndicator(color = DarkBlue)
-                is PinState.Error -> {
-                    Text(
-                        text =
-                            when ((pinState as PinState.Error).errorState) {
-                                ErrorState.IncorrectPin -> "Incorrect PIN"
-                                ErrorState.PinTooShort -> "PIN must be 4 digits"
-                                ErrorState.PinsDoNotMatch -> "PINs do not match"
-                                ErrorState.SaveFailed -> "Failed to save PIN"
-                                ErrorState.None -> "An error occurred"
-                            },
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    )
-                }
                 is PinState.Success -> LaunchedEffect(Unit) { onVerificationSuccess() }
                 else -> { /* Initial or Valid state, do nothing */ }
             }
-
-            Spacer(modifier = Modifier.height(60.dp))
 
             // Number pad
             Column(
@@ -181,12 +205,20 @@ fun PinVerificationScreen(
                                         Modifier
                                             .size(90.dp, 56.dp)
                                             .clickable {
-                                                when (digit) {
-                                                    "backspace" ->
+                                                when {
+                                                    digit == "backspace" && pinState !is PinState.Error -> {
                                                         if (pin.isNotEmpty()) {
                                                             pin = pin.dropLast(1)
                                                         }
-                                                    else -> if (pin.length < 4) pin += digit
+                                                    }
+                                                    digit != "backspace" -> {
+                                                        if (pinState is PinState.Error) {
+                                                            pin = digit
+                                                            viewModel.clearPins()
+                                                        } else if (pin.length < 4) {
+                                                            pin += digit
+                                                        }
+                                                    }
                                                 }
                                                 if (pin.length == 4) {
                                                     viewModel.verifyPin(pin)

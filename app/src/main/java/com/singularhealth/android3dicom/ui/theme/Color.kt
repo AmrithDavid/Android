@@ -23,7 +23,8 @@ val TextFieldTextColor = Color(0xFFA2A2A9)
 val LightBlue = Color(0xFF50A5DE)
 val ButtonBorderColor = Color(0xFFA2A2A9)
 val BackgroundGray = Color(0xFFF7F7F7)
-
-// New colors for selected login option
 val SelectedOptionBackground = Color(0xFFE2F2FD)
 val SelectedOptionCircle = Color(0xFF50A5DE)
+val ErrorRed = Color(0xFFB21717)
+val WarningRed = Color(0xFFDE5050)
+val OtherErrorRed = Color(0xFFB21817)
