@@ -157,8 +157,8 @@ fun ScanCard(
                         onClick = {
                             when (index) {
                                 0 -> onImageButtonClick()
-                                1 -> onShareButtonClick()
-                                2 -> onReportButtonClick()
+                                1 -> onReportButtonClick()
+                                2 -> onShareButtonClick()
                             }
                         },
                         modifier =

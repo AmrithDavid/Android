@@ -5,12 +5,15 @@ package com.singularhealth.android3dicom.view
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -18,15 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 import com.singularhealth.android3dicom.ui.theme.TitleColor
+import com.singularhealth.android3dicom.viewmodel.ReportViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun ReportView() {
+fun ReportView(viewModel: ReportViewModel = hiltViewModel()) {
     Column(
         modifier =
             Modifier
@@ -67,7 +72,9 @@ fun ReportView() {
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun PatientInfoCard() {
+fun PatientInfoCard(viewModel: ReportViewModel = hiltViewModel()) {
+    val cardData by viewModel.cardData.collectAsState()
+
     Card(
         modifier =
             Modifier
@@ -88,12 +95,12 @@ fun PatientInfoCard() {
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            PatientInfoRow("Study Description: ", "CT Scan")
-            PatientInfoRow("Patient name: ", "Sam Kellahan :(")
-            PatientInfoRow("Patient ID: ", "12345")
-            PatientInfoRow("Date of Birth: ", "01/01/1980")
-            PatientInfoRow("Study Date: ", "06/15/2023")
-            PatientInfoRow("Physician's name: ", "David, Amrith")
+            PatientInfoRow("Study Description: ", cardData.fileName)
+            PatientInfoRow("Patient name: ", cardData.patientName)
+            PatientInfoRow("Patient ID: ", cardData.patientId)
+            PatientInfoRow("Date of Birth: ", cardData.date)
+            PatientInfoRow("Study Date: ", cardData.date)
+            PatientInfoRow("Physician's name: ", cardData.patientName)
         }
     }
 }
@@ -136,13 +143,13 @@ fun ReportSection(
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun ActionButtons() {
+fun ActionButtons(viewModel: ReportViewModel = hiltViewModel()) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Button(
-            onClick = { /* TODO: Handle view images click */ },
+            onClick = { viewModel.onViewImages() },
             modifier =
                 Modifier
                     .width(147.dp)
@@ -176,7 +183,7 @@ fun ActionButtons() {
         }
 
         Button(
-            onClick = { /* TODO: Handle download PDF click */ },
+            onClick = { viewModel.onDownloadPdf() },
             modifier =
                 Modifier
                     .width(161.dp)
@@ -212,7 +219,7 @@ fun ActionButtons() {
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun ReportTopBar() {
+fun ReportTopBar(viewModel: ReportViewModel = hiltViewModel()) {
     Column(
         modifier =
             Modifier
@@ -232,7 +239,7 @@ fun ReportTopBar() {
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(24.dp).clickable { viewModel.onBack() },
             )
 
             Spacer(modifier = Modifier.width(20.dp))

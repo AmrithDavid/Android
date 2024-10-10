@@ -1,6 +1,8 @@
 package com.singularhealth.android3dicom.model
 
 import com.singularhealth.android3dicom.utilities.KeystorePinHandler
+import androidx.navigation.NavHostController
+import com.singularhealth.android3dicom.view.ViewRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,6 +50,8 @@ class AppState
         dataStore: IDataStoreRepository,
     ) {
         private val appStateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        private lateinit var navController: NavHostController
+        private var returnDestination = ViewRoute.SCAN_LIBRARY
 
         @Suppress("ktlint:standard:backing-property-naming")
         private val _dataStore = dataStore
@@ -82,4 +86,20 @@ class AppState
                 // KeystorePinHandler is not initialised, assume no PIN is set
                 false
             }
+
+        fun setNavController(navController: NavHostController) {
+            this.navController = navController
+        }
+
+        fun setReturnDestination(viewRoute: ViewRoute) {
+            returnDestination = viewRoute
+        }
+
+        fun navigateTo(viewRoute: ViewRoute) {
+            navController.navigate(viewRoute.toString())
+        }
+
+        fun navigateBack() {
+            navController.navigateUp()
+        }
     }
