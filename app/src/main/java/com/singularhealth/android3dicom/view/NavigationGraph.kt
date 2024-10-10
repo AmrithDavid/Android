@@ -18,10 +18,12 @@ import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
+import kotlin.text.Typography.dagger
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+
 
 @EntryPoint
 @InstallIn(ActivityComponent::class)
@@ -140,6 +142,6 @@ fun getStartRoute(): String {
     return when (appState.loginPreference) {
         LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
         LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString() // replace with biometric login
-        LoginPreferenceOption.PIN -> ViewRoute.REPORT.toString() // replace with PIN login
+        LoginPreferenceOption.PIN -> ViewRoute.SCAN_LIBRARY.toString() // replace with PIN login
     }
 }

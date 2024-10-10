@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -28,7 +29,7 @@ import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
 @Composable
 fun ScanLibraryView(
-    viewModel: ScanLibraryViewModel = viewModel(),
+    viewModel: ScanLibraryViewModel = hiltViewModel(),
     navController: NavController,
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
@@ -37,6 +38,7 @@ fun ScanLibraryView(
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val isBiometricEnabled by viewModel.isBiometricLoginActive.collectAsState()
 
     // Control system UI color
     val view = LocalView.current
@@ -106,6 +108,7 @@ fun ScanLibraryView(
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
             onLogoutClick = { showLogoutDialog = true },
+            isBiometricEnabled = isBiometricEnabled,
         )
     }
 

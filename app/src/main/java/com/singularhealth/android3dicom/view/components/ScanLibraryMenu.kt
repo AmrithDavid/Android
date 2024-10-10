@@ -27,6 +27,7 @@ fun ScanLibraryMenu(
     onAboutClick: () -> Unit,
     onSupportClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    isBiometricEnabled: Boolean,
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -96,9 +97,14 @@ fun ScanLibraryMenu(
                     onClick = onClearCacheClick,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+//                MenuButton(
+//                    icon = R.drawable.ic_fingerprint,
+//                    text = "Turn on Biometric",
+//                    onClick = onBiometricClick,
+//                )
                 MenuButton(
-                    icon = R.drawable.ic_fingerprint,
-                    text = "Turn on Biometric",
+                    icon = if (isBiometricEnabled) R.drawable.ic_fingerprint else R.drawable.ic_pin, // Toggle between fingerprint and pin icons
+                    text = if (isBiometricEnabled) "Turn on Biometric" else "Turn on Pin", // Toggle text
                     onClick = onBiometricClick,
                 )
             }
