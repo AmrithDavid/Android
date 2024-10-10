@@ -18,12 +18,10 @@ import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
-import kotlin.text.Typography.dagger
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-
 
 @EntryPoint
 @InstallIn(ActivityComponent::class)
@@ -34,6 +32,7 @@ interface IAppStateEntryPoint {
 enum class ViewRoute {
     LOGIN,
     LOGIN_SETUP,
+    BIOMETRIC_LOGIN,
     SCAN_LIBRARY,
     IMAGE_DETAIL,
     SHARE,
@@ -90,7 +89,7 @@ fun NavigationGraph() {
                         }
                         LoginPreferenceOption.BIOMETRIC -> {
                             // replace with biometric login
-                            navController.navigate(ViewRoute.SCAN_LIBRARY.toString()) {
+                            navController.navigate(ViewRoute.BIOMETRIC_LOGIN.toString()) {
                                 popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
                             }
                         }
@@ -103,6 +102,9 @@ fun NavigationGraph() {
                     }
                 },
             )
+        }
+        composable(ViewRoute.BIOMETRIC_LOGIN.toString()) {
+            BiometricLoginView()
         }
         composable(ViewRoute.SCAN_LIBRARY.toString()) {
             ScanLibraryView(
@@ -141,7 +143,7 @@ fun getStartRoute(): String {
 
     return when (appState.loginPreference) {
         LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
-        LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString() // replace with biometric login
+        LoginPreferenceOption.BIOMETRIC -> ViewRoute.BIOMETRIC_LOGIN.toString()
         LoginPreferenceOption.PIN -> ViewRoute.SCAN_LIBRARY.toString() // replace with PIN login
     }
 }
