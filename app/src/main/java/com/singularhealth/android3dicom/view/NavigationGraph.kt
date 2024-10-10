@@ -129,7 +129,6 @@ fun NavigationGraph() {
         }
         composable(ViewRoute.SCAN_LIBRARY.toString()) {
             ScanLibraryView(
-                navController = navController,
                 searchQuery = searchQuery,
                 onLogout = {
                     loginViewModel.logoutUser()
@@ -140,10 +139,19 @@ fun NavigationGraph() {
                 onImageButtonClick = {
                     navController.navigate(ViewRoute.IMAGE_DETAIL.toString())
                 },
+                onReportButtonClick = {
+                    navController.navigate(ViewRoute.REPORT.toString())
+                },
+                onShareButtonClick = {
+                    navController.navigate(ViewRoute.SHARE.toString())
+                },
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {
             ImageDetailView(navController = navController)
+        }
+        composable(ViewRoute.REPORT.toString()) {
+            ReportView()
         }
         composable(ViewRoute.SHARE.toString()) {
             ShareView(navController = navController)

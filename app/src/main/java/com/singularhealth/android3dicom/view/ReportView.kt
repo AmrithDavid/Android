@@ -26,21 +26,21 @@ import com.singularhealth.android3dicom.ui.theme.TitleColor
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun ReportScreen() {
+fun ReportView() {
     Column(
         modifier =
-        Modifier
-            .fillMaxSize()
-            .background(Color.White),
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
     ) {
         ReportTopBar()
 
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(25.dp),
         ) {
             Spacer(modifier = Modifier.height(13.dp))
@@ -61,8 +61,6 @@ fun ReportScreen() {
             Spacer(modifier = Modifier.height(5.dp))
 
             ActionButtons()
-
-
         }
     }
 }
@@ -72,12 +70,12 @@ fun ReportScreen() {
 fun PatientInfoCard() {
     Card(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = MaterialTheme.shapes.medium,
-            ),
+            Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 8.dp,
+                    shape = MaterialTheme.shapes.medium,
+                ),
         colors =
             CardDefaults.cardColors(
                 containerColor = Color.White,
@@ -261,6 +259,6 @@ fun ReportTopBar() {
 @Composable
 fun ReportScreenPreview() {
     Android3DicomTheme {
-        ReportScreen()
+        ReportView()
     }
 }

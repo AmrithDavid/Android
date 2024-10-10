@@ -42,6 +42,8 @@ import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 fun ScanCard(
     patientCardData: PatientCardData,
     onImageButtonClick: () -> Unit,
+    onReportButtonClick: () -> Unit,
+    onShareButtonClick: () -> Unit,
 ) {
     Card(
         modifier =
@@ -152,7 +154,13 @@ fun ScanCard(
                     )
                 buttonData.forEachIndexed { index, (text, iconRes, contentDescription) ->
                     OutlinedButton(
-                        onClick = { if (index == 0) onImageButtonClick() },
+                        onClick = {
+                            when (index) {
+                                0 -> onImageButtonClick()
+                                1 -> onShareButtonClick()
+                                2 -> onReportButtonClick()
+                            }
+                        },
                         modifier =
                             Modifier
                                 .weight(1f)
