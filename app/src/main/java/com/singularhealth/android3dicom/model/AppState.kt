@@ -1,7 +1,12 @@
 package com.singularhealth.android3dicom.model
 
 import com.singularhealth.android3dicom.utilities.KeystorePinHandler
+import android.util.Log
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
+import com.singularhealth.android3dicom.network.NetworkClient
 import com.singularhealth.android3dicom.view.ViewRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,16 +53,18 @@ class AppState
     @Inject
     constructor(
         dataStore: IDataStoreRepository,
+        private var networkClient: NetworkClient,
     ) {
         private val appStateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         private lateinit var navController: NavHostController
-        private var returnDestination = ViewRoute.SCAN_LIBRARY
 
-        @Suppress("ktlint:standard:backing-property-naming")
         private val _dataStore = dataStore
+        val dataStore = _dataStore
+
+        private lateinit var currentUser: UserModel
+        private lateinit var currentScan: ScanModel
 
         private var _loginPreference = LoginPreferenceOption.NONE
-        val dataStore = _dataStore
         var loginPreference: LoginPreferenceOption
             get() {
                 // retrieve value from repo
@@ -91,15 +98,36 @@ class AppState
             this.navController = navController
         }
 
-        fun setReturnDestination(viewRoute: ViewRoute) {
-            returnDestination = viewRoute
-        }
-
         fun navigateTo(viewRoute: ViewRoute) {
             navController.navigate(viewRoute.toString())
         }
 
         fun navigateBack() {
             navController.navigateUp()
+        }
+
+        fun getAvailableCredits(): Int = currentUser.creditBalance
+
+        fun login(
+            email: String,
+            password: String,
+        ) {
+            appStateScope.launch {
+                networkClient.loginUser(email, password)
+            }
+        }
+
+        fun logout() {
+            appStateScope.launch {
+                dataStore.getInstance().edit { preferences ->
+                    preferences.remove(stringPreferencesKey("access_token"))
+                    preferences[booleanPreferencesKey("is_logged_in")] = false
+                }
+                Log.d("LoginViewModel", "User logged out")
+            }
+        }
+
+        fun shareScan(email: String) {
+            appStateScope.launch { networkClient.shareScan(currentScan.id, listOf(email)) }
         }
     }

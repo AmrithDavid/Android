@@ -3,7 +3,6 @@ package com.singularhealth.android3dicom.view
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -17,7 +16,7 @@ import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
-import com.singularhealth.android3dicom.view.components.ShareView
+import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -156,7 +155,7 @@ fun NavigationGraph() {
             ReportView()
         }
         composable(ViewRoute.SHARE.toString()) {
-            ShareView(navController = navController)
+            ShareView()
         }
     }
 

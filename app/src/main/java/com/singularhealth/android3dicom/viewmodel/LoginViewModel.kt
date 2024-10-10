@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginRequest
-import com.singularhealth.android3dicom.network.ApiService
+import com.singularhealth.android3dicom.network.ISingularHealthRestService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +37,7 @@ class LoginViewModel
     constructor(
         private val appState: AppState,
     ) : ViewModel() {
-        private val apiService: ApiService
+        private val singularHealthRestService: ISingularHealthRestService
         private val dataStore = appState.dataStore
 
         companion object {
@@ -81,7 +81,7 @@ class LoginViewModel
                     .client(client)
                     .build()
 
-            apiService = retrofit.create(ApiService::class.java)
+            singularHealthRestService = retrofit.create(ISingularHealthRestService::class.java)
         }
 
         suspend fun loginUser(
@@ -92,7 +92,7 @@ class LoginViewModel
                 try {
                     val loginRequest = LoginRequest(email, password)
                     Log.d("LoginViewModel", "Sending login request: $loginRequest")
-                    val response = apiService.login(loginRequest)
+                    val response = singularHealthRestService.login(loginRequest)
                     Log.d("LoginViewModel", "Received response: $response")
 
                     if (response.access_token != null) {

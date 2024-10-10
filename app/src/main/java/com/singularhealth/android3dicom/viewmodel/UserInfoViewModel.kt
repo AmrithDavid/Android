@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.UserModel
-import com.singularhealth.android3dicom.network.ApiService
+import com.singularhealth.android3dicom.network.ISingularHealthRestService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -21,7 +21,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 class UserInfoViewModel(
     private val context: Context,
 ) : ViewModel() {
-    private val apiService: ApiService
+    private val singularHealthRestService: ISingularHealthRestService
     private var _userInfo: UserModel? = null
 
     init { // Initialises Retrofit instance with a base URL, JSON converter and logging intercepter
@@ -40,7 +40,7 @@ class UserInfoViewModel(
                         ).build(),
                 ).build()
 // then creates the ApiService
-        apiService = retrofit.create(ApiService::class.java)
+        singularHealthRestService = retrofit.create(ISingularHealthRestService::class.java)
     }
 
     fun fetchUserInfo(onResult: (Result<UserModel>) -> Unit) {
@@ -50,7 +50,7 @@ class UserInfoViewModel(
                     context.dataStore.data.first()[stringPreferencesKey("access_token")]
                         ?: throw Exception("No access token found")
 
-                val response = apiService.getUserInfo("Bearer $token")
+                val response = singularHealthRestService.getUserInfo("Bearer $token")
                 _userInfo = response
 
                 Log.d("UserInfoViewModel", "User Info Retrieved: $response")

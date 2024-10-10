@@ -1,6 +1,6 @@
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
-package com.singularhealth.android3dicom.view.components
+package com.singularhealth.android3dicom.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,42 +12,51 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.ui.theme.BorderColor
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
+import com.singularhealth.android3dicom.viewmodel.ShareViewModel
 
 @Composable
-fun ShareView(navController: NavController) {
+fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
     var searchText by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var includeReport by remember { mutableStateOf(false) }
     var hasConsent by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf<String?>(null) }
 
-    // A regular expression for basic email validation
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+    // A regular expression for basic email validation "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+    // val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.+[A-Za-z0-9.-]$".toRegex()
+    val emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$".toRegex()
+
+    /*LaunchedEffect(viewModel.email) {
+        viewModel.email.observeForever { newEmail ->
+            email = TextFieldValue(newEmail ?: "")
+        }
+    }*/
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White),
     ) {
-
-        ShareTopBar(onBackClick = { navController.navigateUp() })
+        ShareTopBar(onBackClick = { viewModel.onBackClick() })
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(56.dp))
@@ -58,55 +67,82 @@ fun ShareView(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(50.dp))
             Text(
-                text = buildAnnotatedString {
-                    pushStyle(MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = SubheadingColor))
-                    append("Sharing this scan will cost ")
-                    pushStyle(MaterialTheme.typography.displayLarge.toSpanStyle().copy(color = SubheadingColor))
-                    append("1 credit")
-                    pop()
-                    append(".")
-                },
+                text =
+                    buildAnnotatedString {
+                        pushStyle(
+                            MaterialTheme.typography.bodyMedium
+                                .toSpanStyle()
+                                .copy(color = SubheadingColor),
+                        )
+                        append("Sharing this scan will cost ")
+                        pushStyle(
+                            MaterialTheme.typography.displayLarge
+                                .toSpanStyle()
+                                .copy(color = SubheadingColor),
+                        )
+                        append("1 credit")
+                        pop()
+                        append(".")
+                    },
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = buildAnnotatedString {
-                    pushStyle(MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = SubheadingColor))
-                    append("After sharing you will have ")
-                    pushStyle(MaterialTheme.typography.displayLarge.toSpanStyle().copy(color = SubheadingColor))
-                    append("2 credit(s)")
-                    pop()
-                    append(" remaining.")
-                },
+                text =
+                    buildAnnotatedString {
+                        pushStyle(
+                            MaterialTheme.typography.bodyMedium
+                                .toSpanStyle()
+                                .copy(color = SubheadingColor),
+                        )
+                        append("After sharing you will have ")
+                        pushStyle(
+                            MaterialTheme.typography.displayLarge
+                                .toSpanStyle()
+                                .copy(color = SubheadingColor),
+                        )
+                        append("2 credit(s)")
+                        pop()
+                        append(" remaining.")
+                    },
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                ) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
+            ) {
                 TextField(
-                    value = searchText,
+                    value = email,
                     onValueChange = {
-                        searchText = it
-                        emailError = if (!emailRegex.matches(it)) {
-                            "Invalid email format"
-                        } else {
-                            null
-                        }
+                        email = it
+                        emailError =
+                            if (!emailRegex.matches(it)) {
+                                "Invalid email format"
+                            } else {
+                                null
+                            }
+                        viewModel.onEmailChanged(it)
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .width(300.dp)
-                        .padding(start = 56.dp, end = 56.dp)
-
-                        .border(1.dp, if (emailError == null) BorderColor else Color(0xFFB21717), RoundedCornerShape(4.dp)),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                    ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .width(300.dp)
+                            .padding(start = 56.dp, end = 56.dp)
+                            .border(
+                                1.dp,
+                                if (emailError == null) BorderColor else Color(0xFFB21717),
+                                RoundedCornerShape(4.dp),
+                            ),
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
                     shape = RoundedCornerShape(8.dp),
                     placeholder = {
                         Text(
@@ -115,31 +151,29 @@ fun ShareView(navController: NavController) {
                             color = if (emailError == null) BorderColor else Color.Transparent,
                         )
                     },
-
                     textStyle = MaterialTheme.typography.bodyLarge,
-
                     // Use trailingIcon to display the icon inside the text box
                     trailingIcon = {
                         if (emailError != null) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_warning), // Replace with your icon
                                 contentDescription = "Warning icon",
-                                tint = Color(0xFFB21717)
+                                tint = Color(0xFFB21717),
                             )
                         }
-                    }
+                    },
                 )
 
                 Text(
                     text = "Recipient's Email",
                     color = if (emailError == null) Color.Transparent else Color(0xFFB21717),
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .padding(start = 72.dp)
-                        .background(if (emailError == null) Color.Transparent else Color.White)
-                        .offset(y = (-7).dp)
+                    modifier =
+                        Modifier
+                            .padding(start = 72.dp)
+                            .background(if (emailError == null) Color.Transparent else Color.White)
+                            .offset(y = (-7).dp),
                 )
-
             }
 
             // Display email error message if invalid
@@ -148,14 +182,14 @@ fun ShareView(navController: NavController) {
                     text = emailError!!,
                     color = Color(0xFFB21717),
                     style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .fillMaxWidth()
-                        .offset(x = 72.dp),
-                    textAlign = TextAlign.Left
+                    modifier =
+                        Modifier
+                            .padding(top = 4.dp)
+                            .fillMaxWidth()
+                            .offset(x = 72.dp),
+                    textAlign = TextAlign.Left,
                 )
             }
-
 
             Spacer(modifier = Modifier.height(50.dp))
 
@@ -166,10 +200,11 @@ fun ShareView(navController: NavController) {
                 Checkbox(
                     checked = includeReport,
                     onCheckedChange = { includeReport = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = SubheadingColor,
-                    ),
+                    colors =
+                        CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = SubheadingColor,
+                        ),
                     modifier = Modifier.padding(end = 1.dp),
                 )
                 Text(
@@ -189,10 +224,11 @@ fun ShareView(navController: NavController) {
                 Checkbox(
                     checked = hasConsent,
                     onCheckedChange = { hasConsent = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = SubheadingColor,
-                    ),
+                    colors =
+                        CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = SubheadingColor,
+                        ),
                     modifier = Modifier.padding(end = 1.dp),
                 )
                 Text(
@@ -212,10 +248,11 @@ fun ShareView(navController: NavController) {
                 Button(
                     onClick = {},
                     colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
-                    modifier = Modifier
-                        .height(35.dp)
-                        .fillMaxWidth(0.75f),
-                    shape = RoundedCornerShape(4.dp)
+                    modifier =
+                        Modifier
+                            .height(35.dp)
+                            .fillMaxWidth(0.75f),
+                    shape = RoundedCornerShape(4.dp),
                 ) {
                     Text(
                         "Send(1 Credit)",
@@ -231,25 +268,28 @@ fun ShareView(navController: NavController) {
 @Composable
 fun ShareTopBar(onBackClick: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(DarkBlue),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(DarkBlue),
     ) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.White,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { onBackClick() }
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .clickable { onBackClick() },
             )
 
             Spacer(modifier = Modifier.width(20.dp))
@@ -275,6 +315,6 @@ fun ShareTopBar(onBackClick: () -> Unit) {
 @Composable
 fun ShareViewPreview() {
     Android3DicomTheme {
-        ShareView(rememberNavController())
+        // ShareView(ShareViewModel())
     }
 }
