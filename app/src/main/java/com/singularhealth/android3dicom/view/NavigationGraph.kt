@@ -73,7 +73,11 @@ fun NavigationGraph() {
         }
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
+                    }
+                },
                 onNavigateToPinSetup = {
                     navController.navigate(ViewRoute.PIN_SETUP.toString())
                 },

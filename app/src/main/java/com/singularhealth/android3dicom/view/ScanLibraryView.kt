@@ -112,7 +112,7 @@ fun ScanLibraryView(
             onBiometricClick = { viewModel.onBiometricClick() },
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
-            onLogoutClick = { viewModel.onLogoutClick() },
+            onLogoutClick = { showLogoutDialog = true },
             isBiometricEnabled = isBiometricEnabled,
         )
     }
