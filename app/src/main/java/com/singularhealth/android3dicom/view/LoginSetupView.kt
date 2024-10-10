@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -389,9 +390,11 @@ private fun makeBiometricCallbacks(
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
         LoginSetupView(
+            viewModel = hiltViewModel(),
             onBackClick = {},
-            onBiometricLoginClick = {},
-            onSetupSuccess = {},
+            onNavigateToPinSetup = {},
+            onNavigateToBiometricSetup = {},
+            onNavigateToLogin = {},
         )
     }
 }

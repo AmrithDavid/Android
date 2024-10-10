@@ -2,6 +2,7 @@
 
 package com.singularhealth.android3dicom.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
@@ -36,19 +37,23 @@ class PinViewModel
 
         fun updateFirstPin(pin: String) {
             _firstPin.value = pin
+            Log.d("PIN_SETUP", "First pin value is: $pin")
             _isFirstPinComplete.value = pin.length == 4
             validatePins()
         }
 
         fun updateSecondPin(pin: String) {
             _secondPin.value = pin
+            Log.d("PIN_SETUP", "Second pin value is: $pin")
             validatePins()
         }
 
         private fun validatePins() {
             _pinState.value =
                 when {
-                    _firstPin.value.length == 4 && _secondPin.value.length == 4 && _firstPin.value != _secondPin.value ->
+                    _firstPin.value.length == 4 &&
+                        _secondPin.value.length == 4 &&
+                        _firstPin.value != _secondPin.value ->
                         PinState.Error(ErrorState.PinsDoNotMatch)
                     else -> PinState.Initial
                 }
