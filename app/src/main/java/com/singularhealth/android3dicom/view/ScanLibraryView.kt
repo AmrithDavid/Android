@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -33,12 +35,15 @@ fun ScanLibraryView(
     navController: NavController,
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
+    onImageButtonClick: () -> Unit,
 ) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
     val isBiometricEnabled by viewModel.isBiometricLoginActive.collectAsState()
+    var showClearCacheDialog by remember { mutableStateOf(false) }
+    val isClearingCache by viewModel.isClearingCache.collectAsStateWithLifecycle()
 
     // Control system UI color
     val view = LocalView.current
@@ -63,7 +68,7 @@ fun ScanLibraryView(
                 onMenuClick = { viewModel.toggleSideMenu() },
                 searchQuery = searchQuery,
                 onSearchQueryChange = { newQuery ->
-                    searchQuery.value = newQuery.value // Update the search query state
+                    searchQuery.value = newQuery.value
                 },
             )
         },
@@ -81,12 +86,13 @@ fun ScanLibraryView(
             CardList(
                 modifier = Modifier.padding(innerPadding),
                 patientCards = filteredCards,
-                onImageButtonClick = { navController.navigate("mainImageMenu") },
+                onImageButtonClick = { onImageButtonClick() },
             )
         } else {
             EmptyStateView()
         }
     }
+
     // Semi-transparent overlay
     if (isSideMenuVisible) {
         Box(
@@ -94,7 +100,6 @@ fun ScanLibraryView(
                 Modifier
                     .fillMaxSize()
                     .background(Color(0x52000000)),
-            // #00000052
         )
     }
 
@@ -103,11 +108,11 @@ fun ScanLibraryView(
         ScanLibraryMenu(
             onCloseMenu = { viewModel.toggleSideMenu() },
             onHomeClick = { viewModel.onHomeClick() },
-            onClearCacheClick = { viewModel.onClearCacheClick() },
+            onClearCacheClick = { showClearCacheDialog = true },
             onBiometricClick = { viewModel.onBiometricClick() },
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
-            onLogoutClick = { showLogoutDialog = true },
+            onLogoutClick = { viewModel.onLogoutClick() },
             isBiometricEnabled = isBiometricEnabled,
         )
     }
@@ -120,6 +125,54 @@ fun ScanLibraryView(
                 onLogout()
             },
         )
+    }
+
+    // Clear Cache Dialog
+    if (showClearCacheDialog) {
+        ClearCacheDialog(
+            onDismissRequest = { showClearCacheDialog = false },
+            onConfirmLogout = {
+                viewModel.onClearCacheClick()
+                showClearCacheDialog = false
+            },
+        )
+    }
+
+    // Loading indicator for cache clearing
+    if (isClearingCache) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    // Clear Cache Dialog
+    if (showClearCacheDialog) {
+        ClearCacheDialog(
+            onDismissRequest = { showClearCacheDialog = false },
+            onConfirmLogout = {
+                viewModel.onClearCacheClick()
+                showClearCacheDialog = false
+            },
+        )
+    }
+
+    // Loading indicator for cache clearing
+    if (isClearingCache) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -154,6 +207,7 @@ fun ScanScreenPreview() {
             navController = navController,
             searchQuery = searchQuery,
             onLogout = {}, // Add this line
+            onImageButtonClick = {},
         )
     }
 }

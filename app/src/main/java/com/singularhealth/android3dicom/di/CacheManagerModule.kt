@@ -1,7 +1,7 @@
 package com.singularhealth.android3dicom.di
 
 import android.content.Context
-import com.singularhealth.android3dicom.model.DataStoreRepository
+import com.singularhealth.android3dicom.utilities.CacheManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,14 +9,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-// private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
-
 @Module
 @InstallIn(SingletonComponent::class)
-object DataStoreModule {
+object CacheManagerModule {
     @Singleton
     @Provides
-    fun provideDataStoreRepository(
+    fun provideCacheManager(
         @ApplicationContext context: Context,
-    ): DataStoreRepository = DataStoreRepository(context)
+    ): CacheManager = CacheManager(context)
 }

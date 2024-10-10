@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
-import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import kotlinx.coroutines.launch
 
 // required for
@@ -42,7 +42,7 @@ import android.net.Uri
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(LocalContext.current)),
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

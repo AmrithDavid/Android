@@ -7,8 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +16,6 @@ import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
-import com.singularhealth.android3dicom.viewmodel.LoginViewModelFactory
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -43,8 +41,7 @@ enum class ViewRoute {
 @Composable
 fun NavigationGraph() {
     val navController = rememberNavController()
-    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(LocalContext.current))
-    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val loginViewModel: LoginViewModel = hiltViewModel()
     val searchQuery = remember { mutableStateOf("") }
 
     // Inject the AppState via the entrypoint defined above
@@ -112,9 +109,12 @@ fun NavigationGraph() {
                 searchQuery = searchQuery,
                 onLogout = {
                     loginViewModel.logoutUser()
-                    navController.navigate("login") {
-                        popUpTo("scanScreen") { inclusive = true }
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.SCAN_LIBRARY.toString()) { inclusive = true }
                     }
+                },
+                onImageButtonClick = {
+                    navController.navigate(ViewRoute.IMAGE_DETAIL.toString())
                 },
             )
         }

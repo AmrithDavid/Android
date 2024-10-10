@@ -30,6 +30,7 @@ class AppState
         private val _dataStore = dataStore
 
         private var _loginPreference = LoginPreferenceOption.NONE
+        val dataStore = _dataStore
         var loginPreference: LoginPreferenceOption
             get() {
                 // retrieve value from repo
