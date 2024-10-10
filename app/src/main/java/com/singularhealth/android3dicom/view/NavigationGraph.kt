@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -47,6 +48,7 @@ enum class ViewRoute {
 fun NavigationGraph() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val searchQuery = remember { mutableStateOf("") }
 
     val appState: AppState =

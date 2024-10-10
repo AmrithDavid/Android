@@ -34,6 +34,7 @@ import com.singularhealth.android3dicom.utilities.BiometricAuthListener
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.viewmodel.LoginSetupViewModel
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(
     viewModel: LoginSetupViewModel = hiltViewModel(),
