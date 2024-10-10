@@ -30,12 +30,6 @@ interface IAppStateEntryPoint {
     fun appState(): AppState
 }
 
-/*@EntryPoint
-@InstallIn(ActivityComponent::class)
-interface INavigationHostControllerEntryPoint {
-    fun navHostController(): NavHostController
-}*/
-
 enum class ViewRoute {
     LOGIN,
     LOGIN_SETUP,
@@ -65,13 +59,6 @@ fun NavigationGraph() {
             ).appState()
 
     appState.setNavController(navController)
-
-/*    val navController: NavHostController =
-        EntryPoints
-            .get(
-                LocalContext.current as ComponentActivity,
-                INavigationHostControllerEntryPoint::class.java,
-            ).navHostController()*/
 
     NavHost(
         navController = navController,
