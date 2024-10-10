@@ -73,6 +73,7 @@ fun LoginSetupView(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginTopBar(onBackClick: () -> Unit) {
     Column(
@@ -115,6 +116,7 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginContent(
     viewModel: LoginSetupViewModel,
@@ -221,6 +223,7 @@ private fun LoginContent(
     }
 }
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginOptionItem(
     text: String,
@@ -336,6 +339,7 @@ private fun makeBiometricCallbacks(onSuccess: () -> Unit): BiometricAuthListener
     }
 
 @Preview(showBackground = true)
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
