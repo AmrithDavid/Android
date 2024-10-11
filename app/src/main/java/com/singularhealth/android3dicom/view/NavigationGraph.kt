@@ -59,9 +59,14 @@ fun NavigationGraph() {
 
     appState.setNavController(navController)
 
+    var startRoute = getStartRoute()
+    if (startRoute != ViewRoute.LOGIN.toString()) {
+        appState.renewStoredLogin()
+    }
+
     NavHost(
         navController = navController,
-        startDestination = getStartRoute(appState),
+        startDestination = startRoute,
     ) {
         composable(ViewRoute.LOGIN.toString()) {
             LoginScreen()
@@ -130,16 +135,7 @@ fun NavigationGraph() {
                     navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.SCAN_LIBRARY.toString()) { inclusive = true }
                     }
-                },
-                onImageButtonClick = {
-                    navController.navigate(ViewRoute.IMAGE_DETAIL.toString())
-                },
-                onReportButtonClick = {
-                    navController.navigate(ViewRoute.REPORT.toString())
-                },
-                onShareButtonClick = {
-                    navController.navigate(ViewRoute.SHARE.toString())
-                },
+                }
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {

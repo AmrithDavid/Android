@@ -22,26 +22,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.DividerColor
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
+import com.singularhealth.android3dicom.viewmodel.ScanCardViewModel
 
 @Suppress("ktlint:standard:function-naming")
 // ScanCard is a composable function that represents a single card in the list
 @Composable
 fun ScanCard(
+    viewModel: ScanCardViewModel = hiltViewModel(),
     patientCardData: PatientCardData,
-    onImageButtonClick: () -> Unit,
-    onReportButtonClick: () -> Unit,
-    onShareButtonClick: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) {
+        viewModel.data = patientCardData
+    }
+
     Card(
         modifier =
             Modifier
@@ -153,9 +159,9 @@ fun ScanCard(
                     OutlinedButton(
                         onClick = {
                             when (index) {
-                                0 -> onImageButtonClick()
-                                1 -> onReportButtonClick()
-                                2 -> onShareButtonClick()
+                                0 -> viewModel.onImages()
+                                1 -> viewModel.onReport()
+                                2 -> viewModel.onShare()
                             }
                         },
                         modifier =

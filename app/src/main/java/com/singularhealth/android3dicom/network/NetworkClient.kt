@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.singularhealth.android3dicom.model.FetchCardItem
 import com.singularhealth.android3dicom.model.IDataStoreRepository
 import com.singularhealth.android3dicom.model.LoginRequest
 import com.singularhealth.android3dicom.model.ScanModel
@@ -11,9 +12,6 @@ import com.singularhealth.android3dicom.model.UserModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -63,7 +61,7 @@ class NetworkClient
         suspend fun loginUser(
             email: String,
             password: String,
-        ): Boolean =
+        ): String? =
             withContext(clientScope.coroutineContext) {
                 try {
                     val loginRequest = LoginRequest(email, password)
@@ -76,14 +74,14 @@ class NetworkClient
                         dataStore.getInstance().edit { preferences ->
                             preferences[stringPreferencesKey("username")] = email
                             preferences[stringPreferencesKey("password")] = password
-                            preferences[stringPreferencesKey("access_token")] = response.access_token
+                            // preferences[stringPreferencesKey("access_token")] = response.access_token
                             preferences[booleanPreferencesKey("is_logged_in")] = true
                         }
                         Log.d(LOG_TAG, "Login successful, token saved")
-                        true
+                        response.access_token
                     } else {
                         Log.e(LOG_TAG, "Login failed: No access token in response")
-                        false
+                        null
                     }
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Error during login", e)
@@ -95,78 +93,84 @@ class NetworkClient
                         }
                         else -> Log.e(LOG_TAG, "Unexpected error: ${e.message}")
                     }
-                    false
+                    null
                 }
             }
 
-        fun fetchUserInfo(onResult: (Result<UserModel>) -> Unit) {
-            clientScope.launch {
-                try {
-                    val token =
-                        dataStore.getInstance().data.first()[stringPreferencesKey("access_token")]
-                            ?: throw Exception("No access token found")
-
-                    val response = singularHealthRestService.getUserInfo("Bearer $token")
-                    // _userInfo = response
-
-                    Log.d("UserInfoViewModel", "User Info Retrieved: $response")
-
-                    onResult(Result.success(response))
-                } catch (e: Exception) {
-                    Log.e("UserInfoViewModel", "Error fetching user info", e)
-                    onResult(Result.failure(e))
-                }
+        suspend fun fetchUserInfo(accessToken: String): UserModel? {
+            var user: UserModel? = null
+            try {
+                val response = singularHealthRestService.getUserInfo("Bearer $accessToken")
+                Log.d(LOG_TAG, "User Info Retrieved: $response")
+                user = response
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Error fetching user info", e)
             }
+            return user
         }
 
-        suspend fun fetchScans(): List<ScanModel> {
+        suspend fun fetchScans(accessToken: String?): MutableList<ScanModel> {
+            val cardList = mutableListOf<ScanModel>()
             try {
-                val token =
-                    getAccessToken()
-                        ?: throw Exception("No access token found for share scan request")
-                val response = singularHealthRestService.fetchScans(token)
-                Log.d(LOG_TAG, response.body().toString())
+                accessToken ?: throw Exception("No access token found for fetch-scan request")
+
+                val response = singularHealthRestService.fetchScans("Bearer $accessToken")
+                if (!response.isSuccessful) {
+                    throw Exception("Scan list request failed")
+                }
+
+                var fetchCardItemList = mutableListOf<FetchCardItem>()
+                Log.d(LOG_TAG, "Received fetch-scans response:" + response.body().toString())
+                response.body()?.let { fetchCardItemList = it.items.toMutableList() }
+
+                fetchCardItemList.forEach { item ->
+                    val newScan =
+                        ScanModel(
+                            item.id,
+                            item.fileName,
+                            item.nickname,
+                            item.createdAt,
+                            "Unknown",
+                            "modality",
+                            item.expires ?: "No expiry",
+                            "imageName",
+                            "",
+                            mutableListOf(),
+                            mutableListOf(),
+                            mutableListOf(),
+                        )
+                    cardList.add(newScan)
+                }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, e.message.toString())
-                false
             }
-            return listOf(ScanModel("", "", "", "", "", "", "", "", "", listOf(""), listOf(""), listOf("")))
+            return cardList
         }
 
         suspend fun shareScan(
+            accessToken: String?,
             scanId: String,
             emailList: List<String>,
         ): Boolean =
             try {
-                val token =
-                    getAccessToken()
-                        ?: throw Exception("No access token found for share scan request")
-                val response = singularHealthRestService.shareScan(token, scanId, emailList)
+                accessToken ?: throw Exception("No access token found for share scan request")
+                val response = singularHealthRestService.shareScan(accessToken, scanId, emailList)
                 response.code() == DELETE_SUCCESS
             } catch (e: Exception) {
                 Log.e(LOG_TAG, e.message.toString())
                 false
             }
 
-        suspend fun deleteScanFromServer(scanId: String): Boolean =
+        suspend fun deleteScanFromServer(
+            accessToken: String?,
+            scanId: String,
+        ): Boolean =
             try {
-                val token =
-                    getAccessToken()
-                        ?: throw Exception("No access token found for delete scan request")
-                val response = singularHealthRestService.deleteScan(token, scanId)
+                accessToken ?: throw Exception("No access token found for delete scan request")
+                val response = singularHealthRestService.deleteScan(accessToken, scanId)
                 response.code() == DELETE_SUCCESS
             } catch (e: Exception) {
                 Log.e(LOG_TAG, e.message.toString())
                 false
             }
-
-        private fun getAccessToken(): String? {
-            val accessTokenKey = stringPreferencesKey("access_token")
-            val preferences =
-                runBlocking {
-                    dataStore.getInstance().data.first()
-                }
-            println("Access Token: $accessTokenKey")
-            return preferences[accessTokenKey]
-        }
     }

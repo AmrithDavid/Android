@@ -25,6 +25,7 @@ class ReportViewModel
                     "",
                     "",
                     "",
+                    null,
                 ),
             )
         val cardData: StateFlow<PatientCardData> = _cardData.asStateFlow()

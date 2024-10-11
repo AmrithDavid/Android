@@ -7,4 +7,5 @@ data class PatientCardData(
     val modality: String,
     val expiresIn: String,
     val fileName: String,
+    val scanData: ScanModel?,
 )

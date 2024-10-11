@@ -3,8 +3,6 @@ package com.singularhealth.android3dicom.viewmodel
 import android.content.Context
 import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,12 +34,6 @@ class LoginViewModel
     ) : ViewModel() {
         private val singularHealthRestService: ISingularHealthRestService
         private val dataStore = appState.dataStore
-
-        /*private val _isLoginSuccess = MutableLiveData<Boolean>()
-        val isLoginSuccess: LiveData<Boolean> get() = _isLoginSuccess*/
-
-        // var isLoading by mutableStateOf(false)
-        // var errorMessage by mutableStateOf(String)
 
         private val _isLoading = MutableStateFlow<Boolean>(false)
         val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -99,58 +91,16 @@ class LoginViewModel
             singularHealthRestService = retrofit.create(ISingularHealthRestService::class.java)
         }
 
-        /*fun loginUser(
-            email: String,
-            password: String,
-        ) = appState.login(email, password) { onLoginComplete() }*/
-
-    /*withContext(Dispatchers.IO) {
-        try {
-            val loginRequest = LoginRequest(email, password)
-            Log.d("LoginViewModel", "Sending login request: $loginRequest")
-            val response = singularHealthRestService.login(loginRequest)
-            Log.d("LoginViewModel", "Received response: $response")
-
-            if (response.access_token != null) {
-                // Save the access token
-                dataStore.getInstance().edit { preferences ->
-                    preferences[stringPreferencesKey("username")] = email
-                    preferences[stringPreferencesKey("password")] = password
-                    preferences[stringPreferencesKey("access_token")] = response.access_token
-                    preferences[booleanPreferencesKey("is_logged_in")] = true
-                }
-                Log.d("LoginViewModel", "Login successful, token saved")
-                true
-            } else {
-                Log.e("LoginViewModel", "Login failed: No access token in response")
-                false
-            }
-        } catch (e: Exception) {
-            Log.e("LoginViewModel", "Error during login", e)
-            when (e) {
-                is IOException -> Log.e("LoginViewModel", "Network error: ${e.message}")
-                is HttpException -> {
-                    val errorBody = e.response()?.errorBody()?.string()
-                    Log.e("LoginViewModel", "HTTP error ${e.code()}: $errorBody")
-                }
-                else -> Log.e("LoginViewModel", "Unexpected error: ${e.message}")
-            }
-            false
-        }
-    }*/
-
-        suspend fun logout() {
+        /*suspend fun logout() {
             dataStore.getInstance().edit { preferences ->
                 preferences.remove(stringPreferencesKey("access_token"))
                 preferences[booleanPreferencesKey("is_logged_in")] = false
             }
             Log.d("LoginViewModel", "User logged out")
-        }
+        }*/
 
         fun logoutUser() {
-            viewModelScope.launch {
-                logout()
-            }
+            appState.logout()
         }
 
         private fun onLoginComplete(isSuccess: Boolean) {
@@ -169,8 +119,6 @@ class LoginViewModel
         fun onLoginPressed() {
             _errorMessage.value = ""
             _isLoading.value = true
-            // val success = viewModel.loginUser(email, password)
-            // loginUser(email, password)
             viewModelScope.launch {
                 appState.login(email.value, password.value) { onLoginComplete(it) }
             }

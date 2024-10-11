@@ -53,7 +53,12 @@ class ScanLibraryViewModel
 
         private fun loadPatientCards() {
             // _patientCards.value = generateDummyData()
-            appState.getScans { processScanData(it) }
+            // Register for update from AppState when new scans are available
+            appState.setOnScansReceivedListener { processScanData(it) }
+            // Load scans manually in case they are already available
+            if (appState.isLoggedIn()) {
+                appState.getScans { processScanData(it) }
+            }
         }
 
         private fun processScanData(scanList: List<ScanModel>) {
@@ -67,6 +72,7 @@ class ScanLibraryViewModel
                         modality = it.modality,
                         expiresIn = it.expiresIn,
                         fileName = it.imageName,
+                        scanData = it,
                     ),
                 )
             }
@@ -82,6 +88,7 @@ class ScanLibraryViewModel
                     modality = "CT",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "Luna Shin",
@@ -90,6 +97,7 @@ class ScanLibraryViewModel
                     modality = "Xray",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "testing name",
@@ -98,6 +106,7 @@ class ScanLibraryViewModel
                     modality = "CT",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "choco",
@@ -106,6 +115,7 @@ class ScanLibraryViewModel
                     modality = "3D",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
             )
 

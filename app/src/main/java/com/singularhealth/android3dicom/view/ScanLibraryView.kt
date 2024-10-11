@@ -33,9 +33,6 @@ fun ScanLibraryView(
     viewModel: ScanLibraryViewModel = hiltViewModel(),
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
-    onImageButtonClick: () -> Unit,
-    onReportButtonClick: () -> Unit,
-    onShareButtonClick: () -> Unit,
 ) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
@@ -85,10 +82,7 @@ fun ScanLibraryView(
         if (filteredCards.isNotEmpty()) {
             CardList(
                 modifier = Modifier.padding(innerPadding),
-                patientCards = filteredCards,
-                onImageButtonClick = { onImageButtonClick() },
-                onReportButtonClick = { onReportButtonClick() },
-                onShareButtonClick = { onShareButtonClick() },
+                patientCards = filteredCards
             )
         } else {
             EmptyStateView()
@@ -182,9 +176,6 @@ fun ScanLibraryView(
 fun CardList(
     modifier: Modifier = Modifier,
     patientCards: List<PatientCardData>,
-    onImageButtonClick: () -> Unit,
-    onReportButtonClick: () -> Unit,
-    onShareButtonClick: () -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -194,9 +185,6 @@ fun CardList(
         items(patientCards.size) { index ->
             ScanCard(
                 patientCardData = patientCards[index],
-                onImageButtonClick = onImageButtonClick,
-                onReportButtonClick = onReportButtonClick,
-                onShareButtonClick = onShareButtonClick,
             )
         }
     }
@@ -212,9 +200,6 @@ fun ScanScreenPreview() {
         ScanLibraryView(
             searchQuery = searchQuery,
             onLogout = {}, // Add this line
-            onImageButtonClick = {},
-            onReportButtonClick = {},
-            onShareButtonClick = {},
         )
     }
 }

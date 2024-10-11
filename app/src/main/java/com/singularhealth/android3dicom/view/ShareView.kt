@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +30,7 @@ import com.singularhealth.android3dicom.viewmodel.ShareViewModel
 fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
     var searchText by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    val remainingCredits by viewModel.remainingCredits.collectAsState()
     var includeReport by remember { mutableStateOf(false) }
     var hasConsent by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf<String?>(null) }
@@ -39,17 +39,15 @@ fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
     // val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.+[A-Za-z0-9.-]$".toRegex()
     val emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$".toRegex()
 
-    /*LaunchedEffect(viewModel.email) {
-        viewModel.email.observeForever { newEmail ->
-            email = TextFieldValue(newEmail ?: "")
-        }
-    }*/
+    LaunchedEffect(Unit) {
+        viewModel.loadAvailableCredits()
+    }
 
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White),
+        Modifier
+            .fillMaxSize()
+            .background(Color.White),
     ) {
         ShareTopBar(onBackClick = { viewModel.onBackClick() })
         Column(
@@ -80,7 +78,7 @@ fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
                                 .toSpanStyle()
                                 .copy(color = SubheadingColor),
                         )
-                        append("1 credit")
+                        append("${viewModel.SharingCost} credit")
                         pop()
                         append(".")
                     },
@@ -101,7 +99,7 @@ fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
                                 .toSpanStyle()
                                 .copy(color = SubheadingColor),
                         )
-                        append("2 credit(s)")
+                        append("$remainingCredits credit(s)")
                         pop()
                         append(" remaining.")
                     },
@@ -246,8 +244,9 @@ fun ShareView(viewModel: ShareViewModel = hiltViewModel()) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Button(
-                    onClick = {},
+                    onClick = { viewModel.shareScan() },
                     colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
+                    enabled = (emailError == null && hasConsent),
                     modifier =
                         Modifier
                             .height(35.dp)
