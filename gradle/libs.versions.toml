@@ -38,6 +38,7 @@ playServicesAuth = "20.5.0"
 retrofit = "2.9.0"
 xcrSdkAndroid = "1.2.9"
 media3CommonKtx = "1.4.1"
+runtimeLivedata = "1.7.3"
 
 [libraries]
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
@@ -86,6 +87,7 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 xcr-sdk-android = { module = "com.github.singularhealth:3cr-sdk-android", version.ref = "xcrSdkAndroid" }
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

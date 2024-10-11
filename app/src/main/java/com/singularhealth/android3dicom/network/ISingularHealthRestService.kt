@@ -2,6 +2,7 @@ package com.singularhealth.android3dicom.network
 
 import com.singularhealth.android3dicom.model.LoginRequest
 import com.singularhealth.android3dicom.model.LoginResponse
+import com.singularhealth.android3dicom.model.ScanModel
 import com.singularhealth.android3dicom.model.UserModel
 import retrofit2.Response
 import retrofit2.http.Body
@@ -37,6 +38,11 @@ interface ISingularHealthRestService {
         @Path("id") id: String,
         @Body emails: List<String>,
     ): Response<Unit>
+
+    @GET("api/Mftp/V2/Simple?activeOnly=true")
+    suspend fun fetchScans(
+        @Header("Authorization") token: String,
+    ): Response<ScanModel>
 
     @DELETE("/api/Mftp/V2?scanId={id}")
     suspend fun deleteScan(

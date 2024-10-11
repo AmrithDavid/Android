@@ -108,13 +108,12 @@ class AppState
 
         fun getAvailableCredits(): Int = currentUser.creditBalance
 
-        fun login(
+        suspend fun login(
             email: String,
             password: String,
+            callback: (Boolean) -> Unit,
         ) {
-            appStateScope.launch {
-                networkClient.loginUser(email, password)
-            }
+            callback(networkClient.loginUser(email, password))
         }
 
         fun logout() {
@@ -125,6 +124,10 @@ class AppState
                 }
                 Log.d("LoginViewModel", "User logged out")
             }
+        }
+
+        fun getScans(onResult: (List<ScanModel>) -> Unit) {
+            appStateScope.launch { onResult(networkClient.fetchScans()) }
         }
 
         fun shareScan(email: String) {

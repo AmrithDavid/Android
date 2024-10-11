@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.model.PatientCardData
+import com.singularhealth.android3dicom.model.ScanModel
 import com.singularhealth.android3dicom.utilities.CacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,25 @@ class ScanLibraryViewModel
         }
 
         private fun loadPatientCards() {
-            _patientCards.value = generateDummyData()
+            // _patientCards.value = generateDummyData()
+            appState.getScans { processScanData(it) }
+        }
+
+        private fun processScanData(scanList: List<ScanModel>) {
+            var cards: MutableList<PatientCardData> = mutableListOf()
+            scanList.forEach {
+                cards.add(
+                    PatientCardData(
+                        patientName = it.patientName,
+                        date = it.date,
+                        patientId = it.patientID,
+                        modality = it.modality,
+                        expiresIn = it.expiresIn,
+                        fileName = it.imageName,
+                    ),
+                )
+            }
+            _patientCards.value = cards
         }
 
         private fun generateDummyData(): List<PatientCardData> =

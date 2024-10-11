@@ -1,7 +1,6 @@
 package com.singularhealth.android3dicom.view.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.singularhealth.android3dicom.R
@@ -72,7 +69,7 @@ fun ScanCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top,
             ) {
-                Image(
+                /*Image(
                     painter =
                         painterResource(
                             id =
@@ -89,7 +86,7 @@ fun ScanCard(
                             .height(125.dp)
                             .clip(RoundedCornerShape(4.dp)),
                     contentScale = ContentScale.Fit,
-                )
+                )*/
 
                 Column(
                     modifier =

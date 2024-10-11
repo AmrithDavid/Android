@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.singularhealth.android3dicom.model.IDataStoreRepository
 import com.singularhealth.android3dicom.model.LoginRequest
+import com.singularhealth.android3dicom.model.ScanModel
 import com.singularhealth.android3dicom.model.UserModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,6 +74,8 @@ class NetworkClient
                     if (response.access_token != null) {
                         // Save the access token
                         dataStore.getInstance().edit { preferences ->
+                            preferences[stringPreferencesKey("username")] = email
+                            preferences[stringPreferencesKey("password")] = password
                             preferences[stringPreferencesKey("access_token")] = response.access_token
                             preferences[booleanPreferencesKey("is_logged_in")] = true
                         }
@@ -116,13 +119,28 @@ class NetworkClient
             }
         }
 
+        suspend fun fetchScans(): List<ScanModel> {
+            try {
+                val token =
+                    getAccessToken()
+                        ?: throw Exception("No access token found for share scan request")
+                val response = singularHealthRestService.fetchScans(token)
+                Log.d(LOG_TAG, response.body().toString())
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, e.message.toString())
+                false
+            }
+            return listOf(ScanModel("", "", "", "", "", "", "", "", "", listOf(""), listOf(""), listOf("")))
+        }
+
         suspend fun shareScan(
             scanId: String,
             emailList: List<String>,
         ): Boolean =
             try {
-                val token = getAccessToken()
-                    ?: throw Exception("No access token found for share scan request")
+                val token =
+                    getAccessToken()
+                        ?: throw Exception("No access token found for share scan request")
                 val response = singularHealthRestService.shareScan(token, scanId, emailList)
                 response.code() == DELETE_SUCCESS
             } catch (e: Exception) {
@@ -132,8 +150,9 @@ class NetworkClient
 
         suspend fun deleteScanFromServer(scanId: String): Boolean =
             try {
-                val token = getAccessToken()
-                    ?: throw Exception("No access token found for delete scan request")
+                val token =
+                    getAccessToken()
+                        ?: throw Exception("No access token found for delete scan request")
                 val response = singularHealthRestService.deleteScan(token, scanId)
                 response.code() == DELETE_SUCCESS
             } catch (e: Exception) {

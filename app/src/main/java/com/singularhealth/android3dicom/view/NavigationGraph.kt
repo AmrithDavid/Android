@@ -64,13 +64,7 @@ fun NavigationGraph() {
         startDestination = getStartRoute(appState),
     ) {
         composable(ViewRoute.LOGIN.toString()) {
-            LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(ViewRoute.LOGIN_SETUP.toString()) {
-                        popUpTo(ViewRoute.LOGIN.toString()) { inclusive = true }
-                    }
-                },
-            )
+            LoginScreen()
         }
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(

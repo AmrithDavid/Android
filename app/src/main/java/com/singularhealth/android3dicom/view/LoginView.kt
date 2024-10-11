@@ -32,26 +32,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
-import kotlinx.coroutines.launch
-
 // required for
 import android.content.Intent
 import android.net.Uri
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel(),
-) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
+    // var email by remember { mutableStateOf("") }
+    // var password by remember { mutableStateOf("") }
+    // var isLoading by remember { mutableStateOf(false) }
+    // var errorMessage by remember { mutableStateOf<String?>(null) }
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
     var passwordVisible by remember { mutableStateOf(false) }
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var hasError by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+    // val scope = rememberCoroutineScope()
 
     val buttonCornerRadius = 8
 
@@ -230,10 +230,7 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = {
-                    email = it
-                    hasError = false // Reset error state when user types
-                },
+                onValueChange = { viewModel.onEmailChanged(it) },
                 label = { Text("Email") },
                 singleLine = true,
                 modifier =
@@ -275,10 +272,7 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    hasError = false // Reset error state when user types
-                },
+                onValueChange = { viewModel.onPasswordChanged(it) },
                 label = { Text("Password") },
                 singleLine = true,
                 modifier =
@@ -358,18 +352,7 @@ fun LoginScreen(
             }
 
             Button(
-                onClick = {
-                    isLoading = true
-                    scope.launch {
-                        val success = viewModel.loginUser(email, password)
-                        isLoading = false
-                        if (success) {
-                            onLoginSuccess()
-                        } else {
-                            hasError = true // Set error state
-                        }
-                    }
-                },
+                onClick = { viewModel.onLoginPressed() },
                 modifier =
                     Modifier
                         .width(300.dp)
@@ -399,7 +382,16 @@ fun LoginScreen(
                 modifier = Modifier.clickable { /* Handle forgot password */ },
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            if (errorMessage != "") {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(45.dp))
 
             Row(
                 modifier = Modifier.width(300.dp),
