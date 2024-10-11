@@ -2,7 +2,7 @@
 
 package com.singularhealth.android3dicom.view
 
-import android.util.Log
+import android.app.Activity
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,15 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.ui.theme.*
@@ -30,22 +34,75 @@ import com.singularhealth.android3dicom.utilities.BiometricAuthListener
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.viewmodel.LoginSetupViewModel
 
-private lateinit var biometricPrompt: BiometricPrompt
-private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(
     viewModel: LoginSetupViewModel = hiltViewModel(),
-    onBackClick: () -> Unit = {},
-    onBiometricLoginClick: () -> Unit,
-    onSetupSuccess: () -> Unit,
+    onBackClick: () -> Unit,
+    onNavigateToPinSetup: () -> Unit,
+    onNavigateToBiometricSetup: () -> Unit,
+    onNavigateToLogin: () -> Unit,
 ) {
-    var selectedOption by remember { mutableStateOf<String?>(null) }
-    val context = LocalContext.current
+    val loginPreference by viewModel.loginPreference.collectAsStateWithLifecycle()
+    val navigateToPinSetup by viewModel.navigateToPinSetup.collectAsStateWithLifecycle()
+    val navigateToBiometricSetup by viewModel.navigateToBiometricSetup.collectAsStateWithLifecycle()
+    val navigateToLogin by viewModel.navigateToLogin.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    // Execute the provided initialization function
-    InitBiometrics(context as FragmentActivity, onSetupSuccess)
+    val context = LocalContext.current as FragmentActivity
+
+    var biometricPrompt by remember { mutableStateOf<BiometricPrompt?>(null) }
+    var promptInfo by remember { mutableStateOf<BiometricPrompt.PromptInfo?>(null) }
+
+    val view = LocalView.current
+
+    SideEffect {
+        val window =
+            (view.context as? Activity)?.window
+                ?: throw Exception("Not in an activity - unable to get Window reference")
+        window.statusBarColor = DarkBlue.toArgb()
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+    }
+
+    LaunchedEffect(Unit) {
+        val callback =
+            makeBiometricCallbacks(
+                onSuccess = {
+                    viewModel.onBiometricAuthSuccess()
+                },
+                onError = { errorCode, errorString ->
+                    viewModel.onBiometricAuthError(errorCode, errorString)
+                },
+            )
+        biometricPrompt = BiometricUtils.initBiometricPrompt(context, callback) {}
+        promptInfo =
+            BiometricUtils.createPromptInfo(
+                title = "Biometric Login for 3Dicom",
+                description = "Log in using your biometric credential",
+                negativeText = "Cancel",
+            )
+    }
+
+    LaunchedEffect(navigateToPinSetup) {
+        if (navigateToPinSetup) {
+            onNavigateToPinSetup()
+            viewModel.onNavigatedToPinSetup()
+        }
+    }
+
+    LaunchedEffect(navigateToBiometricSetup) {
+        if (navigateToBiometricSetup) {
+            onNavigateToBiometricSetup()
+            viewModel.onNavigatedToBiometricSetup()
+        }
+    }
+
+    LaunchedEffect(navigateToLogin) {
+        if (navigateToLogin) {
+            onNavigateToLogin()
+            viewModel.onNavigatedToLogin()
+        }
+    }
 
     Column(
         modifier =
@@ -55,18 +112,27 @@ fun LoginSetupView(
     ) {
         LoginTopBar(onBackClick)
         LoginContent(
-            viewModel,
-            selectedOption = selectedOption,
-            onOptionSelected = {
-                selectedOption = it.toString()
-                viewModel.saveLoginPreference(it)
-            },
+            loginPreference = loginPreference,
+            onOptionSelected = viewModel::saveLoginPreference,
             onSetupClick = {
-                if (selectedOption == LoginPreferenceOption.BIOMETRIC.toString()) {
-                    onBiometricLoginClick()
-                } else {
-                    // Handle PIN setup
-                    // TODO: Implement PIN setup
+                when (loginPreference) {
+                    LoginPreferenceOption.BIOMETRIC -> biometricPrompt?.authenticate(promptInfo!!)
+                    LoginPreferenceOption.PIN -> viewModel.onSetupClick()
+                    else -> { /* Do nothing */ }
+                }
+            },
+            onCancelClick = viewModel::onCancelClick,
+        )
+    }
+
+    errorMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearErrorMessage() },
+            title = { Text("Error") },
+            text = { Text(message) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearErrorMessage() }) {
+                    Text("OK")
                 }
             },
         )
@@ -119,10 +185,10 @@ private fun LoginTopBar(onBackClick: () -> Unit) {
 @Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginContent(
-    viewModel: LoginSetupViewModel,
-    selectedOption: String?,
+    loginPreference: LoginPreferenceOption,
     onOptionSelected: (LoginPreferenceOption) -> Unit,
     onSetupClick: () -> Unit,
+    onCancelClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
 
@@ -157,7 +223,7 @@ private fun LoginContent(
                 text = "Biometric",
                 description = "Log in using your fingerprint or face ID",
                 icon = R.drawable.ic_fingerprint,
-                isSelected = selectedOption == LoginPreferenceOption.BIOMETRIC.toString(),
+                isSelected = loginPreference == LoginPreferenceOption.BIOMETRIC,
                 onSelect = { onOptionSelected(LoginPreferenceOption.BIOMETRIC) },
                 modifier = Modifier.weight(1f),
             )
@@ -165,7 +231,7 @@ private fun LoginContent(
                 text = "PIN",
                 description = "Log in by setting up a 4-digit PIN",
                 icon = R.drawable.ic_pin,
-                isSelected = selectedOption == LoginPreferenceOption.PIN.toString(),
+                isSelected = loginPreference == LoginPreferenceOption.PIN,
                 onSelect = { onOptionSelected(LoginPreferenceOption.PIN) },
                 modifier = Modifier.weight(1f),
             )
@@ -174,10 +240,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         Button(
-            onClick = {
-                Log.d("LoginSetupView", "The selected login type is: ${viewModel.getLoginPreference()}")
-                onSetupClick()
-            },
+            onClick = onSetupClick,
             modifier =
                 Modifier
                     .width(300.dp)
@@ -185,10 +248,10 @@ private fun LoginContent(
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = DarkBlue,
-                    disabledContainerColor = if (selectedOption != null) DarkBlue else DarkBlue.copy(alpha = 0.5f),
+                    disabledContainerColor = DarkBlue.copy(alpha = 0.5f),
                 ),
-            shape = RoundedCornerShape(4.dp),
-            enabled = selectedOption != null,
+            shape = RoundedCornerShape(8.dp),
+            enabled = loginPreference != LoginPreferenceOption.NONE,
         ) {
             Text(
                 "Setup",
@@ -200,7 +263,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(22.dp))
 
         OutlinedButton(
-            onClick = { /* TODO: Handle cancel */ },
+            onClick = onCancelClick,
             modifier =
                 Modifier
                     .width(300.dp)
@@ -210,7 +273,7 @@ private fun LoginContent(
                     containerColor = Color.White,
                 ),
             border = BorderStroke(2.dp, DarkBlue),
-            shape = RoundedCornerShape(4.dp),
+            shape = RoundedCornerShape(8.dp),
         ) {
             Text(
                 "Cancel",
@@ -223,7 +286,6 @@ private fun LoginContent(
     }
 }
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 private fun LoginOptionItem(
     text: String,
@@ -302,36 +364,21 @@ private fun LoginOptionItem(
     }
 }
 
-@Composable
-private fun InitBiometrics(
-    context: FragmentActivity,
-    successListener: () -> Unit,
-) {
-    val callback = makeBiometricCallbacks(successListener)
-    biometricPrompt = BiometricUtils.initBiometricPrompt(context, callback, successListener)
-
-    promptInfo =
-        BiometricUtils.createPromptInfo(
-            title = "Biometric Example",
-            description = "Touch your Fingerprint sensor",
-            negativeText = "Cancel",
-        )
-}
-
-private fun makeBiometricCallbacks(onSuccess: () -> Unit): BiometricAuthListener =
+private fun makeBiometricCallbacks(
+    onSuccess: () -> Unit,
+    onError: (Int, String) -> Unit,
+): BiometricAuthListener =
     object : BiometricAuthListener {
         override fun onBiometricAuthenticateError(
             error: Int,
             errMsg: String,
         ) {
-            when (error) {
-                BiometricPrompt.ERROR_USER_CANCELED -> {}
-                BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {}
-                BiometricPrompt.ERROR_NO_BIOMETRICS -> {}
-            }
+            onError(error, errMsg)
         }
 
-        override fun onAuthenticationFailed() {}
+        override fun onAuthenticationFailed() {
+            // Handle failed authentication
+        }
 
         override fun onBiometricAuthenticateSuccess(result: BiometricPrompt.AuthenticationResult) {
             onSuccess()
@@ -344,9 +391,11 @@ private fun makeBiometricCallbacks(onSuccess: () -> Unit): BiometricAuthListener
 fun LoginSetupViewPreview() {
     Android3DicomTheme {
         LoginSetupView(
+            viewModel = hiltViewModel(),
             onBackClick = {},
-            onBiometricLoginClick = {},
-            onSetupSuccess = {},
+            onNavigateToPinSetup = {},
+            onNavigateToBiometricSetup = {},
+            onNavigateToLogin = {},
         )
     }
 }

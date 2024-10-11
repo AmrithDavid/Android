@@ -50,7 +50,7 @@ fun LoginScreen(
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var hasError by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val buttonCornerRadius = 8
@@ -230,7 +230,10 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    hasError = false // Reset error state when user types
+                },
                 label = { Text("Email") },
                 singleLine = true,
                 modifier =
@@ -242,18 +245,40 @@ fun LoginScreen(
                     OutlinedTextFieldDefaults.colors(
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
-                        focusedBorderColor = LightBlue,
-                        unfocusedBorderColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
-                        focusedLabelColor = LightBlue,
-                        unfocusedLabelColor = if (email.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedBorderColor = if (hasError) ErrorRed else LightBlue,
+                        unfocusedBorderColor =
+                            when {
+                                hasError -> ErrorRed
+                                email.isBlank() -> TextFieldTextColor
+                                else -> TitleColor
+                            },
+                        focusedLabelColor = if (hasError) ErrorRed else LightBlue,
+                        unfocusedLabelColor =
+                            when {
+                                hasError -> ErrorRed
+                                email.isBlank() -> TextFieldTextColor
+                                else -> TitleColor
+                            },
                     ),
+                trailingIcon = {
+                    if (hasError) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_warning),
+                            contentDescription = "Error",
+                            tint = ErrorRed,
+                        )
+                    }
+                },
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    hasError = false // Reset error state when user types
+                },
                 label = { Text("Password") },
                 singleLine = true,
                 modifier =
@@ -262,37 +287,78 @@ fun LoginScreen(
                         .onFocusChanged { isPasswordFocused = it.isFocused },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_visibility_off else R.drawable.ic_visibility),
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint =
-                                when {
-                                    isPasswordFocused -> TitleColor
-                                    password.isNotBlank() -> TitleColor
-                                    else -> TextFieldTextColor
-                                },
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                },
                 colors =
                     OutlinedTextFieldDefaults.colors(
                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                         unfocusedTextColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
-                        focusedBorderColor = LightBlue,
-                        unfocusedBorderColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
-                        focusedLabelColor = LightBlue,
-                        unfocusedLabelColor = if (password.isBlank()) TextFieldTextColor else TitleColor,
+                        focusedBorderColor = if (hasError) ErrorRed else LightBlue,
+                        unfocusedBorderColor =
+                            when {
+                                hasError -> ErrorRed
+                                password.isBlank() -> TextFieldTextColor
+                                else -> TitleColor
+                            },
+                        focusedLabelColor = if (hasError) ErrorRed else LightBlue,
+                        unfocusedLabelColor =
+                            when {
+                                hasError -> ErrorRed
+                                password.isBlank() -> TextFieldTextColor
+                                else -> TitleColor
+                            },
                     ),
+                trailingIcon = {
+                    if (hasError) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_warning),
+                            contentDescription = "Error",
+                            tint = ErrorRed,
+                        )
+                    } else {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                painter =
+                                    painterResource(
+                                        id = if (passwordVisible) R.drawable.ic_visibility_off else R.drawable.ic_visibility,
+                                    ),
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                                tint =
+                                    when {
+                                        isPasswordFocused -> TitleColor
+                                        password.isNotBlank() -> TitleColor
+                                        else -> TextFieldTextColor
+                                    },
+                            )
+                        }
+                    }
+                },
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            // Fixed space of 60dp with error message if needed
+            Box(modifier = Modifier.height(80.dp)) {
+                if (hasError) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth(0.8f)
+                                .height(38.dp)
+                                .background(
+                                    color = WarningRed,
+                                    shape = RoundedCornerShape(4.dp),
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "Email or password is incorrect",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                        )
+                    }
+                }
+            }
 
             Button(
                 onClick = {
-                    errorMessage = null
                     isLoading = true
                     scope.launch {
                         val success = viewModel.loginUser(email, password)
@@ -300,7 +366,7 @@ fun LoginScreen(
                         if (success) {
                             onLoginSuccess()
                         } else {
-                            errorMessage = "Login failed"
+                            hasError = true // Set error state
                         }
                     }
                 },
@@ -316,18 +382,11 @@ fun LoginScreen(
                 shape = RoundedCornerShape(buttonCornerRadius.dp),
                 enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                    )
-                } else {
-                    Text(
-                        "Log in",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
-                    )
-                }
+                Text(
+                    "Log in",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -340,16 +399,7 @@ fun LoginScreen(
                 modifier = Modifier.clickable { /* Handle forgot password */ },
             )
 
-            if (errorMessage != null) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = errorMessage!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(45.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
             Row(
                 modifier = Modifier.width(300.dp),
@@ -446,14 +496,3 @@ fun LoginScreen(
         }
     }
 }
-
-/* @Suppress("ktlint:standard:function-naming")
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
-@Composable
-fun LoginScreenPreview() {
-    Android3DicomTheme {
-        LoginScreen(
-            onLoginSuccess = {},
-        )
-    }
-} */

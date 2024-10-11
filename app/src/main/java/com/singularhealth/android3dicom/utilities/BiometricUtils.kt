@@ -13,7 +13,6 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
-import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
@@ -34,6 +33,9 @@ object BiometricUtils {
      *         [BiometricManager.BIOMETRIC_SUCCESS] - The device supports biometric authentication.
      *         [BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE] - The device does not have biometric hardware.
      *         [BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE] - Biometric hardware is currently unavailable.
+     *         [BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED] - No biometric credentials are enrolled.
+     *         [BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED] - A security vulnerability has been discovered.
+     *         [BiometricManager.BIOMETRIC_STATUS_UNKNOWN] - Unable to determine whether the user can authenticate.
      *         [BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED] - The device does not support the required features.
      */
     private fun hasBiometricCapability(context: Context): Int =
@@ -54,9 +56,9 @@ object BiometricUtils {
      *
      * @param activity The [FragmentActivity] context.
      * @param listener The listener for biometric authentication events.
+     * @param successListener A callback function to be called on successful authentication.
      * @return Configured [BiometricPrompt] instance.
      */
-    @Composable
     fun initBiometricPrompt(
         activity: FragmentActivity,
         listener: BiometricAuthListener,
@@ -104,6 +106,10 @@ object BiometricUtils {
         return biometricPrompt
     }
 
+    /**
+     * Initiates the biometric authentication process.
+     * Handles different scenarios such as biometric availability, hardware errors, and enrollment status.
+     */
     fun authenticate() {
         when (biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
@@ -132,6 +138,11 @@ object BiometricUtils {
         }
     }
 
+    /**
+     * Handles the result of a biometric enrollment attempt.
+     *
+     * @param result The [ActivityResult] containing the result of the enrollment attempt.
+     */
     fun onEnrolAttempt(result: ActivityResult) {
         if (result.resultCode == Activity.RESULT_OK) {
             Log.d("ENROL_INTENT", "Returned result from activity")
@@ -156,33 +167,11 @@ object BiometricUtils {
         description: String,
         negativeText: String,
     ): BiometricPrompt.PromptInfo =
-        setBiometricPromptInfo(
-            title,
-            description,
-            negativeText,
-        )
-
-    /**
-     * Sets up a BiometricPrompt.PromptInfo with the specified parameters.
-     *
-     * @param title The title to be displayed in the biometric prompt.
-     * @param description The description to be displayed in the biometric prompt.
-     * @param negativeText The text for the negative button in the biometric prompt.
-     * @return Configured [BiometricPrompt.PromptInfo] instance.
-     */
-    private fun setBiometricPromptInfo(
-        title: String,
-        description: String,
-        negativeText: String,
-    ): BiometricPrompt.PromptInfo {
-        promptInfo =
-            BiometricPrompt.PromptInfo
-                .Builder()
-                .setTitle(title)
-                .setDescription(description)
-                .setNegativeButtonText(negativeText)
-                .setConfirmationRequired(false)
-                .build()
-        return promptInfo
-    }
+        BiometricPrompt.PromptInfo
+            .Builder()
+            .setTitle(title)
+            .setDescription(description)
+            .setNegativeButtonText(negativeText)
+            .setConfirmationRequired(false)
+            .build()
 }

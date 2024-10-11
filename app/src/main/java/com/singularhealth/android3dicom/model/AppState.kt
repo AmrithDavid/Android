@@ -1,5 +1,6 @@
 package com.singularhealth.android3dicom.model
 
+import com.singularhealth.android3dicom.utilities.KeystorePinHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,6 +18,28 @@ enum class LoginPreferenceOption {
         // Returns the enum option matching a given string
         infix fun from(name: String): LoginPreferenceOption? = LoginPreferenceOption.values().firstOrNull { it.toString() == name }
     }
+}
+
+sealed class PinState {
+    object Initial : PinState()
+
+    object Loading : PinState()
+
+    object Valid : PinState()
+
+    object Success : PinState()
+
+    data class Error(
+        val errorState: ErrorState,
+    ) : PinState()
+}
+
+enum class ErrorState {
+    None,
+    PinTooShort,
+    PinsDoNotMatch,
+    IncorrectPin,
+    SaveFailed,
 }
 
 class AppState
@@ -45,11 +68,18 @@ class AppState
 
         init {
             // Checks for existing login preference stored in settings and loads if available
-            // Replace with equivalent logic but more concise
-            var storedLoginPref = runBlocking { _dataStore.getString(::_loginPreference.name) }
+            val storedLoginPref = runBlocking { _dataStore.getString(::_loginPreference.name) }
             if (storedLoginPref != null) {
-                var opt = LoginPreferenceOption from storedLoginPref
+                val opt = LoginPreferenceOption.from(storedLoginPref)
                 if (opt != null) _loginPreference = opt
             }
         }
+
+        fun isPinSet(): Boolean =
+            try {
+                KeystorePinHandler.isPinSet()
+            } catch (e: IllegalStateException) {
+                // KeystorePinHandler is not initialised, assume no PIN is set
+                false
+            }
     }
