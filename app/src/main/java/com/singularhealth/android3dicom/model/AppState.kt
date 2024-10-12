@@ -1,12 +1,12 @@
 package com.singularhealth.android3dicom.model
 
-import com.singularhealth.android3dicom.utilities.KeystorePinHandler
 import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
 import com.singularhealth.android3dicom.network.NetworkClient
+import com.singularhealth.android3dicom.utilities.KeystorePinHandler
 import com.singularhealth.android3dicom.view.ViewRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -156,7 +156,8 @@ class AppState
         fun logout() {
             appStateScope.launch {
                 dataStore.getInstance().edit { preferences ->
-                    // preferences.remove(stringPreferencesKey("access_token"))
+                    preferences.remove(stringPreferencesKey("username"))
+                    preferences.remove(stringPreferencesKey("password"))
                     preferences[booleanPreferencesKey("is_logged_in")] = false
                 }
                 Log.d(LOG_TAG, "User logged out")
