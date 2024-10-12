@@ -51,6 +51,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     var passwordVisible by remember { mutableStateOf(false) }
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
+    var hasError by remember { mutableStateOf(false) }
     // val scope = rememberCoroutineScope()
 
     val buttonCornerRadius = 8

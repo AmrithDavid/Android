@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,7 +15,6 @@ import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
-import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -47,7 +45,7 @@ enum class ViewRoute {
 fun NavigationGraph() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    // val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val searchQuery = remember { mutableStateOf("") }
 
     val appState: AppState =
@@ -59,7 +57,7 @@ fun NavigationGraph() {
 
     appState.setNavController(navController)
 
-    var startRoute = getStartRoute()
+    var startRoute = getStartRoute(appState)
     if (startRoute != ViewRoute.LOGIN.toString()) {
         appState.renewStoredLogin()
     }
@@ -135,7 +133,7 @@ fun NavigationGraph() {
                     navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.SCAN_LIBRARY.toString()) { inclusive = true }
                     }
-                }
+                },
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {
