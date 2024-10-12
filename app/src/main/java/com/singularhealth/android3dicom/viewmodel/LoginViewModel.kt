@@ -91,14 +91,6 @@ class LoginViewModel
             singularHealthRestService = retrofit.create(ISingularHealthRestService::class.java)
         }
 
-        /*suspend fun logout() {
-            dataStore.getInstance().edit { preferences ->
-                preferences.remove(stringPreferencesKey("access_token"))
-                preferences[booleanPreferencesKey("is_logged_in")] = false
-            }
-            Log.d("LoginViewModel", "User logged out")
-        }*/
-
         fun logoutUser() {
             appState.logout()
         }
@@ -137,15 +129,3 @@ class LoginViewModel
             Log.d("LoginViewModel", "Debug mode toggled. New value: ${_isDebugMode.value}")
         }
     }
-
-/*class LoginViewModelFactory(
-    private val context: Context,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return LoginViewModel() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}*/

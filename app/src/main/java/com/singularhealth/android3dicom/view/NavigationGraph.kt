@@ -137,7 +137,7 @@ fun NavigationGraph() {
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {
-            ImageDetailView(navController = navController)
+            ImageDetailView()
         }
         composable(ViewRoute.REPORT.toString()) {
             ReportView()
