@@ -3,12 +3,10 @@ package com.singularhealth.android3dicom.view
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +15,6 @@ import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
-import com.singularhealth.android3dicom.view.components.ShareView
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -48,7 +45,7 @@ enum class ViewRoute {
 fun NavigationGraph() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    // val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val searchQuery = remember { mutableStateOf("") }
 
     val appState: AppState =
@@ -58,18 +55,19 @@ fun NavigationGraph() {
                 IAppStateEntryPoint::class.java,
             ).appState()
 
+    appState.setNavController(navController)
+
+    var startRoute = getStartRoute(appState)
+    if (startRoute != ViewRoute.LOGIN.toString()) {
+        appState.renewStoredLogin()
+    }
+
     NavHost(
         navController = navController,
-        startDestination = getStartRoute(appState),
+        startDestination = startRoute,
     ) {
         composable(ViewRoute.LOGIN.toString()) {
-            LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(ViewRoute.LOGIN_SETUP.toString()) {
-                        popUpTo(ViewRoute.LOGIN.toString()) { inclusive = true }
-                    }
-                },
-            )
+            LoginScreen()
         }
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(
@@ -129,7 +127,6 @@ fun NavigationGraph() {
         }
         composable(ViewRoute.SCAN_LIBRARY.toString()) {
             ScanLibraryView(
-                navController = navController,
                 searchQuery = searchQuery,
                 onLogout = {
                     loginViewModel.logoutUser()
@@ -137,16 +134,16 @@ fun NavigationGraph() {
                         popUpTo(ViewRoute.SCAN_LIBRARY.toString()) { inclusive = true }
                     }
                 },
-                onImageButtonClick = {
-                    navController.navigate(ViewRoute.IMAGE_DETAIL.toString())
-                },
             )
         }
         composable(ViewRoute.IMAGE_DETAIL.toString()) {
             ImageDetailView(navController = navController)
         }
+        composable(ViewRoute.REPORT.toString()) {
+            ReportView()
+        }
         composable(ViewRoute.SHARE.toString()) {
-            ShareView(navController = navController)
+            ShareView()
         }
     }
 

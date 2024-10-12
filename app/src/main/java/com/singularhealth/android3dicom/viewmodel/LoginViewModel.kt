@@ -3,16 +3,14 @@ package com.singularhealth.android3dicom.viewmodel
 import android.content.Context
 import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
-import com.singularhealth.android3dicom.model.LoginRequest
-import com.singularhealth.android3dicom.network.ApiService
+import com.singularhealth.android3dicom.model.LoginPreferenceOption
+import com.singularhealth.android3dicom.network.ISingularHealthRestService
+import com.singularhealth.android3dicom.view.ViewRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,13 +18,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
 import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
@@ -37,8 +32,20 @@ class LoginViewModel
     constructor(
         private val appState: AppState,
     ) : ViewModel() {
-        private val apiService: ApiService
+        private val singularHealthRestService: ISingularHealthRestService
         private val dataStore = appState.dataStore
+
+        private val _isLoading = MutableStateFlow<Boolean>(false)
+        val isLoading: StateFlow<Boolean> get() = _isLoading
+
+        private val _errorMessage = MutableStateFlow<String>("")
+        val errorMessage: StateFlow<String> get() = _errorMessage
+
+        private val _email = MutableStateFlow<String>("")
+        val email: StateFlow<String> get() = _email
+
+        private val _password = MutableStateFlow<String>("")
+        val password: StateFlow<String> get() = _password
 
         companion object {
             // Set this to true to work on the login UI
@@ -81,58 +88,48 @@ class LoginViewModel
                     .client(client)
                     .build()
 
-            apiService = retrofit.create(ApiService::class.java)
+            singularHealthRestService = retrofit.create(ISingularHealthRestService::class.java)
         }
 
-        suspend fun loginUser(
-            email: String,
-            password: String,
-        ): Boolean =
-            withContext(Dispatchers.IO) {
-                try {
-                    val loginRequest = LoginRequest(email, password)
-                    Log.d("LoginViewModel", "Sending login request: $loginRequest")
-                    val response = apiService.login(loginRequest)
-                    Log.d("LoginViewModel", "Received response: $response")
-
-                    if (response.access_token != null) {
-                        // Save the access token
-                        dataStore.getInstance().edit { preferences ->
-                            preferences[stringPreferencesKey("access_token")] = response.access_token
-                            preferences[booleanPreferencesKey("is_logged_in")] = true
-                        }
-                        Log.d("LoginViewModel", "Login successful, token saved")
-                        true
-                    } else {
-                        Log.e("LoginViewModel", "Login failed: No access token in response")
-                        false
-                    }
-                } catch (e: Exception) {
-                    Log.e("LoginViewModel", "Error during login", e)
-                    when (e) {
-                        is IOException -> Log.e("LoginViewModel", "Network error: ${e.message}")
-                        is HttpException -> {
-                            val errorBody = e.response()?.errorBody()?.string()
-                            Log.e("LoginViewModel", "HTTP error ${e.code()}: $errorBody")
-                        }
-                        else -> Log.e("LoginViewModel", "Unexpected error: ${e.message}")
-                    }
-                    false
-                }
-            }
-
-        suspend fun logout() {
+        /*suspend fun logout() {
             dataStore.getInstance().edit { preferences ->
                 preferences.remove(stringPreferencesKey("access_token"))
                 preferences[booleanPreferencesKey("is_logged_in")] = false
             }
             Log.d("LoginViewModel", "User logged out")
-        }
+        }*/
 
         fun logoutUser() {
-            viewModelScope.launch {
-                logout()
+            appState.logout()
+        }
+
+        private fun onLoginComplete(isSuccess: Boolean) {
+            _isLoading.value = false
+            if (isSuccess) {
+                if (appState.loginPreference == LoginPreferenceOption.NONE) {
+                    appState.navigateTo(ViewRoute.LOGIN_SETUP)
+                } else {
+                    appState.navigateTo(ViewRoute.SCAN_LIBRARY)
+                }
+            } else {
+                _errorMessage.value = "Login failed"
             }
+        }
+
+        fun onLoginPressed() {
+            _errorMessage.value = ""
+            _isLoading.value = true
+            viewModelScope.launch {
+                appState.login(email.value, password.value) { onLoginComplete(it) }
+            }
+        }
+
+        fun onEmailChanged(value: String) {
+            _email.value = value
+        }
+
+        fun onPasswordChanged(value: String) {
+            _password.value = value
         }
 
         fun toggleDebugMode() {

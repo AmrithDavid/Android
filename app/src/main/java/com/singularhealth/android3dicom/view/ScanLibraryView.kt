@@ -19,7 +19,6 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
@@ -32,10 +31,8 @@ import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 @Composable
 fun ScanLibraryView(
     viewModel: ScanLibraryViewModel = hiltViewModel(),
-    navController: NavController,
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
-    onImageButtonClick: () -> Unit,
 ) {
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
@@ -85,8 +82,7 @@ fun ScanLibraryView(
         if (filteredCards.isNotEmpty()) {
             CardList(
                 modifier = Modifier.padding(innerPadding),
-                patientCards = filteredCards,
-                onImageButtonClick = { onImageButtonClick() },
+                patientCards = filteredCards
             )
         } else {
             EmptyStateView()
@@ -180,7 +176,6 @@ fun ScanLibraryView(
 fun CardList(
     modifier: Modifier = Modifier,
     patientCards: List<PatientCardData>,
-    onImageButtonClick: () -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -190,7 +185,6 @@ fun CardList(
         items(patientCards.size) { index ->
             ScanCard(
                 patientCardData = patientCards[index],
-                onImageButtonClick = onImageButtonClick,
             )
         }
     }
@@ -204,10 +198,8 @@ fun ScanScreenPreview() {
         val searchQuery = remember { mutableStateOf("") }
 
         ScanLibraryView(
-            navController = navController,
             searchQuery = searchQuery,
             onLogout = {}, // Add this line
-            onImageButtonClick = {},
         )
     }
 }

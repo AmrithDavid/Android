@@ -1,6 +1,5 @@
 package com.singularhealth.android3dicom.di
 
-import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.DataStoreRepository
 import com.singularhealth.android3dicom.network.NetworkClient
 import dagger.Module
@@ -11,11 +10,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppStateModule {
+object NetworkClientModule {
     @Singleton
     @Provides
-    fun provideAppState(
-        dataStoreRepository: DataStoreRepository,
-        networkClient: NetworkClient,
-    ): AppState = AppState(dataStoreRepository, networkClient)
+    fun provideNetworkClient(dataStoreRepository: DataStoreRepository): NetworkClient = NetworkClient(dataStoreRepository)
 }

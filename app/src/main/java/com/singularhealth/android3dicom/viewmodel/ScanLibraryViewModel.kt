@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
 import com.singularhealth.android3dicom.model.PatientCardData
+import com.singularhealth.android3dicom.model.ScanModel
 import com.singularhealth.android3dicom.utilities.CacheManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,31 @@ class ScanLibraryViewModel
         }
 
         private fun loadPatientCards() {
-            _patientCards.value = generateDummyData()
+            // _patientCards.value = generateDummyData()
+            // Register for update from AppState when new scans are available
+            appState.setOnScansReceivedListener { processScanData(it) }
+            // Load scans manually in case they are already available
+            if (appState.isLoggedIn()) {
+                appState.getScans { processScanData(it) }
+            }
+        }
+
+        private fun processScanData(scanList: List<ScanModel>) {
+            var cards: MutableList<PatientCardData> = mutableListOf()
+            scanList.forEach {
+                cards.add(
+                    PatientCardData(
+                        patientName = it.patientName,
+                        date = it.date,
+                        patientId = it.patientID,
+                        modality = it.modality,
+                        expiresIn = it.expiresIn,
+                        fileName = it.imageName,
+                        scanData = it,
+                    ),
+                )
+            }
+            _patientCards.value = cards
         }
 
         private fun generateDummyData(): List<PatientCardData> =
@@ -63,6 +88,7 @@ class ScanLibraryViewModel
                     modality = "CT",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "Luna Shin",
@@ -71,6 +97,7 @@ class ScanLibraryViewModel
                     modality = "Xray",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "testing name",
@@ -79,6 +106,7 @@ class ScanLibraryViewModel
                     modality = "CT",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
                 PatientCardData(
                     patientName = "choco",
@@ -87,6 +115,7 @@ class ScanLibraryViewModel
                     modality = "3D",
                     expiresIn = "7 days",
                     fileName = "patient_image",
+                    scanData = null,
                 ),
             )
 

@@ -1,7 +1,6 @@
 package com.singularhealth.android3dicom.view.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,26 +22,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.model.PatientCardData
 import com.singularhealth.android3dicom.ui.theme.DividerColor
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
+import com.singularhealth.android3dicom.viewmodel.ScanCardViewModel
 
 @Suppress("ktlint:standard:function-naming")
 // ScanCard is a composable function that represents a single card in the list
 @Composable
 fun ScanCard(
+    viewModel: ScanCardViewModel = hiltViewModel(),
     patientCardData: PatientCardData,
-    onImageButtonClick: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) {
+        viewModel.data = patientCardData
+    }
+
     Card(
         modifier =
             Modifier
@@ -70,7 +75,7 @@ fun ScanCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top,
             ) {
-                Image(
+                /*Image(
                     painter =
                         painterResource(
                             id =
@@ -87,7 +92,7 @@ fun ScanCard(
                             .height(125.dp)
                             .clip(RoundedCornerShape(4.dp)),
                     contentScale = ContentScale.Fit,
-                )
+                )*/
 
                 Column(
                     modifier =
@@ -152,7 +157,13 @@ fun ScanCard(
                     )
                 buttonData.forEachIndexed { index, (text, iconRes, contentDescription) ->
                     OutlinedButton(
-                        onClick = { if (index == 0) onImageButtonClick() },
+                        onClick = {
+                            when (index) {
+                                0 -> viewModel.onImages()
+                                1 -> viewModel.onReport()
+                                2 -> viewModel.onShare()
+                            }
+                        },
                         modifier =
                             Modifier
                                 .weight(1f)
