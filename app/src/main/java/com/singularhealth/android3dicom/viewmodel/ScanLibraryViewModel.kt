@@ -153,7 +153,9 @@ class ScanLibraryViewModel
         }
 
         fun onAboutClick() {
-            // Implement about action
+            viewModelScope.launch{
+
+            }
             toggleSideMenu()
         }
 
