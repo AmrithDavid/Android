@@ -88,7 +88,7 @@ fun ScanLibraryView(
                     card.fileName.contains(searchQuery.value, ignoreCase = true)
             }
 
-        if (filteredCards.isNotEmpty()) {
+        if (!filteredCards.isNotEmpty()) {
             CardList(
                 modifier = Modifier.padding(innerPadding),
                 patientCards = filteredCards
