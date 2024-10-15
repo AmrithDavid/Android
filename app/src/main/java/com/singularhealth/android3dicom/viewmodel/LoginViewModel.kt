@@ -47,6 +47,9 @@ class LoginViewModel
         private val _password = MutableStateFlow<String>("")
         val password: StateFlow<String> get() = _password
 
+        private val _hasError = MutableStateFlow(false)
+        val hasError: StateFlow<Boolean> = _hasError.asStateFlow()
+
         companion object {
             // Set this to true to work on the login UI
             private const val FORCE_LOGIN_SCREEN = false
@@ -99,12 +102,13 @@ class LoginViewModel
             _isLoading.value = false
             if (isSuccess) {
                 if (appState.loginPreference == LoginPreferenceOption.NONE) {
+                    _hasError.value = false
                     appState.navigateTo(ViewRoute.LOGIN_SETUP)
                 } else {
                     appState.navigateTo(ViewRoute.SCAN_LIBRARY)
                 }
             } else {
-                _errorMessage.value = "Login failed"
+                _hasError.value = true
             }
         }
 
@@ -114,6 +118,11 @@ class LoginViewModel
             viewModelScope.launch {
                 appState.login(email.value, password.value) { onLoginComplete(it) }
             }
+        }
+
+        fun resetErrorState() {
+            _hasError.value = false
+            _errorMessage.value = ""
         }
 
         fun onEmailChanged(value: String) {

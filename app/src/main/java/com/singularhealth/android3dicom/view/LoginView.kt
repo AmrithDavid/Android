@@ -1,4 +1,4 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
+@file:Suppress("ktlint:standard:import-ordering", "ktlint:standard:no-wildcard-imports")
 
 package com.singularhealth.android3dicom.view
 
@@ -47,11 +47,12 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     val password by viewModel.password.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val hasError by viewModel.hasError.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
-    var hasError by remember { mutableStateOf(false) }
+
     // val scope = rememberCoroutineScope()
 
     val buttonCornerRadius = 8
@@ -231,7 +232,10 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { viewModel.onEmailChanged(it) },
+                onValueChange = {
+                    viewModel.onEmailChanged(it)
+                    viewModel.resetErrorState()
+                },
                 label = { Text("Email") },
                 singleLine = true,
                 modifier =
