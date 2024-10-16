@@ -27,6 +27,7 @@ import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
 import com.singularhealth.android3dicom.view.components.LoadingSpinner
+import com.singularhealth.android3dicom.view.components.SupportDialog
 import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
 @Suppress("ktlint:standard:function-naming")
@@ -54,8 +55,6 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
     // only one UI is displayed at a time
     var currentView by remember { mutableStateOf("None") }
     val isInitialLoading by viewModel.isInitialLoading.collectAsState()
-
-    val context = LocalContext.current
 
     Android3DicomTheme {
         Column(
@@ -169,90 +168,13 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 },
             )
         }
-
-        // Support Dialog
-        if (showSupportDialog) {
-            AlertDialog(
-                onDismissRequest = { showSupportDialog = false },
-                title = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_support),
-                            contentDescription = "Support",
-                            tint = Color.Black,
-                            modifier = Modifier.size(32.dp),
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Visit the customer support website?",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .width(232.dp)
-                                .height(50.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                },
-                text = {
-                    Text(
-                        "Got a question or need some help? We are here to help.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .width(232.dp)
-                            .height(36.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Left,
-                        lineHeight = 15.sp,
-                    )
-                },
-                confirmButton = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .width(144.dp)
-                            .height(36.dp),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        TextButton(onClick = { showSupportDialog = false }) {
-                            Text(
-                                "Cancel",
-                                color = Color(0xFF606066),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                        TextButton(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/knowledgebase"))
-                                showSupportDialog = false
-                                context.startActivity(intent)
-                            },
-                        ) {
-                            Text(
-                                "OK",
-                                color = Color(0xFF50A5DE),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                    }
-                },
-                properties = DialogProperties(
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = true,
-                ),
-                shape = RoundedCornerShape(16.dp),
-                containerColor = Color.White,
-                modifier = Modifier
-                    .width(280.dp)
-                    .height(252.dp),
-            )
-        }
     }
+
+    // Use the new SupportDialog component
+    SupportDialog(
+        showDialog = showSupportDialog,
+        onDismiss = { showSupportDialog = false }
+    )
 }
 
 @Composable
