@@ -79,7 +79,7 @@ fun EmptyStateView() {
 
             Button(
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com"))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://my.3dicomviewer.com/"))
                     context.startActivity(intent)  // Launch the browser with the given URL
                 },
 
