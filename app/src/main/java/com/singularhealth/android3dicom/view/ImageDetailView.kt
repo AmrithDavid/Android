@@ -1,9 +1,5 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
 package com.singularhealth.android3dicom.view
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,52 +10,44 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
+import com.singularhealth.android3dicom.ui.theme.LightBlue
+import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 import com.singularhealth.android3dicom.view.components.ImageDetailOptionsMenu
 import com.singularhealth.android3dicom.view.components.LoadingSpinner
 import com.singularhealth.android3dicom.view.components.SupportDialog
 import com.singularhealth.android3dicom.viewmodel.ImageDetailViewModel
 
-@Suppress("ktlint:standard:function-naming")
 @Composable
 fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
+    // State variables
     var showDropdown by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
+    var showMoreInfoDialog by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
-    var showDisplayUI by remember { mutableStateOf(false) }
-    var showWindowingUI by remember { mutableStateOf(false) }
-    var showSlicerUI by remember { mutableStateOf(false) }
+    var currentView by remember { mutableStateOf("None") }
 
-    // Shared slider state variables for Display UI
+    // Shared slider state variables
     var displayBrightness by remember { mutableStateOf(0.5f) }
     var displayContrast by remember { mutableStateOf(0.5f) }
     var displayOpacity by remember { mutableStateOf(0.5f) }
-
-    // Shared slider state variables for Windowing and Slicer UIs
     var windowingRange by remember { mutableStateOf(30f..70f) }
-
     var slicerTransverse by remember { mutableStateOf(30f..70f) }
     var slicerSagittal by remember { mutableStateOf(30f..70f) }
     var slicerCoronal by remember { mutableStateOf(30f..70f) }
 
-    // only one UI is displayed at a time
-    var currentView by remember { mutableStateOf("None") }
     val isInitialLoading by viewModel.isInitialLoading.collectAsState()
 
     Android3DicomTheme {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             ImageDetailTopBar(
                 selectedButton = selectedButton,
                 onButtonSelected = { selectedButton = it },
@@ -68,7 +56,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 onSagittalClick = { viewModel.onSagittalClick() },
                 onCoronalClick = { viewModel.onCoronalClick() },
                 onMoreClick = { showDropdown = true },
-                onBackClick = { viewModel.onBack() },
+                onBackClick = { viewModel.onBack() }
             )
 
             // Content area
@@ -76,25 +64,22 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 0.dp),
+                    .padding(vertical = 16.dp, horizontal = 0.dp)
             ) {
                 if (isInitialLoading) {
-                    LoadingSpinner(
-                        modifier = Modifier.align(Alignment.Center),
-                    )
+                    LoadingSpinner(modifier = Modifier.align(Alignment.Center))
                 } else {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Text(
                             text = "Scan Image goes here",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
 
-                    // Conditionally display the Display UI
                     when (currentView) {
                         "Display" -> DisplayUI(
                             brightnessValue = displayBrightness,
@@ -106,7 +91,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .fillMaxWidth()
-                                .offset(y = 16.dp),
+                                .offset(y = 16.dp)
                         )
                         "Windowing" -> WindowingUI(
                             sliderRange = windowingRange,
@@ -114,7 +99,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .fillMaxWidth()
-                                .offset(y = 16.dp),
+                                .offset(y = 16.dp)
                         )
                         "Slicer" -> SlicerUI(
                             transverseValue = slicerTransverse,
@@ -126,7 +111,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .fillMaxWidth()
-                                .offset(y = 16.dp),
+                                .offset(y = 16.dp)
                         )
                     }
 
@@ -134,7 +119,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .offset(y = (-76).dp),
+                            .offset(y = (-76).dp)
                     ) {
                         ImageDetailOptionsMenu(
                             expanded = showDropdown,
@@ -142,7 +127,10 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                             onItemClick = { selectedOption ->
                                 when (selectedOption) {
                                     "Share" -> viewModel.onShare()
-                                    "More Info" -> viewModel.onMoreInfo()
+                                    "More Info" -> {
+                                        showMoreInfoDialog = true
+                                        showDropdown = false
+                                    }
                                     "Delete" -> viewModel.onDelete()
                                     "Report" -> viewModel.onReport()
                                     "Support" -> {
@@ -150,7 +138,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                         showDropdown = false
                                     }
                                 }
-                            },
+                            }
                         )
                     }
                 }
@@ -165,16 +153,97 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 },
                 onSlicerClick = {
                     currentView = if (currentView == "Slicer") "None" else "Slicer"
-                },
+                }
             )
         }
     }
 
-    // Use the new SupportDialog component
+    // Support Dialog
     SupportDialog(
         showDialog = showSupportDialog,
         onDismiss = { showSupportDialog = false }
     )
+
+    // More Info Dialog
+    if (showMoreInfoDialog) {
+        Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
+            Box(
+                modifier = Modifier
+                    .size(width = 280.dp, height = 273.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_info),
+                        contentDescription = "Information",
+                        tint = Color.Black,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Study description",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        InfoRow("Date added:", "dd/mm/yyyy")
+                        InfoRow("Image count:", "257")
+                        InfoRow("Series description:", "Chest")
+                        InfoRow("Series number:", "3")
+                        InfoRow("Instance ID:", "1.2.3.4.5.6.789")
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        TextButton(
+                            onClick = { showMoreInfoDialog = false },
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = LightBlue
+                            )
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 1.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = SubheadingColor
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = SubheadingColor
+        )
+    }
 }
 
 @Composable
