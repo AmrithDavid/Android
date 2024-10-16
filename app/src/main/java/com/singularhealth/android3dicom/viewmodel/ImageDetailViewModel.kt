@@ -38,6 +38,10 @@ class ImageDetailViewModel
         private val _isInitialLoading = MutableStateFlow(true)
         val isInitialLoading: StateFlow<Boolean> = _isInitialLoading.asStateFlow()
 
+        // Add a state flow to manage the delete dialog visibility
+        private val _showDeleteDialog = MutableStateFlow(false)
+        val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog.asStateFlow()
+
         init {
             loadInitialView()
         }
@@ -97,6 +101,11 @@ class ImageDetailViewModel
 
         fun onCoronalClick() {
             Log.d("ImageDetailViewModel", "Selected Coronal tab")
+        }
+
+        // Toggle delete dialog visibility
+        fun showDeleteDialog(show: Boolean) {
+            _showDeleteDialog.value = show
         }
 
         // Bottom panel controls callback functions

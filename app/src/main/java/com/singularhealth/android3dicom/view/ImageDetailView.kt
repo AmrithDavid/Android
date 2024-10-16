@@ -37,7 +37,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
     var showMoreInfoDialog by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
     var currentView by remember { mutableStateOf("None") }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
 
     // Shared slider state variables
     var displayBrightness by remember { mutableStateOf(0.5f) }
@@ -212,10 +212,10 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
             // Show the delete confirmation dialog
             if (showDeleteDialog) {
                 DeleteConfirmationDialog(
-                    onDismiss = { showDeleteDialog = false },
+                    onDismiss = { viewModel.showDeleteDialog(false) },
                     onConfirmDelete = {
                         viewModel.onDelete()
-                        showDeleteDialog = false
+                        viewModel.showDeleteDialog(false)
                     }
                 )
             }
