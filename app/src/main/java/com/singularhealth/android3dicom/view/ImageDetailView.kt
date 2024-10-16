@@ -211,10 +211,12 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
 
             // Show the delete confirmation dialog
             if (showDeleteDialog) {
+                println("View: showing dialog")
                 DeleteConfirmationDialog(
                     onDismiss = { viewModel.showDeleteDialog(false) },
                     onConfirmDelete = {
-                        viewModel.onDelete()
+                        println("View: confirming delete")
+                        viewModel.deleteScan()  // Trigger the delete function in the ViewModel
                         viewModel.showDeleteDialog(false)
                     }
                 )
@@ -268,7 +270,9 @@ fun DeleteConfirmationDialog(
                         Text("Cancel", color = Color(0xFF606066))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = {
+                        onConfirmDelete()
+                    }) {
                         Text("Delete", color = Color(0xFF50A5DE))
                     }
                 }

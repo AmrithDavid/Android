@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
+import com.singularhealth.android3dicom.network.NetworkClient
 import com.singularhealth.android3dicom.view.ViewRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,6 +20,7 @@ class ImageDetailViewModel
     @Inject
     constructor(
         private var appState: AppState,
+        private val networkClient: NetworkClient,
     ) : ViewModel() {
         enum class WindowingPreset {
             CUSTOM,
@@ -107,6 +109,29 @@ class ImageDetailViewModel
         fun showDeleteDialog(show: Boolean) {
             _showDeleteDialog.value = show
         }
+
+        // Perform scan deletion
+        fun deleteScan() {
+            appState.deleteScan { success ->
+                if (success) {
+                    println("ImageDetailViewModel: Scan deleted successfully")
+                    appState.navigateBack() // Navigate back after deletion
+                } else {
+                    println("ImageDetailViewModel: Failed to delete scan")
+                }
+            }
+        }
+
+//        fun deleteScan(scanFileName: String) {
+//            viewModelScope.launch {
+//                val success = networkClient.fetchAndDeleteScan(scanFileName)
+//                if (success) {
+//                    println("ImageDetailViewModel: Scan deleted successfully")
+//                } else {
+//                    println("ImageDetailViewModel: Failed to delete scan")
+//                }
+//            }
+//        }
 
         // Bottom panel controls callback functions
         fun onBrightnessSliderUpdate(value: Float) {
