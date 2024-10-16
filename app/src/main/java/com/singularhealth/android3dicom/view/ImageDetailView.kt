@@ -17,6 +17,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.Android3DicomTheme
@@ -35,6 +37,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
     var showMoreInfoDialog by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
     var currentView by remember { mutableStateOf("None") }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Shared slider state variables
     var displayBrightness by remember { mutableStateOf(0.5f) }
@@ -205,7 +208,169 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                     currentView = if (currentView == "Slicer") "None" else "Slicer"
                 },
             )
+
+            // Show the delete confirmation dialog
+            if (showDeleteDialog) {
+                DeleteConfirmationDialog(
+                    onDismiss = { showDeleteDialog = false },
+                    onConfirmDelete = {
+                        viewModel.onDelete()
+                        showDeleteDialog = false
+                    }
+                )
+            }
         }
+    }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .size(width = 280.dp, height = 240.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_delete),
+                    contentDescription = "Delete",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color(0xFF1D1D1F)
+                )
+                Text(
+                    text = "Delete scan?",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Deleting this scan will mean it is no longer accessible on this device or through the web portal.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
+                    textAlign = TextAlign.Left,
+                    lineHeight = 15.sp
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ){
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", color = Color(0xFF606066))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextButton(onClick = onDismiss) {
+                        Text("Delete", color = Color(0xFF50A5DE))
+                    }
+                }
+
+            }
+        }
+    }
+
+    // Support Dialog
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { showSupportDialog = false },
+            context = LocalContext.current,
+        )
+    }
+
+    // More Info Dialog
+    if (showMoreInfoDialog) {
+        Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(width = 280.dp, height = 273.dp)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(24.dp),
+                        ),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_info),
+                        contentDescription = "Information",
+                        tint = Color.Black,
+                        modifier = Modifier.size(32.dp),
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Study description",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        InfoRow("Date added:", "dd/mm/yyyy")
+                        InfoRow("Image count:", "257")
+                        InfoRow("Series description:", "Chest")
+                        InfoRow("Series number:", "3")
+                        InfoRow("Instance ID:", "1.2.3.4.5.6.789")
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        TextButton(
+                            onClick = { showMoreInfoDialog = false },
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            colors =
+                                ButtonDefaults.textButtonColors(
+                                    contentColor = LightBlue,
+                                ),
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    label: String,
+    value: String,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = SubheadingColor,
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = SubheadingColor,
+        )
     }
 
     // Support Dialog
