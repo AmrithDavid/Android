@@ -62,7 +62,10 @@ fun ImageDetailOptionsMenu(
                         )
                     }
                 },
-                onClick = { onItemClick(text) },
+                onClick = {
+                    onItemClick(text)
+                    onDismissRequest()
+                },
             )
         }
     }
