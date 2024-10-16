@@ -40,12 +40,31 @@ class ScanLibraryViewModel
         private val _isClearingCache = MutableStateFlow(false)
         val isClearingCache: StateFlow<Boolean> = _isClearingCache.asStateFlow()
 
+        // New state flows for managing dialog visibility
+        private val _showAboutDialog = MutableStateFlow(false)
+        val showAboutDialog: StateFlow<Boolean> = _showAboutDialog.asStateFlow()
+
+        private val _showSupportDialog = MutableStateFlow(false)
+        val showSupportDialog: StateFlow<Boolean> = _showSupportDialog.asStateFlow()
+
         init {
             viewModelScope.launch {
                 loadData()
                 _dataLoaded.value = true
             }
         }
+
+        // Method to toggle About dialog visibility
+        fun showAboutDialog(show: Boolean) {
+            _showAboutDialog.value = show
+        }
+
+        // Method to toggle Support dialog visibility
+        fun showSupportDialog(show: Boolean) {
+            _showSupportDialog.value = show
+        }
+
+
 
         fun loadData() {
             _isBiometricLoginActive.value = appState.loginPreference == LoginPreferenceOption.BIOMETRIC
@@ -152,20 +171,20 @@ class ScanLibraryViewModel
             toggleSideMenu()
         }
 
-        fun onAboutClick() {
-            viewModelScope.launch{
-
-            }
-            toggleSideMenu()
-        }
-
-        fun onSupportClick() {
-            // Implement support action
-            toggleSideMenu()
-        }
-
         fun onLogoutClick() {
             // Implement logout action
             toggleSideMenu()
+        }
+
+        fun onAboutClick() {
+            // Show the About dialog when this function is called
+            _showAboutDialog.value = true
+            toggleSideMenu()  // Close side menu
+        }
+
+        fun onSupportClick() {
+            // Show the Support dialog when this function is called
+            _showSupportDialog.value = true
+            toggleSideMenu()  // Close side menu
         }
     }

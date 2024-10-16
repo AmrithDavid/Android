@@ -46,8 +46,10 @@ fun ScanLibraryView(
     val isBiometricEnabled by viewModel.isBiometricLoginActive.collectAsState()
     var showClearCacheDialog by remember { mutableStateOf(false) }
     val isClearingCache by viewModel.isClearingCache.collectAsStateWithLifecycle()
-    var showAboutDialog by remember { mutableStateOf(false) }  // About dialog state
-    var showSupportDialog by remember { mutableStateOf(false) } // Support dialog state
+
+    // Observe state from ViewModel
+    val showAboutDialog by viewModel.showAboutDialog.collectAsState()
+    val showSupportDialog by viewModel.showSupportDialog.collectAsState()
 
     // Control system UI color
     val view = LocalView.current
@@ -100,9 +102,9 @@ fun ScanLibraryView(
     if (isSideMenuVisible) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x52000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x52000000)),
         )
     }
 
@@ -113,8 +115,8 @@ fun ScanLibraryView(
             onHomeClick = { viewModel.onHomeClick() },
             onClearCacheClick = { showClearCacheDialog = true },
             onBiometricClick = { viewModel.onBiometricClick() },
-            onAboutClick = { showAboutDialog = true },
-            onSupportClick = { showSupportDialog = true },
+            onAboutClick = { viewModel.onAboutClick() },
+            onSupportClick = { viewModel.onSupportClick() },
             onLogoutClick = { showLogoutDialog = true },
             isBiometricEnabled = isBiometricEnabled,
         )
@@ -123,14 +125,14 @@ fun ScanLibraryView(
     // Show About dialog
     if (showAboutDialog) {
         AboutDialog(
-            onDismissRequest = { showAboutDialog = false }
+            onDismissRequest = { viewModel.showAboutDialog(false) }
         )
     }
 
     // Show Support dialog
     if (showSupportDialog) {
         SupportDialog(
-            onDismissRequest = { showSupportDialog = false },
+            onDismissRequest = { viewModel.showSupportDialog(false) },
             context = context
         )
     }
@@ -160,9 +162,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x80000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
@@ -184,9 +186,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x80000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
