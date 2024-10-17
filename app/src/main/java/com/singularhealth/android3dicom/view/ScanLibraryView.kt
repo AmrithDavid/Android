@@ -3,6 +3,8 @@
 package com.singularhealth.android3dicom.view
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,8 @@ fun ScanLibraryView(
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
 ) {
+
+    val context = LocalContext.current // Get context here
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
     val isSideMenuVisible by viewModel.isSideMenuVisible.collectAsState()
@@ -41,6 +46,10 @@ fun ScanLibraryView(
     val isBiometricEnabled by viewModel.isBiometricLoginActive.collectAsState()
     var showClearCacheDialog by remember { mutableStateOf(false) }
     val isClearingCache by viewModel.isClearingCache.collectAsStateWithLifecycle()
+
+    // Observe state from ViewModel
+    val showAboutDialog by viewModel.showAboutDialog.collectAsState()
+    val showSupportDialog by viewModel.showSupportDialog.collectAsState()
 
     // Control system UI color
     val view = LocalView.current
@@ -93,9 +102,9 @@ fun ScanLibraryView(
     if (isSideMenuVisible) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x52000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x52000000)),
         )
     }
 
@@ -110,6 +119,21 @@ fun ScanLibraryView(
             onSupportClick = { viewModel.onSupportClick() },
             onLogoutClick = { showLogoutDialog = true },
             isBiometricEnabled = isBiometricEnabled,
+        )
+    }
+
+    // Show About dialog
+    if (showAboutDialog) {
+        AboutDialog(
+            onDismissRequest = { viewModel.showAboutDialog(false) }
+        )
+    }
+
+    // Show Support dialog
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { viewModel.showSupportDialog(false) },
+            context = context
         )
     }
 
@@ -138,9 +162,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x80000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
@@ -162,9 +186,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0x80000000)),
+            Modifier
+                .fillMaxSize()
+                .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
