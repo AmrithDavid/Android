@@ -2,6 +2,8 @@
 
 package com.singularhealth.android3dicom.view.components
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +31,9 @@ import com.singularhealth.android3dicom.ui.theme.WebPortalBlue
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun EmptyStateView() {
+
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter,
@@ -72,7 +78,12 @@ fun EmptyStateView() {
             )
 
             Button(
-                onClick = { /* TODO: Handle button click */ },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://my.3dicomviewer.com/"))
+                    context.startActivity(intent)  // Launch the browser with the given URL
+                },
+
+
                 colors = ButtonDefaults.buttonColors(containerColor = WebPortalBlue),
                 shape = RoundedCornerShape(8.dp),
             ) {
