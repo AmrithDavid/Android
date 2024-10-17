@@ -16,36 +16,38 @@ import androidx.compose.ui.window.Dialog
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.SubheadingColor
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun SupportDialog(
     onDismissRequest: () -> Unit,
-    context: Context
-
+    context: Context,
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
-            modifier = Modifier
-                .size(width = 280.dp, height = 252.dp),
+            modifier =
+                Modifier
+                    .size(width = 280.dp, height = 252.dp),
             shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_support),
                     contentDescription = "Support",
                     modifier = Modifier.size(24.dp),
-                    tint = Color(0xFF1D1D1F)
+                    tint = Color(0xFF1D1D1F),
                 )
                 Text(
                     text = "Visit the customer support website?",
                     style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 Text(
                     text = "Got a question or need some help? We are here to help.",
@@ -54,20 +56,20 @@ fun SupportDialog(
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ){
+                    horizontalArrangement = Arrangement.End,
+                ) {
                     TextButton(onClick = onDismissRequest) {
                         Text("Cancel", color = Color(0xFF606066))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     TextButton(onClick = {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/knowledgebase"))
+                        onDismissRequest()
                         context.startActivity(intent) // Use context to start the activity
                     }) {
                         Text("OK", color = Color(0xFF50A5DE))
                     }
                 }
-
             }
         }
     }
