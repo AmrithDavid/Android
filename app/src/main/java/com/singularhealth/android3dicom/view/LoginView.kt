@@ -2,6 +2,8 @@
 
 package com.singularhealth.android3dicom.view
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -384,17 +386,20 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.labelLarge,
                 color = DarkBlue,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/pricing/"))
-                    context.startActivity(intent) // Launch the browser with the URL
-                },
+                modifier =
+                    Modifier.clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/pricing/"))
+                        context.startActivity(intent) // Launch the browser with the URL
+                    },
             )
         }
     }
 
     // Use the new SupportDialog component
-    SupportDialog(
-        showDialog = showSupportDialog,
-        onDismiss = { showSupportDialog = false },
-    )
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { showSupportDialog = false },
+            context = LocalContext.current,
+        )
+    }
 }

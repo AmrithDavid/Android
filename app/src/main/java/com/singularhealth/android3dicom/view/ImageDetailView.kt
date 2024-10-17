@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,15 +57,16 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 onSagittalClick = { viewModel.onSagittalClick() },
                 onCoronalClick = { viewModel.onCoronalClick() },
                 onMoreClick = { showDropdown = true },
-                onBackClick = { viewModel.onBack() }
+                onBackClick = { viewModel.onBack() },
             )
 
             // Content area
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 0.dp)
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 0.dp),
             ) {
                 if (isInitialLoading) {
                     LoadingSpinner(modifier = Modifier.align(Alignment.Center))
@@ -72,54 +74,61 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         Text(
                             text = "Scan Image goes here",
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
 
                     when (currentView) {
-                        "Display" -> DisplayUI(
-                            brightnessValue = displayBrightness,
-                            onBrightnessChange = { displayBrightness = it },
-                            contrastValue = displayContrast,
-                            onContrastChange = { displayContrast = it },
-                            opacityValue = displayOpacity,
-                            onOpacityChange = { displayOpacity = it },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth()
-                                .offset(y = 16.dp)
-                        )
-                        "Windowing" -> WindowingUI(
-                            sliderRange = windowingRange,
-                            onRangeChange = { windowingRange = it },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth()
-                                .offset(y = 16.dp)
-                        )
-                        "Slicer" -> SlicerUI(
-                            transverseValue = slicerTransverse,
-                            onTransverseChange = { slicerTransverse = it },
-                            sagittalValue = slicerSagittal,
-                            onSagittalChange = { slicerSagittal = it },
-                            coronalValue = slicerCoronal,
-                            onCoronalChange = { slicerCoronal = it },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth()
-                                .offset(y = 16.dp)
-                        )
+                        "Display" ->
+                            DisplayUI(
+                                brightnessValue = displayBrightness,
+                                onBrightnessChange = { displayBrightness = it },
+                                contrastValue = displayContrast,
+                                onContrastChange = { displayContrast = it },
+                                opacityValue = displayOpacity,
+                                onOpacityChange = { displayOpacity = it },
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .offset(y = 16.dp),
+                            )
+                        "Windowing" ->
+                            WindowingUI(
+                                sliderRange = windowingRange,
+                                onRangeChange = { windowingRange = it },
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .offset(y = 16.dp),
+                            )
+                        "Slicer" ->
+                            SlicerUI(
+                                transverseValue = slicerTransverse,
+                                onTransverseChange = { slicerTransverse = it },
+                                sagittalValue = slicerSagittal,
+                                onSagittalChange = { slicerSagittal = it },
+                                coronalValue = slicerCoronal,
+                                onCoronalChange = { slicerCoronal = it },
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .offset(y = 16.dp),
+                            )
                     }
 
                     // Options menu
                     Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(y = (-76).dp)
+                        modifier =
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(y = (-76).dp),
                     ) {
                         ImageDetailOptionsMenu(
                             expanded = showDropdown,
@@ -138,7 +147,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                         showDropdown = false
                                     }
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -153,46 +162,50 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                 },
                 onSlicerClick = {
                     currentView = if (currentView == "Slicer") "None" else "Slicer"
-                }
+                },
             )
         }
     }
 
     // Support Dialog
-    SupportDialog(
-        showDialog = showSupportDialog,
-        onDismiss = { showSupportDialog = false }
-    )
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { showSupportDialog = false },
+            context = LocalContext.current,
+        )
+    }
 
     // More Info Dialog
     if (showMoreInfoDialog) {
         Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
             Box(
-                modifier = Modifier
-                    .size(width = 280.dp, height = 273.dp)
-                    .background(
-                        color = Color.White,
-                        shape = RoundedCornerShape(24.dp)
-                    )
+                modifier =
+                    Modifier
+                        .size(width = 280.dp, height = 273.dp)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(24.dp),
+                        ),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_info),
                         contentDescription = "Information",
                         tint = Color.Black,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Study description",
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.Black,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -210,9 +223,10 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         TextButton(
                             onClick = { showMoreInfoDialog = false },
                             modifier = Modifier.align(Alignment.BottomEnd),
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = LightBlue
-                            )
+                            colors =
+                                ButtonDefaults.textButtonColors(
+                                    contentColor = LightBlue,
+                                ),
                         ) {
                             Text("OK")
                         }
@@ -224,24 +238,28 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
+private fun InfoRow(
+    label: String,
+    value: String,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 1.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp),
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = SubheadingColor
+            color = SubheadingColor,
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = SubheadingColor
+            color = SubheadingColor,
         )
     }
 }
