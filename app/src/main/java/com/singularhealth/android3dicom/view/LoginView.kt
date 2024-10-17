@@ -488,7 +488,10 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.labelLarge,
                 color = DarkBlue,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable { /* Handle sign up */ },
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://3dicomviewer.com/pricing/"))
+                    context.startActivity(intent) // Launch the browser with the URL
+                },
             )
         }
     }
