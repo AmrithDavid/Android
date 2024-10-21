@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,8 +27,10 @@ import com.singularhealth.android3dicom.viewmodel.BiometricLoginViewModel
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
+    var context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        viewModel.onLoad()
+        viewModel.onLoad(context)
     }
 
     Column(
@@ -111,7 +114,7 @@ fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.labelLarge,
                 color = DarkBlue,
                 textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable { /* Handle sign up */ },
+                modifier = Modifier.clickable { viewModel.onDifferentAccount() },
             )
         }
     }

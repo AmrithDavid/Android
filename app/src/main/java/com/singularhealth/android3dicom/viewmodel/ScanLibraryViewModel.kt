@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.text.Typography.dagger
 
 @HiltViewModel
 class ScanLibraryViewModel
@@ -53,8 +52,7 @@ class ScanLibraryViewModel
         private val _triggerBiometricPrompt = MutableStateFlow(false)
         val triggerBiometricPrompt: StateFlow<Boolean> = _triggerBiometricPrompt.asStateFlow()
 
-
-    init {
+        init {
             viewModelScope.launch {
                 loadData()
                 _dataLoaded.value = true
@@ -71,8 +69,6 @@ class ScanLibraryViewModel
         fun showSupportDialog(show: Boolean) {
             _showSupportDialog.value = show
         }
-
-
 
         fun loadData() {
             _isBiometricLoginActive.value = appState.loginPreference == LoginPreferenceOption.BIOMETRIC
@@ -175,14 +171,13 @@ class ScanLibraryViewModel
             // Implement biometric action
             _isBiometricLoginActive.value = !_isBiometricLoginActive.value
             appState.loginPreference =
-                if (_isBiometricLoginActive.value)
-                {
+                if (_isBiometricLoginActive.value) {
                     LoginPreferenceOption.BIOMETRIC
                 } else {
                     LoginPreferenceOption.PIN
                 }
 
-            //Save the selected preference asynchronously
+            // Save the selected preference asynchronously
             saveLoginPreference(appState.loginPreference)
 
             if (appState.loginPreference == LoginPreferenceOption.BIOMETRIC) {
@@ -224,12 +219,12 @@ class ScanLibraryViewModel
         fun onAboutClick() {
             // Show the About dialog when this function is called
             _showAboutDialog.value = true
-            toggleSideMenu()  // Close side menu
+            toggleSideMenu() // Close side menu
         }
 
         fun onSupportClick() {
             // Show the Support dialog when this function is called
             _showSupportDialog.value = true
-            toggleSideMenu()  // Close side menu
+            toggleSideMenu() // Close side menu
         }
     }

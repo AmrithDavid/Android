@@ -1,6 +1,8 @@
 package com.singularhealth.android3dicom.view
 
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
+import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
@@ -57,6 +60,8 @@ fun NavigationGraph() {
                 IAppStateEntryPoint::class.java,
             ).appState()
 
+
+
     appState.setNavController(navController)
 
     var startRoute = getStartRoute(appState)
@@ -73,7 +78,6 @@ fun NavigationGraph() {
         }
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(
-                scanLibraryViewModel = scanLibraryViewModel,
                 onBackClick = {
                     navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }
