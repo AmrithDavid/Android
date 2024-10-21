@@ -1,8 +1,6 @@
 package com.singularhealth.android3dicom.view
 
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
@@ -14,12 +12,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
-import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
-import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -49,8 +45,6 @@ enum class ViewRoute {
 fun NavigationGraph() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val scanLibraryViewModel: ScanLibraryViewModel = hiltViewModel()
-    // val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val searchQuery = remember { mutableStateOf("") }
 
     val appState: AppState =
@@ -59,8 +53,6 @@ fun NavigationGraph() {
                 LocalContext.current as ComponentActivity,
                 IAppStateEntryPoint::class.java,
             ).appState()
-
-
 
     appState.setNavController(navController)
 
