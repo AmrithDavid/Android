@@ -1,12 +1,10 @@
 package com.singularhealth.android3dicom.model
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
@@ -110,6 +108,7 @@ class AppState
         // Listeners
         private var onScansReceived: ((List<ScanModel>) -> Unit)? = null
         private var onBiometricAuthSuccess: (() -> Unit)? = null
+        private var onUserDataReceived: ((UserModel) -> Unit)? = null
 
         init {
             // Check for existing login preference stored in settings and loads if available
@@ -158,6 +157,10 @@ class AppState
                 networkClient.fetchUserInfo(accessToken!!)?.let { currentUser = it }
                 getScans { onScansReceived?.invoke(it) }
             }
+
+            val userInfo = networkClient.fetchUserInfo(accessToken!!)
+            currentUser = userInfo
+            currentUser?.let { onUserDataReceived?.invoke(it) }
             callback(accessToken != null)
         }
 
@@ -202,6 +205,14 @@ class AppState
 
         fun setOnScansReceivedListener(listener: (List<ScanModel>) -> Unit) {
             onScansReceived = listener
+        }
+
+        fun setOnUserDataReceivedListener(listener: (UserModel) -> Unit) {
+            onUserDataReceived = listener
+        }
+
+        fun getCurrentUserName(): String {
+            return currentUser?.firstName ?: "Guest" // Provide a default value
         }
 
         fun initialiseBiometricPrompt(
@@ -280,15 +291,4 @@ class AppState
                     onSuccess()
                 }
             }
-
-        private fun onEnrolAttempt(result: ActivityResult) {
-            if (result.resultCode == Activity.RESULT_OK) {
-                Log.d("ENROL_INTENT", "Biometric enrolment succeeded")
-                onBiometricAuthSuccess?.invoke()
-            } else {
-                val errMsg = "The biometric enrolment failed with code: + ${result.resultCode}"
-                Log.e("ENROL_INTENT", errMsg)
-                Toast.makeText(promptActivity, errMsg, Toast.LENGTH_LONG).show()
-            }
-        }
     }

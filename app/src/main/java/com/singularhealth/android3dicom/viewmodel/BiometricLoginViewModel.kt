@@ -20,9 +20,15 @@ class BiometricLoginViewModel
         private val _showSupportDialog = MutableStateFlow(false)
         val showSupportDialog: StateFlow<Boolean> = _showSupportDialog.asStateFlow()
 
+        private var _username = MutableStateFlow("")
+        val username: StateFlow<String> = _username.asStateFlow()
+
         fun onLoad(context: Context) {
             appState.initialiseBiometricPrompt(context, ::onLoginSuccess, ::onLoginError)
             appState.promptBiometricLogin()
+
+            appState.setOnUserDataReceivedListener { _username.value = it.firstName }
+            _username.value = appState.getCurrentUserName()
         }
 
         fun onSupport() {

@@ -1,5 +1,6 @@
 package com.singularhealth.android3dicom.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.singularhealth.android3dicom.model.AppState
@@ -21,7 +22,7 @@ class ScanLibraryViewModel
         private val appState: AppState,
         private val cacheManager: CacheManager,
     ) : ViewModel() {
-        private val _greeting = MutableStateFlow("Hello Sam")
+        private val _greeting = MutableStateFlow("Hello")
         val greeting: StateFlow<String> = _greeting.asStateFlow()
 
         private val _patientCards = MutableStateFlow<List<PatientCardData>>(emptyList())
@@ -53,11 +54,9 @@ class ScanLibraryViewModel
         val triggerBiometricPrompt: StateFlow<Boolean> = _triggerBiometricPrompt.asStateFlow()
 
         init {
-            viewModelScope.launch {
-                loadData()
-                _dataLoaded.value = true
-                _loginPreference.value = appState.loginPreference
-            }
+            loadData()
+            _dataLoaded.value = true
+            _loginPreference.value = appState.loginPreference
         }
 
         // Method to toggle About dialog visibility
@@ -72,15 +71,17 @@ class ScanLibraryViewModel
 
         fun loadData() {
             _isBiometricLoginActive.value = appState.loginPreference == LoginPreferenceOption.BIOMETRIC
-            loadPatientCards()
+            loadPatientData()
         }
 
-        private fun loadPatientCards() {
+        private fun loadPatientData() {
             // _patientCards.value = generateDummyData()
             // Register for update from AppState when new scans are available
             appState.setOnScansReceivedListener { processScanData(it) }
+            appState.setOnUserDataReceivedListener { updateGreeting(it.firstName) }
             // Load scans manually in case they are already available
             if (appState.isLoggedIn()) {
+                updateGreeting(appState.getCurrentUserName())
                 appState.getScans { processScanData(it) }
             }
         }
@@ -144,6 +145,7 @@ class ScanLibraryViewModel
             )
 
         fun updateGreeting(name: String) {
+            Log.d("ScanLibraryViewModel", "Setting name to $name")
             _greeting.value = "Hello $name"
         }
 
