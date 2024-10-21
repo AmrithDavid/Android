@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.text.Typography.dagger
 
 @HiltViewModel
 class ScanLibraryViewModel
@@ -47,10 +46,17 @@ class ScanLibraryViewModel
         private val _showSupportDialog = MutableStateFlow(false)
         val showSupportDialog: StateFlow<Boolean> = _showSupportDialog.asStateFlow()
 
+        private val _loginPreference = MutableStateFlow<LoginPreferenceOption>(LoginPreferenceOption.NONE)
+        val loginPreference: StateFlow<LoginPreferenceOption> = _loginPreference.asStateFlow()
+
+        private val _triggerBiometricPrompt = MutableStateFlow(false)
+        val triggerBiometricPrompt: StateFlow<Boolean> = _triggerBiometricPrompt.asStateFlow()
+
         init {
             viewModelScope.launch {
                 loadData()
                 _dataLoaded.value = true
+                _loginPreference.value = appState.loginPreference
             }
         }
 
@@ -63,8 +69,6 @@ class ScanLibraryViewModel
         fun showSupportDialog(show: Boolean) {
             _showSupportDialog.value = show
         }
-
-
 
         fun loadData() {
             _isBiometricLoginActive.value = appState.loginPreference == LoginPreferenceOption.BIOMETRIC
@@ -167,8 +171,44 @@ class ScanLibraryViewModel
             // Implement biometric action
             _isBiometricLoginActive.value = !_isBiometricLoginActive.value
             appState.loginPreference =
-                if (_isBiometricLoginActive.value) LoginPreferenceOption.BIOMETRIC else LoginPreferenceOption.PIN
+                if (_isBiometricLoginActive.value) {
+                    LoginPreferenceOption.BIOMETRIC
+                } else {
+                    LoginPreferenceOption.PIN
+                }
+
+            // Save the selected preference asynchronously
+            saveLoginPreference(appState.loginPreference)
+
+            if (appState.loginPreference == LoginPreferenceOption.BIOMETRIC) {
+                _triggerBiometricPrompt.value = true // Trigger the biometric prompt
+                println("ScanLibraryViewModel: Trigger biometric prompt")
+            }
+
             toggleSideMenu()
+            println("toggle clicked")
+        }
+
+        fun resetBiometricTrigger() {
+//            _triggerBiometricPrompt.value = false
+            viewModelScope.launch {
+                println("Resetting biometric trigger...")
+                kotlinx.coroutines.delay(100) // Slight delay to ensure state update propagation
+                _triggerBiometricPrompt.value = false
+                println("Biometric trigger reset to false")
+            }
+        }
+
+        fun triggerBiometricLogin() {
+            _triggerBiometricPrompt.value = true
+        }
+
+        fun saveLoginPreference(preference: LoginPreferenceOption) {
+            viewModelScope.launch {
+                appState.loginPreference = preference
+                _loginPreference.value = preference
+                println("saved login preference")
+            }
         }
 
         fun onLogoutClick() {
@@ -179,12 +219,12 @@ class ScanLibraryViewModel
         fun onAboutClick() {
             // Show the About dialog when this function is called
             _showAboutDialog.value = true
-            toggleSideMenu()  // Close side menu
+            toggleSideMenu() // Close side menu
         }
 
         fun onSupportClick() {
             // Show the Support dialog when this function is called
             _showSupportDialog.value = true
-            toggleSideMenu()  // Close side menu
+            toggleSideMenu() // Close side menu
         }
     }
