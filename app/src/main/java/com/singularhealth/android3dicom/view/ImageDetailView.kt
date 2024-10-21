@@ -122,11 +122,6 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                         lower_limit = range.start
                                     ) // Update ViewModel
                                 },
-//                                modifier =
-//                                    Modifier
-//                                        .align(Alignment.BottomCenter)
-//                                        .fillMaxWidth()
-//                                        .offset(y = 16.dp),
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .fillMaxWidth()
@@ -652,24 +647,18 @@ fun WindowingUI(
     onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit // New callback for preset changes
 ) {
     var expanded by remember { mutableStateOf(false) }
-    //var selectedPreset by remember { mutableStateOf("Custom") }
     var selectedPreset by remember { mutableStateOf(ImageDetailViewModel.WindowingPreset.CUSTOM) }
-    var selectedIcon by remember { mutableStateOf(R.drawable.ic_list) }
 
-    // Presets dropdown options with corresponding icons
-    val presets =
-        listOf(
-//            "Bone (100, 2400)" to R.drawable.ic_bone,
-//            "Brain (0, 80)" to R.drawable.ic_brain,
-//            "Liver (-45, 105)" to R.drawable.ic_liver,
-//            "Lungs (-1350, 150)" to R.drawable.ic_lung,
-//            "Muscle (-05, 150)" to R.drawable.ic_muscle,
-            ImageDetailViewModel.WindowingPreset.BONES to R.drawable.ic_bone,
-            ImageDetailViewModel.WindowingPreset.BRAIN to R.drawable.ic_brain,
-            ImageDetailViewModel.WindowingPreset.LIVER to R.drawable.ic_liver,
-            ImageDetailViewModel.WindowingPreset.LUNGS to R.drawable.ic_lung,
-            ImageDetailViewModel.WindowingPreset.MUSCLE to R.drawable.ic_muscle
-        )
+    //dictionary of preset icon, text and enum
+    val presetMap = mapOf(
+        ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
+        ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
+        ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
+        ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
+        ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle)
+    )
+
+    val (selectedText, selectedIcon) = presetMap[selectedPreset] ?: ("Custom" to R.drawable.ic_list)
 
     Column(
         modifier =
@@ -729,11 +718,11 @@ fun WindowingUI(
                             // Icon + Text inside the button
                             Icon(
                                 painter = painterResource(id = selectedIcon),
-                                contentDescription = "Presets",
+                                contentDescription = "Preset Icon",
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(selectedPreset.name)
+                            Text(selectedText)
                             Spacer(modifier = Modifier.weight(1f)) // Push dropdown arrow to the end
 
                             Icon(
@@ -754,13 +743,13 @@ fun WindowingUI(
                                 .padding(8.dp)
                                 .offset(y = (-10).dp), // Slight offset to avoid overlap with threshold
                     ) {
-                        presets.forEach { (preset, icon) ->
+                        presetMap.forEach { (preset, value) ->
+                            val (text, icon) = value
                             DropdownMenuItem(
                                 onClick = {
                                     selectedPreset = preset
-                                    selectedIcon = icon
-                                    expanded = false
                                     onPresetChange(preset) // Notify parent about the change
+                                    expanded = false
                                 },
                                 text = {
                                     Row(
@@ -769,11 +758,11 @@ fun WindowingUI(
                                     ) {
                                         Icon(
                                             painter = painterResource(id = icon),
-                                            contentDescription = null,
+                                            contentDescription = "Preset Icon",
                                             modifier = Modifier.size(20.dp),
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(text = preset.name, modifier = Modifier.align(Alignment.CenterVertically))
+                                        Text(text = text)
                                     }
                                 },
                             )

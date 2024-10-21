@@ -126,7 +126,7 @@ class ImageDetailViewModel
             lower_limit: Float
         ) {
 
-            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with MIN: $lower_limit, MAX: $upper_limit")
+            Log.d("ImageDetailViewModel", "Windowing slider updated for [$preset] preset with MIN: $lower_limit, MAX: $upper_limit")
 
         }
     }
