@@ -3,8 +3,6 @@
 package com.singularhealth.android3dicom.view
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -90,10 +88,12 @@ fun ScanLibraryView(
         if (filteredCards.isNotEmpty()) {
             CardList(
                 modifier = Modifier.padding(innerPadding),
-                patientCards = filteredCards
+                patientCards = filteredCards,
             )
-        } else {
+        } else if (patientCards.isNotEmpty()) {
             NoSearchResultView()
+        } else {
+            EmptyStateView()
         }
     }
 
@@ -101,9 +101,9 @@ fun ScanLibraryView(
     if (isSideMenuVisible) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color(0x52000000)),
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x52000000)),
         )
     }
 
@@ -124,7 +124,7 @@ fun ScanLibraryView(
     // Show About dialog
     if (showAboutDialog) {
         AboutDialog(
-            onDismissRequest = { viewModel.showAboutDialog(false) }
+            onDismissRequest = { viewModel.showAboutDialog(false) },
         )
     }
 
@@ -132,7 +132,7 @@ fun ScanLibraryView(
     if (showSupportDialog) {
         SupportDialog(
             onDismissRequest = { viewModel.showSupportDialog(false) },
-            context = context
+            context = context,
         )
     }
 
@@ -161,9 +161,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color(0x80000000)),
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
@@ -185,9 +185,9 @@ fun ScanLibraryView(
     if (isClearingCache) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color(0x80000000)),
+                Modifier
+                    .fillMaxSize()
+                    .background(Color(0x80000000)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
