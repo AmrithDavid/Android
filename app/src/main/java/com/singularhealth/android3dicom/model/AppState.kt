@@ -158,6 +158,16 @@ class AppState
                 networkClient.fetchUserInfo(accessToken!!)?.let { currentUser = it }
                 getScans { onScansReceived?.invoke(it) }
             }
+
+            //TODO: remove debug logging
+            val userInfo = networkClient.fetchUserInfo(accessToken!!)
+            currentUser = userInfo
+            if (currentUser != null) {
+                println("Login successful, currentUser: ${currentUser?.firstName}")
+            } else {
+                println( "Failed to fetch user info")
+            }
+
             callback(accessToken != null)
         }
 
@@ -202,6 +212,14 @@ class AppState
 
         fun setOnScansReceivedListener(listener: (List<ScanModel>) -> Unit) {
             onScansReceived = listener
+        }
+
+        fun getCurrentUserName(): String {
+            if(isLoggedIn()){
+                println("get username: logged in")
+            }
+
+            return currentUser?.firstName ?: "Guest"  // Provide a default value
         }
 
         fun initialiseBiometricPrompt(

@@ -21,7 +21,7 @@ class ScanLibraryViewModel
         private val appState: AppState,
         private val cacheManager: CacheManager,
     ) : ViewModel() {
-        private val _greeting = MutableStateFlow("Hello Sam")
+        private val _greeting = MutableStateFlow("Hello")
         val greeting: StateFlow<String> = _greeting.asStateFlow()
 
         private val _patientCards = MutableStateFlow<List<PatientCardData>>(emptyList())
@@ -55,8 +55,16 @@ class ScanLibraryViewModel
         init {
             viewModelScope.launch {
                 loadData()
+                waitForUserData()
+                updateGreeting(appState.getCurrentUserName())
                 _dataLoaded.value = true
                 _loginPreference.value = appState.loginPreference
+            }
+        }
+
+        private suspend fun waitForUserData() {
+            while (!appState.isLoggedIn()) {
+                kotlinx.coroutines.delay(100)  // Small delay to avoid busy-waiting
             }
         }
 
