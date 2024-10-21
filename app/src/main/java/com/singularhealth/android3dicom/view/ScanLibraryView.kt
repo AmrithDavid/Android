@@ -93,7 +93,7 @@ fun ScanLibraryView(
                 patientCards = filteredCards
             )
         } else {
-            EmptyStateView()
+            NoSearchResultView()
         }
     }
 
