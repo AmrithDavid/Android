@@ -47,10 +47,14 @@ class ScanLibraryViewModel
         private val _showSupportDialog = MutableStateFlow(false)
         val showSupportDialog: StateFlow<Boolean> = _showSupportDialog.asStateFlow()
 
+        private val _loginPreference = MutableStateFlow<LoginPreferenceOption>(LoginPreferenceOption.NONE)
+        val loginPreference: StateFlow<LoginPreferenceOption> = _loginPreference.asStateFlow()
+
         init {
             viewModelScope.launch {
                 loadData()
                 _dataLoaded.value = true
+                _loginPreference.value = appState.loginPreference
             }
         }
 
@@ -167,8 +171,26 @@ class ScanLibraryViewModel
             // Implement biometric action
             _isBiometricLoginActive.value = !_isBiometricLoginActive.value
             appState.loginPreference =
-                if (_isBiometricLoginActive.value) LoginPreferenceOption.BIOMETRIC else LoginPreferenceOption.PIN
+                if (_isBiometricLoginActive.value)
+                {
+                    LoginPreferenceOption.BIOMETRIC
+                } else {
+                    LoginPreferenceOption.PIN
+                }
+
+            //Save the selected preference asynchronously
+            saveLoginPreference(appState.loginPreference)
+
             toggleSideMenu()
+            println("biometric clicked")
+        }
+
+        fun saveLoginPreference(preference: LoginPreferenceOption) {
+            viewModelScope.launch {
+                appState.loginPreference = preference
+                _loginPreference.value = preference
+                println("saved login preference")
+            }
         }
 
         fun onLogoutClick() {

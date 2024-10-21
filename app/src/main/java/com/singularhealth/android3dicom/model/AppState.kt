@@ -80,6 +80,7 @@ class AppState
                 appStateScope.launch {
                     _dataStore.setString(::_loginPreference.name, value.toString())
                 }
+                println("appstate: saved login preference")
             }
 
         private var onScansReceived: ((List<ScanModel>) -> Unit)? = null
