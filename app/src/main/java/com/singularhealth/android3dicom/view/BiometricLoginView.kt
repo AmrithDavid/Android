@@ -31,6 +31,7 @@ import com.singularhealth.android3dicom.viewmodel.BiometricLoginViewModel
 @Composable
 fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
     val showSupportDialog by viewModel.showSupportDialog.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
     var context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -87,7 +88,7 @@ fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
                         .padding(bottom = 29.dp),
             )
             Text(
-                text = "Hello Jacob",
+                text = "Hello $username",
                 style = MaterialTheme.typography.titleLarge,
             )
             Spacer(modifier = Modifier.height(8.dp))
