@@ -28,7 +28,7 @@ interface ISingularHealthRestService {
     )
     suspend fun getUserInfo(
         @Header("Authorization") token: String,
-    ): UserModel
+    ): Response<UserModel>
 
     @PUT("api/Mftp/V2/Share")
     @Headers(

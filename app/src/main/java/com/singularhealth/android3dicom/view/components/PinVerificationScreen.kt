@@ -38,9 +38,14 @@ fun PinVerificationScreen(
 ) {
     var pin by remember { mutableStateOf("") }
     val pinState by viewModel.pinState.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val view = LocalView.current
+
+    LaunchedEffect(Unit) {
+        viewModel.onLoad()
+    }
 
     SideEffect {
         val window = (context as? android.app.Activity)?.window
@@ -100,7 +105,7 @@ fun PinVerificationScreen(
             )
 
             Text(
-                text = "Hello Jacob",
+                text = "Hello $username",
                 style = MaterialTheme.typography.headlineMedium,
                 color = TitleColor,
                 modifier = Modifier.padding(bottom = 8.dp),

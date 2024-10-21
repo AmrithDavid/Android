@@ -32,8 +32,16 @@ class PinViewModel
         private val _pinState = MutableStateFlow<PinState>(PinState.Initial)
         val pinState: StateFlow<PinState> = _pinState.asStateFlow()
 
+        private var _username = MutableStateFlow("")
+        val username: StateFlow<String> = _username.asStateFlow()
+
         private val _isFirstPinComplete = MutableStateFlow(false)
         val isFirstPinComplete: StateFlow<Boolean> = _isFirstPinComplete.asStateFlow()
+
+        fun onLoad() {
+            appState.setOnUserDataReceivedListener { _username.value = it.firstName }
+            _username.value = appState.getCurrentUserName()
+        }
 
         fun updateFirstPin(pin: String) {
             _firstPin.value = pin

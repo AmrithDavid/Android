@@ -101,8 +101,9 @@ class NetworkClient
             var user: UserModel? = null
             try {
                 val response = singularHealthRestService.getUserInfo("Bearer $accessToken")
-                Log.d(LOG_TAG, "User Info Retrieved: $response")
-                user = response
+                Log.d(LOG_TAG, "Received fetchUserInfo response:" + response.body().toString())
+                response.body()?.let { user = it }
+                Log.d(LOG_TAG, "User Info Retrieved: $user")
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error fetching user info", e)
             }
