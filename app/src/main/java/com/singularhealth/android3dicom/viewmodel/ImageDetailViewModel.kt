@@ -1,5 +1,6 @@
 package com.singularhealth.android3dicom.viewmodel
 
+import android.transition.Slide
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +20,21 @@ class ImageDetailViewModel
     constructor(
         private var appState: AppState,
     ) : ViewModel() {
+        enum class WindowingPreset {
+            CUSTOM,
+            BONES,
+            BRAIN,
+            LIVER,
+            LUNGS,
+            MUSCLE,
+        }
+
+        enum class SlicerView {
+            TRANSVERSE,
+            SAGITTAL,
+            CORONAL,
+        }
+
         private val _isInitialLoading = MutableStateFlow(true)
         val isInitialLoading: StateFlow<Boolean> = _isInitialLoading.asStateFlow()
 
@@ -58,6 +74,14 @@ class ImageDetailViewModel
             Log.d("ImageDetailViewModel", "Support UI not implemented yet")
         }
 
+        fun onNextImage() {
+            Log.d("ImageDetailViewModel", "Next image pressed")
+        }
+
+        fun onPrevImage() {
+            Log.d("ImageDetailViewModel", "Previous image pressed")
+        }
+
         // Top bar tab callback functions
         fun on3DClick() {
             Log.d("ImageDetailViewModel", "Selected 3D tab")
@@ -76,4 +100,33 @@ class ImageDetailViewModel
         }
 
         // Bottom panel controls callback functions
+        fun onBrightnessSliderUpdate(value: Float) {
+            Log.d("ImageDetailViewModel", "Brightness slider updated with value: $value")
+        }
+
+        fun onContrastSliderUpdate(value: Float) {
+            Log.d("ImageDetailViewModel", "Contrast slider updated with value: $value")
+        }
+
+        fun onOpacitySliderUpdate(value: Float) {
+            Log.d("ImageDetailViewModel", "Opacity slider updated with value: $value")
+        }
+
+        fun onSlicerSliderUpdate(
+            option: SlicerView,
+            upper_limit: Float,
+            lower_limit: Float
+        ) {
+            Log.d("ImageDetailViewModel", "Slicer [$option] Upper: $upper_limit, Lower: $lower_limit")
+        }
+
+        fun onWindowingSliderUpdate(
+            preset: WindowingPreset,
+            upper_limit: Float,
+            lower_limit: Float
+        ) {
+
+            Log.d("ImageDetailViewModel", "Windowing slider updated for [$preset] preset with MIN: $lower_limit, MAX: $upper_limit")
+
+        }
     }

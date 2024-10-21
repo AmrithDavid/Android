@@ -47,6 +47,8 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
 
     val isInitialLoading by viewModel.isInitialLoading.collectAsState()
 
+    var selectedPreset by remember { mutableStateOf(ImageDetailViewModel.WindowingPreset.CUSTOM) }
+
     Android3DicomTheme {
         Column(modifier = Modifier.fillMaxSize()) {
             ImageDetailTopBar(
@@ -86,11 +88,20 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         "Display" ->
                             DisplayUI(
                                 brightnessValue = displayBrightness,
-                                onBrightnessChange = { displayBrightness = it },
+                                onBrightnessChange = { value ->
+                                    displayBrightness = value
+                                    viewModel.onBrightnessSliderUpdate(value) // Update ViewModel
+                                },
                                 contrastValue = displayContrast,
-                                onContrastChange = { displayContrast = it },
+                                onContrastChange = { value ->
+                                    displayContrast = value
+                                    viewModel.onContrastSliderUpdate(value) // Update ViewModel
+                                },
                                 opacityValue = displayOpacity,
-                                onOpacityChange = { displayOpacity = it },
+                                onOpacityChange = { value ->
+                                    displayOpacity = value
+                                    viewModel.onOpacitySliderUpdate(value) // Update ViewModel
+                                },
                                 modifier =
                                     Modifier
                                         .align(Alignment.BottomCenter)
@@ -100,21 +111,51 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         "Windowing" ->
                             WindowingUI(
                                 sliderRange = windowingRange,
-                                onRangeChange = { windowingRange = it },
-                                modifier =
-                                    Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .fillMaxWidth()
-                                        .offset(y = 16.dp),
+                                onPresetChange = { preset ->
+                                    selectedPreset = preset // Update the selected preset state
+                                },
+                                onRangeChange = { range ->
+                                    windowingRange = range
+                                    viewModel.onWindowingSliderUpdate(
+                                        preset = selectedPreset,
+                                        upper_limit = range.endInclusive,
+                                        lower_limit = range.start
+                                    ) // Update ViewModel
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
+                                    .offset(y = 16.dp),
                             )
                         "Slicer" ->
                             SlicerUI(
                                 transverseValue = slicerTransverse,
-                                onTransverseChange = { slicerTransverse = it },
+                                onTransverseChange = { range ->
+                                    slicerTransverse = range
+                                    viewModel.onSlicerSliderUpdate(
+                                        option = ImageDetailViewModel.SlicerView.TRANSVERSE,
+                                        upper_limit = range.endInclusive,
+                                        lower_limit = range.start
+                                    ) // Update ViewModel
+                                },
                                 sagittalValue = slicerSagittal,
-                                onSagittalChange = { slicerSagittal = it },
+                                onSagittalChange = { range ->
+                                    slicerSagittal = range
+                                    viewModel.onSlicerSliderUpdate(
+                                        option = ImageDetailViewModel.SlicerView.SAGITTAL,
+                                        upper_limit = range.endInclusive,
+                                        lower_limit = range.start
+                                    ) // Update ViewModel
+                                },
                                 coronalValue = slicerCoronal,
-                                onCoronalChange = { slicerCoronal = it },
+                                onCoronalChange = { range ->
+                                    slicerCoronal = range
+                                    viewModel.onSlicerSliderUpdate(
+                                        option = ImageDetailViewModel.SlicerView.CORONAL,
+                                        upper_limit = range.endInclusive,
+                                        lower_limit = range.start
+                                    ) // Update ViewModel
+                                },
                                 modifier =
                                     Modifier
                                         .align(Alignment.BottomCenter)
@@ -603,20 +644,21 @@ fun WindowingUI(
     sliderRange: ClosedFloatingPointRange<Float>, // Shared range for Windowing slider
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit, // Callback to update the range
     modifier: Modifier = Modifier,
+    onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit // New callback for preset changes
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedPreset by remember { mutableStateOf("Custom") }
-    var selectedIcon by remember { mutableStateOf(R.drawable.ic_list) }
+    var selectedPreset by remember { mutableStateOf(ImageDetailViewModel.WindowingPreset.CUSTOM) }
 
-    // Presets dropdown options with corresponding icons
-    val presets =
-        listOf(
-            "Bone (100, 2400)" to R.drawable.ic_bone,
-            "Brain (0, 80)" to R.drawable.ic_brain,
-            "Liver (-45, 105)" to R.drawable.ic_liver,
-            "Lungs (-1350, 150)" to R.drawable.ic_lung,
-            "Muscle (-05, 150)" to R.drawable.ic_muscle,
-        )
+    //dictionary of preset icon, text and enum
+    val presetMap = mapOf(
+        ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
+        ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
+        ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
+        ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
+        ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle)
+    )
+
+    val (selectedText, selectedIcon) = presetMap[selectedPreset] ?: ("Custom" to R.drawable.ic_list)
 
     Column(
         modifier =
@@ -676,11 +718,11 @@ fun WindowingUI(
                             // Icon + Text inside the button
                             Icon(
                                 painter = painterResource(id = selectedIcon),
-                                contentDescription = "Presets",
+                                contentDescription = "Preset Icon",
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(selectedPreset)
+                            Text(selectedText)
                             Spacer(modifier = Modifier.weight(1f)) // Push dropdown arrow to the end
 
                             Icon(
@@ -701,11 +743,12 @@ fun WindowingUI(
                                 .padding(8.dp)
                                 .offset(y = (-10).dp), // Slight offset to avoid overlap with threshold
                     ) {
-                        presets.forEach { (presetText, icon) ->
+                        presetMap.forEach { (preset, value) ->
+                            val (text, icon) = value
                             DropdownMenuItem(
                                 onClick = {
-                                    selectedPreset = presetText
-                                    selectedIcon = icon
+                                    selectedPreset = preset
+                                    onPresetChange(preset) // Notify parent about the change
                                     expanded = false
                                 },
                                 text = {
@@ -715,11 +758,11 @@ fun WindowingUI(
                                     ) {
                                         Icon(
                                             painter = painterResource(id = icon),
-                                            contentDescription = null,
+                                            contentDescription = "Preset Icon",
                                             modifier = Modifier.size(20.dp),
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text(text = presetText, modifier = Modifier.align(Alignment.CenterVertically))
+                                        Text(text = text)
                                     }
                                 },
                             )
