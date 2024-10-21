@@ -1,5 +1,6 @@
 package com.singularhealth.android3dicom.viewmodel
 
+import android.transition.Slide
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,11 +33,6 @@ class ImageDetailViewModel
             TRANSVERSE,
             SAGITTAL,
             CORONAL,
-        }
-
-        enum class SliderLimit {
-            UPPER,
-            LOWER,
         }
 
         private val _isInitialLoading = MutableStateFlow(true)
@@ -117,110 +113,20 @@ class ImageDetailViewModel
         }
 
         fun onSlicerSliderUpdate(
-            value: Float,
             option: SlicerView,
-            limit: SliderLimit,
+            upper_limit: Float,
+            lower_limit: Float
         ) {
-            when (option) {
-                SlicerView.TRANSVERSE -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                    }
-                }
-                SlicerView.SAGITTAL -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                    }
-                }
-                SlicerView.CORONAL -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Slicer slider updated for $option view with value: $value")
-                        }
-                    }
-                }
-            }
+            Log.d("ImageDetailViewModel", "Slicer [$option] Upper: $upper_limit, Lower: $lower_limit")
         }
 
         fun onWindowingSliderUpdate(
-            value: Float,
             preset: WindowingPreset,
-            limit: SliderLimit,
+            upper_limit: Float,
+            lower_limit: Float
         ) {
-            when (preset) {
-                WindowingPreset.CUSTOM -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-                WindowingPreset.BONES -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-                WindowingPreset.BRAIN -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-                WindowingPreset.LIVER -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-                WindowingPreset.LUNGS -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-                WindowingPreset.MUSCLE -> {
-                    when (limit) {
-                        SliderLimit.UPPER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                        SliderLimit.LOWER -> {
-                            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with value: $value")
-                        }
-                    }
-                }
-            }
+
+            Log.d("ImageDetailViewModel", "Windowing slider updated for $preset preset with MIN: $lower_limit, MAX: $upper_limit")
+
         }
     }
