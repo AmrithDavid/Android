@@ -177,4 +177,8 @@ class AppState
         fun setOnScansReceivedListener(listener: (List<ScanModel>) -> Unit) {
             onScansReceived = listener
         }
+
+        fun promptBiometricLogin() {
+            // Use BiometricUtils to trigger an authentication prompt
+        }
     }

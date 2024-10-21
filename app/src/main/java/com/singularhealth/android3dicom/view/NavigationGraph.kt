@@ -159,7 +159,7 @@ fun NavigationGraph() {
 fun getStartRoute(appState: AppState): String =
     when (appState.loginPreference) {
         LoginPreferenceOption.NONE -> ViewRoute.LOGIN.toString()
-        LoginPreferenceOption.BIOMETRIC -> ViewRoute.SCAN_LIBRARY.toString()
+        LoginPreferenceOption.BIOMETRIC -> ViewRoute.BIOMETRIC_LOGIN.toString()
         LoginPreferenceOption.PIN -> {
             if (appState.isPinSet()) {
                 ViewRoute.PIN_VERIFICATION.toString()
