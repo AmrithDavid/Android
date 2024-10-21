@@ -86,11 +86,20 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         "Display" ->
                             DisplayUI(
                                 brightnessValue = displayBrightness,
-                                onBrightnessChange = { displayBrightness = it },
+                                onBrightnessChange = { value ->
+                                    displayBrightness = value
+                                    viewModel.onBrightnessSliderUpdate(value) // Update ViewModel
+                                },
                                 contrastValue = displayContrast,
-                                onContrastChange = { displayContrast = it },
+                                onContrastChange = { value ->
+                                    displayContrast = value
+                                    viewModel.onContrastSliderUpdate(value) // Update ViewModel
+                                },
                                 opacityValue = displayOpacity,
-                                onOpacityChange = { displayOpacity = it },
+                                onOpacityChange = { value ->
+                                    displayOpacity = value
+                                    viewModel.onOpacitySliderUpdate(value) // Update ViewModel
+                                },
                                 modifier =
                                     Modifier
                                         .align(Alignment.BottomCenter)
@@ -100,7 +109,14 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         "Windowing" ->
                             WindowingUI(
                                 sliderRange = windowingRange,
-                                onRangeChange = { windowingRange = it },
+                                onRangeChange = { range ->
+                                    windowingRange = range
+                                    viewModel.onWindowingSliderUpdate(
+                                        range.endInclusive,
+                                        ImageDetailViewModel.WindowingPreset.CUSTOM,
+                                        ImageDetailViewModel.SliderLimit.UPPER
+                                    ) // Update ViewModel
+                                },
                                 modifier =
                                     Modifier
                                         .align(Alignment.BottomCenter)
