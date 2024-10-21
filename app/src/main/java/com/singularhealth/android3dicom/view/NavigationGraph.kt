@@ -16,6 +16,7 @@ import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholde
 import com.singularhealth.android3dicom.view.components.PinSetupScreen
 import com.singularhealth.android3dicom.view.components.PinVerificationScreen
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
+import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -45,6 +46,7 @@ enum class ViewRoute {
 fun NavigationGraph() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val scanLibraryViewModel: ScanLibraryViewModel = hiltViewModel()
     // val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val searchQuery = remember { mutableStateOf("") }
 
@@ -71,6 +73,7 @@ fun NavigationGraph() {
         }
         composable(ViewRoute.LOGIN_SETUP.toString()) {
             LoginSetupView(
+                scanLibraryViewModel = scanLibraryViewModel,
                 onBackClick = {
                     navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.LOGIN_SETUP.toString()) { inclusive = true }

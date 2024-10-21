@@ -33,16 +33,21 @@ import com.singularhealth.android3dicom.ui.theme.*
 import com.singularhealth.android3dicom.utilities.BiometricAuthListener
 import com.singularhealth.android3dicom.utilities.BiometricUtils
 import com.singularhealth.android3dicom.viewmodel.LoginSetupViewModel
+import com.singularhealth.android3dicom.viewmodel.ScanLibraryViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun LoginSetupView(
     viewModel: LoginSetupViewModel = hiltViewModel(),
+    scanLibraryViewModel: ScanLibraryViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onNavigateToPinSetup: () -> Unit,
     onNavigateToBiometricSetup: () -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
+
+    //val scanLibraryViewModel: ScanLibraryViewModel = hiltViewModel()
+
     val loginPreference by viewModel.loginPreference.collectAsStateWithLifecycle()
     val navigateToPinSetup by viewModel.navigateToPinSetup.collectAsStateWithLifecycle()
     val navigateToBiometricSetup by viewModel.navigateToBiometricSetup.collectAsStateWithLifecycle()
@@ -54,7 +59,13 @@ fun LoginSetupView(
     var biometricPrompt by remember { mutableStateOf<BiometricPrompt?>(null) }
     var promptInfo by remember { mutableStateOf<BiometricPrompt.PromptInfo?>(null) }
 
+    val triggerBiometricPrompt by scanLibraryViewModel.triggerBiometricPrompt.collectAsStateWithLifecycle()
+
     val view = LocalView.current
+
+    // Debug print to verify the state
+    println("LoginSetupView: triggerBiometricPrompt = $triggerBiometricPrompt")
+
 
     SideEffect {
         val window =
@@ -81,6 +92,7 @@ fun LoginSetupView(
                 description = "Log in using your biometric credential",
                 negativeText = "Cancel",
             )
+        println("LoginSetupView: Biometric prompt initialized")
     }
 
     LaunchedEffect(navigateToPinSetup) {
@@ -101,6 +113,17 @@ fun LoginSetupView(
         if (navigateToLogin) {
             onNavigateToLogin()
             viewModel.onNavigatedToLogin()
+        }
+    }
+
+    // Trigger the biometric prompt when the value changes to true
+    LaunchedEffect(triggerBiometricPrompt) {
+        println("LoginSetupView: LaunchedEffect triggered with value: $triggerBiometricPrompt")
+
+        if (triggerBiometricPrompt) {
+            //biometricPrompt?.authenticate(promptInfo!!)
+            scanLibraryViewModel.resetBiometricTrigger()
+            println("Login setup view: Reset the trigger")
         }
     }
 
@@ -392,6 +415,7 @@ fun LoginSetupViewPreview() {
     Android3DicomTheme {
         LoginSetupView(
             viewModel = hiltViewModel(),
+            scanLibraryViewModel = hiltViewModel(),
             onBackClick = {},
             onNavigateToPinSetup = {},
             onNavigateToBiometricSetup = {},

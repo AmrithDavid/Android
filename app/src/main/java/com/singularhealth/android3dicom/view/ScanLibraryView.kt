@@ -37,7 +37,6 @@ fun ScanLibraryView(
     searchQuery: MutableState<String>,
     onLogout: () -> Unit,
 ) {
-
     val context = LocalContext.current // Get context here
     val greeting by viewModel.greeting.collectAsState()
     val patientCards by viewModel.patientCards.collectAsState()
@@ -118,7 +117,7 @@ fun ScanLibraryView(
             onAboutClick = { viewModel.onAboutClick() },
             onSupportClick = { viewModel.onSupportClick() },
             onLogoutClick = { showLogoutDialog = true },
-            isBiometricEnabled = isBiometricEnabled,
+            isBiometricEnabled = !isBiometricEnabled,
         )
     }
 
