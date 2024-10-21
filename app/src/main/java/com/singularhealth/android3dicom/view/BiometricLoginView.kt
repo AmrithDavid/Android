@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,13 +21,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.singularhealth.android3dicom.R
 import com.singularhealth.android3dicom.ui.theme.DarkBlue
+import com.singularhealth.android3dicom.view.components.SupportDialog
 import com.singularhealth.android3dicom.viewmodel.BiometricLoginViewModel
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
+    val showSupportDialog by viewModel.showSupportDialog.collectAsStateWithLifecycle()
     var context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -61,6 +65,7 @@ fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
                 text = "Support",
                 style = MaterialTheme.typography.titleMedium,
                 color = DarkBlue,
+                modifier = Modifier.clickable { viewModel.onSupport() },
             )
         }
 
@@ -96,7 +101,8 @@ fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
                 contentDescription = "Fingerprint",
                 modifier =
                     Modifier
-                        .size(150.dp),
+                        .size(150.dp)
+                        .clickable { viewModel.onFingerprint() },
             )
         }
 
@@ -117,6 +123,13 @@ fun BiometricLoginView(viewModel: BiometricLoginViewModel = hiltViewModel()) {
                 modifier = Modifier.clickable { viewModel.onDifferentAccount() },
             )
         }
+    }
+
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { viewModel.onDismissSupport() },
+            context = LocalContext.current,
+        )
     }
 }
 

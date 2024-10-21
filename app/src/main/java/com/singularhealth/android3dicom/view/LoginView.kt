@@ -395,7 +395,6 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
         }
     }
 
-    // Use the new SupportDialog component
     if (showSupportDialog) {
         SupportDialog(
             onDismissRequest = { showSupportDialog = false },

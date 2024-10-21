@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.view.ViewRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,13 +17,24 @@ class BiometricLoginViewModel
     constructor(
         var appState: AppState,
     ) : ViewModel() {
+        private val _showSupportDialog = MutableStateFlow(false)
+        val showSupportDialog: StateFlow<Boolean> = _showSupportDialog.asStateFlow()
+
         fun onLoad(context: Context) {
             appState.initialiseBiometricPrompt(context, ::onLoginSuccess, ::onLoginError)
             appState.promptBiometricLogin()
         }
 
         fun onSupport() {
-            // Show support dialogue; probably toggle boolean
+            _showSupportDialog.value = true
+        }
+
+        fun onDismissSupport() {
+            _showSupportDialog.value = false
+        }
+
+        fun onFingerprint() {
+            appState.promptBiometricLogin()
         }
 
         fun onDifferentAccount() {

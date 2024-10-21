@@ -3,7 +3,6 @@
 package com.singularhealth.android3dicom.view
 
 import android.app.Activity
-import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -48,10 +47,6 @@ fun LoginSetupView(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     val context = LocalContext.current as FragmentActivity
-
-    var biometricPrompt by remember { mutableStateOf<BiometricPrompt?>(null) }
-    var promptInfo by remember { mutableStateOf<BiometricPrompt.PromptInfo?>(null) }
-
     val view = LocalView.current
 
     SideEffect {
