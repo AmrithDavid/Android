@@ -76,7 +76,7 @@ class ScanLibraryViewModel
         }
 
         private fun loadPatientData() {
-            // _patientCards.value = generateDummyData()
+            //_patientCards.value = generateDummyData()
             // Register for update from AppState when new scans are available
             appState.setOnScansReceivedListener { processScanData(it) }
             appState.setOnUserDataReceivedListener { updateGreeting(it.firstName) }
