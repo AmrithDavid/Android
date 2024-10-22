@@ -137,4 +137,22 @@ class LoginViewModel
             _isDebugMode.value = !_isDebugMode.value
             Log.d("LoginViewModel", "Debug mode toggled. New value: ${_isDebugMode.value}")
         }
+
+        // Callback for Google Login
+        fun onGoogleLogin() {
+            Log.d("LoginViewModel", "Google login initiated")
+            // Handle Google login logic here
+        }
+
+        // Callback for Microsoft Login
+        fun onMicrosoftLogin() {
+            Log.d("LoginViewModel", "Microsoft login initiated")
+            // Handle Microsoft login logic here
+        }
+
+        // Callback for Apple Login
+        fun onAppleLogin() {
+            Log.d("LoginViewModel", "Apple login initiated")
+            // Handle Apple login logic here
+        }
     }

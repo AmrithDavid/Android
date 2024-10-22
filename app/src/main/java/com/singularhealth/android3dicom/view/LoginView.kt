@@ -333,7 +333,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                         contentDescription = "Sign in with Microsoft",
                         modifier =
                             Modifier
-                                .clickable { /* Trigger Microsoft Sign-In */ }
+                                .clickable { viewModel.onMicrosoftLogin() }
                                 .size(38.dp),
                     )
                 }
@@ -344,7 +344,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                     modifier =
                         Modifier
                             .offset(x = 15.dp, y = (-28).dp)
-                            .clickable { /* Trigger Apple Sign-In */ }
+                            .clickable { viewModel.onAppleLogin() }
                             .size(120.dp),
                 )
 
@@ -358,7 +358,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                         contentDescription = "Sign in with Google",
                         modifier =
                             Modifier
-                                .clickable { /* Trigger Google Sign-In */ }
+                                .clickable { viewModel.onGoogleLogin() }
                                 .size(70.dp),
                     )
                 }
