@@ -288,7 +288,11 @@ fun ScanCard(
 
     // Display the dialog if `showDeleteDialog` is true
     if (viewModel.showDeleteDialog.value) {
-        DeleteDialog(onDismiss = { viewModel.onCloseDeleteDialog() })
+        DeleteDialog(onDismiss = { viewModel.onCloseDeleteDialog() },
+            onDeleteConfirm = {
+                // Add your delete logic here
+                viewModel.performDeleteAction()
+            })
     }
 }
 
@@ -339,7 +343,7 @@ fun MoreInfoDialog(onDismiss: () -> Unit) {
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.BottomEnd),
                         colors = ButtonDefaults.textButtonColors(
-                            contentColor = LightBlue,
+                            contentColor = Color(0xFF50A5DE),
                         ),
                     ) {
                         Text("OK")
@@ -351,7 +355,7 @@ fun MoreInfoDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun DeleteDialog(onDismiss: () -> Unit) {
+fun DeleteDialog(onDismiss: () -> Unit, onDeleteConfirm: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = Modifier
@@ -388,15 +392,28 @@ fun DeleteDialog(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Box(modifier = Modifier.fillMaxWidth()) {
+                // Row to hold the Cancel and Delete buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Absolute.Right,
+                ) {
+                    // Cancel Button
                     TextButton(
                         onClick = onDismiss,
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = LightBlue,
-                        ),
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF606066)),
                     ) {
-                        Text("OK")
+                        Text("Cancel")
+                    }
+
+                    // Delete Button
+                    TextButton(
+                        onClick = {
+                            onDeleteConfirm() // Call the delete action
+                            onDismiss() // Close the dialog
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF50A5DE)),
+                    ) {
+                        Text("Delete")
                     }
                 }
             }

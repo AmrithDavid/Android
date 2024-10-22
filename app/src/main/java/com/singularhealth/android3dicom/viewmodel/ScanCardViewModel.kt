@@ -35,9 +35,10 @@ class ScanCardViewModel
         }
 
         fun onMoreInfo() {
-            // Logic to handle "More info" action
-            Log.d("ScanCardViewModel", "More info clicked")
-            showMoreInfoDialog.value = true
+            if (!showMoreInfoDialog.value) { // Avoid triggering if already open
+                Log.d("ScanCardViewModel", "More info clicked")
+                showMoreInfoDialog.value = true
+            }
         }
 
         // Function to close the More Info dialog
@@ -46,13 +47,19 @@ class ScanCardViewModel
         }
 
         fun onDelete() {
-            // Logic to handle "Delete" action
-            Log.d("ScanCardViewModel", "Delete clicked")
-            showDeleteDialog.value = true
+            if (!showDeleteDialog.value) { // Avoid triggering if already open
+                Log.d("ScanCardViewModel", "Delete clicked")
+                showDeleteDialog.value = true
+            }
         }
 
         // Function to close the More Info dialog
         fun onCloseDeleteDialog() {
             showDeleteDialog.value = false
+        }
+
+        fun performDeleteAction() {
+            Log.d("ScanCardViewModel", "Performing delete...")
+            // Add delete logic here (e.g., API call or database operation)
         }
     }
