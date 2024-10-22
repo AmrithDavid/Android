@@ -1,4 +1,4 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
+@file:Suppress("ktlint:standard:import-ordering", "ktlint:standard:no-wildcard-imports")
 
 package com.singularhealth.android3dicom.view
 
@@ -102,7 +102,7 @@ fun NavigationGraph() {
                     }
                 },
                 onBackClick = {
-                    navController.popBackStack() // This will navigate back to the previous screen (LOGIN_SETUP)
+                    navController.popBackStack()
                 },
             )
         }
@@ -123,6 +123,11 @@ fun NavigationGraph() {
                     }
                 },
                 onNavigateToLogin = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.PIN_VERIFICATION.toString()) { inclusive = true }
+                    }
+                },
+                onForgotPin = {
                     navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.PIN_VERIFICATION.toString()) { inclusive = true }
                     }

@@ -36,6 +36,7 @@ fun PinVerificationScreen(
     viewModel: PinViewModel = hiltViewModel(),
     onVerificationSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit = {},
+    onForgotPin: () -> Unit = {},
 ) {
     var pin by remember { mutableStateOf("") }
     val pinState by viewModel.pinState.collectAsStateWithLifecycle()
@@ -313,7 +314,10 @@ fun PinVerificationScreen(
                 modifier =
                     Modifier
                         .padding(end = 16.dp)
-                        .clickable { /* Handle forgotten PIN */ },
+                        .clickable {
+                            viewModel.clearPins()
+                            onForgotPin()
+                        },
             )
         }
     }
