@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:import-ordering", "ktlint:standard:no-wildcard-imports")
+
 package com.singularhealth.android3dicom.view
 
 import androidx.activity.ComponentActivity
@@ -12,9 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.singularhealth.android3dicom.model.AppState
 import com.singularhealth.android3dicom.model.LoginPreferenceOption
-import com.singularhealth.android3dicom.view.components.BiometricSetupPlaceholderScreen
-import com.singularhealth.android3dicom.view.components.PinSetupScreen
-import com.singularhealth.android3dicom.view.components.PinVerificationScreen
+import com.singularhealth.android3dicom.view.components.*
 import com.singularhealth.android3dicom.viewmodel.LoginViewModel
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -102,7 +102,7 @@ fun NavigationGraph() {
                     }
                 },
                 onBackClick = {
-                    navController.popBackStack() // This will navigate back to the previous screen (LOGIN_SETUP)
+                    navController.popBackStack()
                 },
             )
         }
@@ -119,6 +119,16 @@ fun NavigationGraph() {
             PinVerificationScreen(
                 onVerificationSuccess = {
                     navController.navigate(ViewRoute.SCAN_LIBRARY.toString()) {
+                        popUpTo(ViewRoute.PIN_VERIFICATION.toString()) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
+                        popUpTo(ViewRoute.PIN_VERIFICATION.toString()) { inclusive = true }
+                    }
+                },
+                onForgotPin = {
+                    navController.navigate(ViewRoute.LOGIN.toString()) {
                         popUpTo(ViewRoute.PIN_VERIFICATION.toString()) { inclusive = true }
                     }
                 },
