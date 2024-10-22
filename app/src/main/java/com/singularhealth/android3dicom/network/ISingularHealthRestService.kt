@@ -12,7 +12,6 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ISingularHealthRestService {
@@ -46,6 +45,9 @@ interface ISingularHealthRestService {
     ): Response<FetchCardResponseData>
 
     @DELETE("/api/Mftp/V2")
+    @Headers(
+        "Swagger-Origin: https://api.singular.health",
+    )
     suspend fun deleteScan(
         @Header("Authorization") token: String,
         @Query("scanId") scanId: String,

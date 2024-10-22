@@ -1,6 +1,5 @@
 package com.singularhealth.android3dicom.viewmodel
 
-import android.transition.Slide
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,7 +68,27 @@ class ImageDetailViewModel
         }
 
         fun onDelete() {
-            Log.d("ImageDetailViewModel", "Delete UI not implemented yet")
+            _showDeleteDialog.value = true
+        }
+
+        fun onDeleteDialogDismiss() {
+            _showDeleteDialog.value = false
+        }
+
+        fun onDeleteDialogConfirm() {
+            appState.deleteScan { onDeleteResult(it) }
+            _showDeleteDialog.value = false
+        }
+
+        private fun onDeleteResult(isSuccess: Boolean) {
+            Log.d("ImageDetailViewModel", "Delete result is $isSuccess")
+            if (isSuccess) {
+                Log.d("ImageDetailViewModel", "Scan deleted successfully")
+                appState.navigateTo(ViewRoute.SCAN_LIBRARY)
+            } else {
+                Log.e("ImageDetailViewModel", "Failed to delete scan")
+                // Show toast notifying of failed delete
+            }
         }
 
         fun onReport() {
@@ -105,34 +124,6 @@ class ImageDetailViewModel
             Log.d("ImageDetailViewModel", "Selected Coronal tab")
         }
 
-        // Toggle delete dialog visibility
-        fun showDeleteDialog(show: Boolean) {
-            _showDeleteDialog.value = show
-        }
-
-        // Perform scan deletion
-        fun deleteScan() {
-            appState.deleteScan { success ->
-                if (success) {
-                    println("ImageDetailViewModel: Scan deleted successfully")
-                    appState.navigateBack() // Navigate back after deletion
-                } else {
-                    println("ImageDetailViewModel: Failed to delete scan")
-                }
-            }
-        }
-
-//        fun deleteScan(scanFileName: String) {
-//            viewModelScope.launch {
-//                val success = networkClient.fetchAndDeleteScan(scanFileName)
-//                if (success) {
-//                    println("ImageDetailViewModel: Scan deleted successfully")
-//                } else {
-//                    println("ImageDetailViewModel: Failed to delete scan")
-//                }
-//            }
-//        }
-
         // Bottom panel controls callback functions
         fun onBrightnessSliderUpdate(value: Float) {
             Log.d("ImageDetailViewModel", "Brightness slider updated with value: $value")
@@ -149,7 +140,7 @@ class ImageDetailViewModel
         fun onSlicerSliderUpdate(
             option: SlicerView,
             upper_limit: Float,
-            lower_limit: Float
+            lower_limit: Float,
         ) {
             Log.d("ImageDetailViewModel", "Slicer [$option] Upper: $upper_limit, Lower: $lower_limit")
         }
@@ -157,10 +148,8 @@ class ImageDetailViewModel
         fun onWindowingSliderUpdate(
             preset: WindowingPreset,
             upper_limit: Float,
-            lower_limit: Float
+            lower_limit: Float,
         ) {
-
             Log.d("ImageDetailViewModel", "Windowing slider updated for [$preset] preset with MIN: $lower_limit, MAX: $upper_limit")
-
         }
     }

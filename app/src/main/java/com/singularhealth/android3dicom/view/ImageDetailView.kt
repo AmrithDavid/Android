@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -122,13 +121,14 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onWindowingSliderUpdate(
                                         preset = selectedPreset,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .offset(y = 16.dp),
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .offset(y = 16.dp),
                             )
                         "Slicer" ->
                             SlicerUI(
@@ -138,7 +138,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.TRANSVERSE,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 sagittalValue = slicerSagittal,
@@ -147,7 +147,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.SAGITTAL,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 coronalValue = slicerCoronal,
@@ -156,7 +156,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.CORONAL,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 modifier =
@@ -213,13 +213,78 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
             if (showDeleteDialog) {
                 println("View: showing dialog")
                 DeleteConfirmationDialog(
-                    onDismiss = { viewModel.showDeleteDialog(false) },
-                    onConfirmDelete = {
-                        println("View: confirming delete")
-                        viewModel.deleteScan()  // Trigger the delete function in the ViewModel
-                        viewModel.showDeleteDialog(false)
-                    }
+                    onDismiss = { viewModel.onDeleteDialogDismiss() },
+                    onConfirmDelete = { viewModel.onDeleteDialogConfirm() },
                 )
+            }
+        }
+    }
+
+    // Support Dialog
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { showSupportDialog = false },
+            context = LocalContext.current,
+        )
+    }
+
+    // More Info Dialog
+    if (showMoreInfoDialog) {
+        Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(width = 280.dp, height = 273.dp)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(24.dp),
+                        ),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_info),
+                        contentDescription = "Information",
+                        tint = Color.Black,
+                        modifier = Modifier.size(32.dp),
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Study description",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        InfoRow("Date added:", "dd/mm/yyyy")
+                        InfoRow("Image count:", "257")
+                        InfoRow("Series description:", "Chest")
+                        InfoRow("Series number:", "3")
+                        InfoRow("Instance ID:", "1.2.3.4.5.6.789")
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        TextButton(
+                            onClick = { showMoreInfoDialog = false },
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            colors =
+                                ButtonDefaults.textButtonColors(
+                                    contentColor = LightBlue,
+                                ),
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                }
             }
         }
     }
@@ -232,40 +297,42 @@ fun DeleteConfirmationDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            modifier = Modifier
-                .size(width = 280.dp, height = 240.dp),
+            modifier =
+                Modifier
+                    .size(width = 280.dp, height = 240.dp),
             shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_delete),
                     contentDescription = "Delete",
                     modifier = Modifier.size(24.dp),
-                    tint = Color(0xFF1D1D1F)
+                    tint = Color(0xFF1D1D1F),
                 )
                 Text(
                     text = "Delete scan?",
                     style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 Text(
                     text = "Deleting this scan will mean it is no longer accessible on this device or through the web portal.",
                     style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
                     textAlign = TextAlign.Left,
-                    lineHeight = 15.sp
+                    lineHeight = 15.sp,
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ){
+                    horizontalArrangement = Arrangement.End,
+                ) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel", color = Color(0xFF606066))
                     }
@@ -274,172 +341,6 @@ fun DeleteConfirmationDialog(
                         onConfirmDelete()
                     }) {
                         Text("Delete", color = Color(0xFF50A5DE))
-                    }
-                }
-
-            }
-        }
-    }
-
-    // Support Dialog
-    if (showSupportDialog) {
-        SupportDialog(
-            onDismissRequest = { showSupportDialog = false },
-            context = LocalContext.current,
-        )
-    }
-
-    // More Info Dialog
-    if (showMoreInfoDialog) {
-        Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(width = 280.dp, height = 273.dp)
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(24.dp),
-                        ),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_info),
-                        contentDescription = "Information",
-                        tint = Color.Black,
-                        modifier = Modifier.size(32.dp),
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Study description",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.Black,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        InfoRow("Date added:", "dd/mm/yyyy")
-                        InfoRow("Image count:", "257")
-                        InfoRow("Series description:", "Chest")
-                        InfoRow("Series number:", "3")
-                        InfoRow("Instance ID:", "1.2.3.4.5.6.789")
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        TextButton(
-                            onClick = { showMoreInfoDialog = false },
-                            modifier = Modifier.align(Alignment.BottomEnd),
-                            colors =
-                                ButtonDefaults.textButtonColors(
-                                    contentColor = LightBlue,
-                                ),
-                        ) {
-                            Text("OK")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(
-    label: String,
-    value: String,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 1.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            color = SubheadingColor,
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = SubheadingColor,
-        )
-    }
-
-    // Support Dialog
-    if (showSupportDialog) {
-        SupportDialog(
-            onDismissRequest = { showSupportDialog = false },
-            context = LocalContext.current,
-        )
-    }
-
-    // More Info Dialog
-    if (showMoreInfoDialog) {
-        Dialog(onDismissRequest = { showMoreInfoDialog = false }) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(width = 280.dp, height = 273.dp)
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(24.dp),
-                        ),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_info),
-                        contentDescription = "Information",
-                        tint = Color.Black,
-                        modifier = Modifier.size(32.dp),
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Study description",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.Black,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        InfoRow("Date added:", "dd/mm/yyyy")
-                        InfoRow("Image count:", "257")
-                        InfoRow("Series description:", "Chest")
-                        InfoRow("Series number:", "3")
-                        InfoRow("Instance ID:", "1.2.3.4.5.6.789")
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        TextButton(
-                            onClick = { showMoreInfoDialog = false },
-                            modifier = Modifier.align(Alignment.BottomEnd),
-                            colors =
-                                ButtonDefaults.textButtonColors(
-                                    contentColor = LightBlue,
-                                ),
-                        ) {
-                            Text("OK")
-                        }
                     }
                 }
             }
@@ -813,19 +714,20 @@ fun WindowingUI(
     sliderRange: ClosedFloatingPointRange<Float>, // Shared range for Windowing slider
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit, // Callback to update the range
     modifier: Modifier = Modifier,
-    onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit // New callback for preset changes
+    onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit, // New callback for preset changes
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedPreset by remember { mutableStateOf(ImageDetailViewModel.WindowingPreset.CUSTOM) }
 
-    //dictionary of preset icon, text and enum
-    val presetMap = mapOf(
-        ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
-        ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
-        ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
-        ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
-        ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle)
-    )
+    // dictionary of preset icon, text and enum
+    val presetMap =
+        mapOf(
+            ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
+            ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
+            ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
+            ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
+            ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle),
+        )
 
     val (selectedText, selectedIcon) = presetMap[selectedPreset] ?: ("Custom" to R.drawable.ic_list)
 

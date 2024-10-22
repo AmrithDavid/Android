@@ -291,18 +291,9 @@ class AppState
                     onSuccess()
                 }
             }
-        }
 
-        fun getScanId(): String {
+        fun getScanId(): String = currentScan.id
 
-            return currentScan.id
-        }
-
-
-        /**
-         * Function to delete the current scan.
-         * It will use the accessToken and currentScan to perform the deletion via NetworkClient.
-         */
         fun deleteScan(callback: (Boolean) -> Unit) {
             println("AppState: in deleteScan function")
             println("Access Token: $accessToken")
@@ -322,5 +313,4 @@ class AppState
                 }
             }
         }
-
     }
