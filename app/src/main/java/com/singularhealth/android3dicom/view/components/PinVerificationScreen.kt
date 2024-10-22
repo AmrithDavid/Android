@@ -39,9 +39,18 @@ fun PinVerificationScreen(
     var pin by remember { mutableStateOf("") }
     val pinState by viewModel.pinState.collectAsStateWithLifecycle()
     val username by viewModel.username.collectAsStateWithLifecycle()
+    var showSupportDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val view = LocalView.current
+
+    // Handle the support dialog
+    if (showSupportDialog) {
+        SupportDialog(
+            onDismissRequest = { showSupportDialog = false },
+            context = context,
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.onLoad()
@@ -66,7 +75,8 @@ fun PinVerificationScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = statusBarHeight + 10.dp, end = 16.dp),
+                    .padding(top = statusBarHeight + 10.dp, end = 16.dp)
+                    .clickable { showSupportDialog = true },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
