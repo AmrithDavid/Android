@@ -35,6 +35,7 @@ import com.singularhealth.android3dicom.viewmodel.PinViewModel
 fun PinVerificationScreen(
     viewModel: PinViewModel = hiltViewModel(),
     onVerificationSuccess: () -> Unit,
+    onNavigateToLogin: () -> Unit = {},
 ) {
     var pin by remember { mutableStateOf("") }
     val pinState by viewModel.pinState.collectAsStateWithLifecycle()
@@ -286,7 +287,10 @@ fun PinVerificationScreen(
                 modifier =
                     Modifier
                         .padding(start = 16.dp)
-                        .clickable { /* Handle different account */ },
+                        .clickable {
+                            viewModel.clearPins()
+                            onNavigateToLogin()
+                        },
             )
 
             Spacer(modifier = Modifier.width(16.dp))
