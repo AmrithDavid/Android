@@ -156,13 +156,15 @@ class NetworkClient
             try {
                 accessToken ?: throw Exception("No access token found for share scan request")
                 val response = singularHealthRestService.shareScan(accessToken, scanId, emailList)
+                Log.d(LOG_TAG, "The response is: ${response.body()} and code: ${response.code()}")
                 response.code() == DELETE_SUCCESS
             } catch (e: Exception) {
                 Log.e(LOG_TAG, e.message.toString())
                 false
             }
 
-        suspend fun deleteScanFromServer(
+        // delete the fetched scan from the server
+        suspend fun deleteScan(
             accessToken: String?,
             scanId: String,
         ): Boolean =
@@ -174,4 +176,21 @@ class NetworkClient
                 Log.e(LOG_TAG, e.message.toString())
                 false
             }
+
+        // fetch the scan to be deleted
+//        suspend fun fetchAndDeleteScan(scanFileName: String): Boolean {
+//            // First, fetch the scans
+//            val scans = fetchScans(accessToken) // assuming fetchScans returns a list of ScanModel
+//
+//            // Find the scan that matches the provided file name or some other identifier
+//            val scanToDelete = scans.find { it.fileName == scanFileName }
+//
+//            return if (scanToDelete != null) {
+//                // If the scan is found, call the deleteScan method
+//                deleteScanFromServer(accessToken, scanToDelete.id)
+//            } else {
+//                // If no scan is found, return false or handle accordingly
+//                false
+//            }
+//        }
     }

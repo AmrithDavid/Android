@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.singularhealth.android3dicom.R
@@ -35,6 +36,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
     var showMoreInfoDialog by remember { mutableStateOf(false) }
     var selectedButton by remember { mutableStateOf("3D") }
     var currentView by remember { mutableStateOf("None") }
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
 
     // Shared slider state variables
     var displayBrightness by remember { mutableStateOf(0.5f) }
@@ -119,13 +121,14 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onWindowingSliderUpdate(
                                         preset = selectedPreset,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .fillMaxWidth()
-                                    .offset(y = 16.dp),
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .offset(y = 16.dp),
                             )
                         "Slicer" ->
                             SlicerUI(
@@ -135,7 +138,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.TRANSVERSE,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 sagittalValue = slicerSagittal,
@@ -144,7 +147,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.SAGITTAL,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 coronalValue = slicerCoronal,
@@ -153,7 +156,7 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                                     viewModel.onSlicerSliderUpdate(
                                         option = ImageDetailViewModel.SlicerView.CORONAL,
                                         upper_limit = range.endInclusive,
-                                        lower_limit = range.start
+                                        lower_limit = range.start,
                                     ) // Update ViewModel
                                 },
                                 modifier =
@@ -205,6 +208,15 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                     currentView = if (currentView == "Slicer") "None" else "Slicer"
                 },
             )
+
+            // Show the delete confirmation dialog
+            if (showDeleteDialog) {
+                println("View: showing dialog")
+                DeleteConfirmationDialog(
+                    onDismiss = { viewModel.onDeleteDialogDismiss() },
+                    onConfirmDelete = { viewModel.onDeleteDialogConfirm() },
+                )
+            }
         }
     }
 
@@ -271,6 +283,64 @@ fun ImageDetailView(viewModel: ImageDetailViewModel = hiltViewModel()) {
                         ) {
                             Text("OK")
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier =
+                Modifier
+                    .size(width = 280.dp, height = 240.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_delete),
+                    contentDescription = "Delete",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color(0xFF1D1D1F),
+                )
+                Text(
+                    text = "Delete scan?",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = "Deleting this scan will mean it is no longer accessible on this device or through the web portal.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = SubheadingColor),
+                    textAlign = TextAlign.Left,
+                    lineHeight = 15.sp,
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", color = Color(0xFF606066))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextButton(onClick = {
+                        onConfirmDelete()
+                    }) {
+                        Text("Delete", color = Color(0xFF50A5DE))
                     }
                 }
             }
@@ -644,19 +714,20 @@ fun WindowingUI(
     sliderRange: ClosedFloatingPointRange<Float>, // Shared range for Windowing slider
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit, // Callback to update the range
     modifier: Modifier = Modifier,
-    onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit // New callback for preset changes
+    onPresetChange: (ImageDetailViewModel.WindowingPreset) -> Unit, // New callback for preset changes
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedPreset by remember { mutableStateOf(ImageDetailViewModel.WindowingPreset.CUSTOM) }
 
-    //dictionary of preset icon, text and enum
-    val presetMap = mapOf(
-        ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
-        ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
-        ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
-        ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
-        ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle)
-    )
+    // dictionary of preset icon, text and enum
+    val presetMap =
+        mapOf(
+            ImageDetailViewModel.WindowingPreset.BONES to ("Bone (100, 2400)" to R.drawable.ic_bone),
+            ImageDetailViewModel.WindowingPreset.BRAIN to ("Brain (0, 80)" to R.drawable.ic_brain),
+            ImageDetailViewModel.WindowingPreset.LIVER to ("Liver (-45, 105)" to R.drawable.ic_liver),
+            ImageDetailViewModel.WindowingPreset.LUNGS to ("Lungs (-1350, 150)" to R.drawable.ic_lung),
+            ImageDetailViewModel.WindowingPreset.MUSCLE to ("Muscle (-05, 150)" to R.drawable.ic_muscle),
+        )
 
     val (selectedText, selectedIcon) = presetMap[selectedPreset] ?: ("Custom" to R.drawable.ic_list)
 

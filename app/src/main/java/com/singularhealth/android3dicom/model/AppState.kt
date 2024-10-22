@@ -291,4 +291,26 @@ class AppState
                     onSuccess()
                 }
             }
+
+        fun getScanId(): String = currentScan.id
+
+        fun deleteScan(callback: (Boolean) -> Unit) {
+            println("AppState: in deleteScan function")
+            println("Access Token: $accessToken")
+            appStateScope.launch {
+                if (accessToken != null && ::currentScan.isInitialized) {
+                    val success = networkClient.deleteScan(accessToken, currentScan.id)
+                    if (success) {
+                        println("$LOG_TAG Scan deleted successfully.")
+                        callback(true)
+                    } else {
+                        println("$LOG_TAG failed to delete.")
+                        callback(false)
+                    }
+                } else {
+                    println("$LOG_TAG Access token not initialised")
+                    callback(false)
+                }
+            }
+        }
     }
